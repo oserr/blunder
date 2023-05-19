@@ -41,6 +41,8 @@ GetRookAttacks(std::uint32_t sq, BitBoard blocking) noexcept
     attacks |= bit;
     if (bit & blocking) break;
   }
+
+  return attacks;
 }
 
 BitBoard
