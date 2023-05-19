@@ -1,6 +1,8 @@
 #include "bitboard_io.h"
 
+#include <algorithm>
 #include <getopt.h>
+#include <functional>
 #include <iostream>
 #include <string>
 #include <string_view>
@@ -27,8 +29,8 @@ int
 main(int argc, char** argv)
 {
   int square = -1;
-  bool print_diag_mask = false;
-  bool print_file_mask = false;
+  bool print_dmask = false;
+  bool print_fmask = false;
   bool print_bmask = false;
   bool print_rmask = false;
 
@@ -56,10 +58,10 @@ main(int argc, char** argv)
         PrintHelp(argv[0], std::cout);
         return EXIT_SUCCESS;
       case 'd':
-        print_diag_mask = true;
+        print_dmask = true;
         break;
       case 'f':
-        print_file_mask = true;
+        print_fmask = true;
         break;
       case 'b':
         print_bmask = true;
@@ -84,11 +86,18 @@ main(int argc, char** argv)
     }
   }
 
+  const bool flags[4] = {
+    print_dmask,
+    print_fmask,
+    print_bmask,
+    print_rmask
+  };
+
   if (square == -1) {
     std::cerr << "Need to specify a square.\n";
     PrintHelp(argv[0], std::cerr);
     return EXIT_FAILURE;
-  } else if (not print_diag_mask and not print_file_mask) {
+  } else if (std::ranges::none_of(flags, std::identity())) {
     std::cerr << "Need to specify a mask for the square.\n";
     PrintHelp(argv[0], std::cerr);
     return EXIT_FAILURE;
@@ -97,13 +106,13 @@ main(int argc, char** argv)
   auto diag_mask = kDiagMask[square];
   auto file_mask = kFileRankMask[square];
 
-  if (print_diag_mask && print_file_mask) {
+  if (print_dmask && print_fmask) {
     std::cout << "Diagonal, rank, and file mask...\n";
     std::cout << ToMailboxStr(diag_mask | file_mask) << std::endl;
-  } else if (print_diag_mask) {
+  } else if (print_dmask) {
     std::cout << "Diagonal mask...\n";
     std::cout << ToMailboxStr(diag_mask) << std::endl;
-  } else if (print_file_mask) {
+  } else if (print_fmask) {
     std::cout << "Rank and file mask...\n";
     std::cout << ToMailboxStr(file_mask) << std::endl;
   }
