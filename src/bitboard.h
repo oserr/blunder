@@ -91,7 +91,7 @@ inline constexpr BitBoard kDiagG8H7 = kDiagF8H6 << 8;
 
 // Mask for the outer squares of the board. This is helpful for ignoring the
 // outer squares when computing sliding attacks.
-inline constexpr BitBoard kOutSquares = kFileA | kFileH | kRank1 | kRank8;
+inline constexpr BitBoard kOuterSquares = kFileA | kFileH | kRank1 | kRank8;
 
 // Colored squres.
 inline constexpr BitBoard kLightSquares = 0x55aa55aa55aa55aa;
