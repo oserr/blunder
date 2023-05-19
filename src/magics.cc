@@ -134,17 +134,11 @@ MagicAttacks::ComputeBishopMagics()
 
   std::random_device rand_dev;
   std::mt19937_64 rand_gen{rand_dev()};
-  auto rand_fn = [&rand_gen]{
-    return rand_gen() & rand_gen() & rand_gen();
-  };
+  auto rand_fn = [&rand_gen]{ return rand_gen() & rand_gen() & rand_gen(); };
 
   for (auto s = 0u; s < 64u; ++s) {
     auto magic_info =
-      FindMagic(s,
-          kBishopShifts[s],
-          GetBishopMask,
-          GetBishopAttacks,
-          rand_fn);
+      FindMagic(s, kBishopShifts[s], GetBishopMask, GetBishopAttacks, rand_fn);
 
     if (not magic_info) {
       std::cerr << "Unable to find magic for square=" << s << std::endl;

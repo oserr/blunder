@@ -16,12 +16,12 @@ void
 PrintHelp(std::string_view prog, std::ostream& os)
 {
   os << "Usage: " << prog << " [options] ...\n"
-     << "     -h/--help      Print this help message.\n"
-     << "     -s/--square    The square to print the mask for.\n"
-     << "     -d/--diag      If set, prints the diagonal mask.\n"
-     << "     -f/--file      If set, prints the rank and file mask.\n"
-     << "     -b/--bmask     If set, prints the maks of attacks for a bishop.\n"
-     << "     -r/--rmask     If set, prints the maks of attacks for a rook.\n"
+     << "     -h|--help      Print this help message.\n"
+     << "     -s|--square    The square to print the mask for.\n"
+     << "     -d|--diag      If set, prints the diagonal mask.\n"
+     << "     -f|--file      If set, prints the rank and file mask.\n"
+     << "     -b|--bmask     If set, prints the bishop mask for magic numbers.\n"
+     << "     -r|--rmask     If set, prints the rook mask for magic numbers.\n"
      << std::endl;
 }
 
@@ -118,11 +118,11 @@ main(int argc, char** argv)
   }
 
   if (print_bmask) {
-    std::cout << "Bishop mask...\n";
+    std::cout << "Bishop mask for magic numbers...\n";
     std::cout << ToMailboxStr(GetBishopMask(square)) << std::endl;
   }
   if (print_rmask) {
-    std::cout << "Rook mask...\n";
+    std::cout << "Rook mask for magic numbers...\n";
     std::cout << ToMailboxStr(GetRookMask(square)) << std::endl;
   }
 
