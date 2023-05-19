@@ -254,14 +254,14 @@ inline BitBoard
 GetRookMask(std::uint32_t sq) noexcept
 {
   assert(sq < 64);
-  return kFileRankMask[sq] & ~kOuterSquares & ~(1 << sq);
+  return kFileRankMask[sq] & ~kOuterSquares & ~(1ull << sq);
 }
 
 inline BitBoard
 GetBishopMask(std::uint32_t sq) noexcept
 {
   assert(sq < 64);
-  return kDiagMask[sq] & ~kOuterSquares & ~(1 << sq);
+  return kDiagMask[sq] & ~kOuterSquares & ~(1ull << sq);
 }
 
 BitBoard
