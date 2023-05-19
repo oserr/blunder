@@ -8,6 +8,7 @@
 #include <format>
 #include <functional>
 #include <iostream>
+#include <random>
 #include <utility>
 
 #include "bitboard.h"
@@ -211,12 +212,6 @@ FindMagic(
   return std::unexpected(Error::MagicNotFound);
 }
 
-std::function<std::uint64_t()>
-CreateRandFn() noexcept
-{
-  return std::function<std::uint64_t()>();
-}
-
 } // namespace
 
 std::expected<MagicAttacks, Error>
@@ -224,7 +219,9 @@ MagicAttacks::ComputeBishopMagics()
 {
   std::vector<Magic> magics;
   magics.reserve(64);
-  auto rand_fn = CreateRandFn();
+
+  std::random_device rand_dev;
+  std::mt19937_64 rand_gen{rand_dev()};
 
   for (auto s = 0u; s < 64u; ++s) {
     auto magic_info =
@@ -232,7 +229,7 @@ MagicAttacks::ComputeBishopMagics()
           kBishopShifts[s],
           GetBishopMask,
           GetBishopAttacks,
-          std::move(rand_fn));
+          rand_gen);
 
     if (not magic_info) {
       std::cerr << "Unable to find magic for square=" << s << std::endl;
