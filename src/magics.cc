@@ -125,7 +125,7 @@ GetBishopAttacks(std::uint32_t sq, BitBoard blocking) {
   }
 
   // Bitscan southwest.
-  for (int r = rk-1, f = fl-1; r >= 0 and f >= 0; r--, f--) {
+  for (int r = rk-1, f = fl-1; r >= 0 and f >= 0; --r, --f) {
     const BitBoard bit = 1ull << (f + r*8);
     attacks |= bit;
     if (bit & blocking) break;
