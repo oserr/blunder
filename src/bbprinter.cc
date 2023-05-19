@@ -106,7 +106,7 @@ main(int argc, char** argv)
   auto diag_mask = kDiagMask[square];
   auto file_mask = kFileRankMask[square];
 
-  if (print_dmask && print_fmask) {
+  if (print_dmask and print_fmask) {
     std::cout << "Diagonal, rank, and file mask...\n";
     std::cout << ToMailboxStr(diag_mask | file_mask) << std::endl;
   } else if (print_dmask) {
