@@ -18,6 +18,8 @@ PrintHelp(std::string_view prog, std::ostream& os)
      << "     -s/--square    The square to print the mask for.\n"
      << "     -d/--diag      If set, prints the diagonal mask.\n"
      << "     -f/--file      If set, prints the rank and file mask.\n"
+     << "     -b/--bmask     If set, prints the maks of attacks for a bishop.\n"
+     << "     -r/--rmask     If set, prints the maks of attacks for a rook.\n"
      << std::endl;
 }
 
@@ -27,12 +29,16 @@ main(int argc, char** argv)
   int square = -1;
   bool print_diag_mask = false;
   bool print_file_mask = false;
+  bool print_bmask = false;
+  bool print_rmask = false;
 
   struct option longopts[] = {
     {"help", no_argument, nullptr, 'h'},
     {"diag", no_argument, nullptr, 'd'},
     {"file", no_argument, nullptr, 'f'},
     {"square", required_argument, nullptr, 's'},
+    {"bmask", no_argument, nullptr, 'b'},
+    {"rmask", no_argument, nullptr, 'r'},
     {0, 0, 0, 0},
   };
 
@@ -54,6 +60,12 @@ main(int argc, char** argv)
         break;
       case 'f':
         print_file_mask = true;
+        break;
+      case 'b':
+        print_bmask = true;
+        break;
+      case 'r':
+        print_rmask = true;
         break;
       case 's':
         try {
@@ -86,11 +98,23 @@ main(int argc, char** argv)
   auto file_mask = kFileRankMask[square];
 
   if (print_diag_mask && print_file_mask) {
+    std::cout << "Diagonal, rank, and file mask...\n";
     std::cout << ToMailboxStr(diag_mask | file_mask) << std::endl;
   } else if (print_diag_mask) {
+    std::cout << "Diagonal mask...\n";
     std::cout << ToMailboxStr(diag_mask) << std::endl;
   } else if (print_file_mask) {
+    std::cout << "Rank and file mask...\n";
     std::cout << ToMailboxStr(file_mask) << std::endl;
+  }
+
+  if (print_bmask) {
+    std::cout << "Bishop mask...\n";
+    std::cout << ToMailboxStr(GetBishopMask(square)) << std::endl;
+  }
+  if (print_rmask) {
+    std::cout << "Rook mask...\n";
+    std::cout << ToMailboxStr(GetRookMask(square)) << std::endl;
   }
 
   return EXIT_SUCCESS;
