@@ -73,18 +73,28 @@ FindMagic(
     std::uint32_t magic_bits,
     std::function<BitBoard(std::uint32_t)> mask_fn,
     std::function<BitBoard(std::uint32_t, BitBoard)> attacks_fn,
-    std::function<std::uint64_t()> rand_fn,
+    std::function<std::uint64_t()> magic_fn,
     std::uint32_t loops = 1000000000) {
   BitBoard mask = mask_fn(sq);
   std::uint32_t num_bits = std::popcount(mask);
+
   if (num_bits != magic_bits) {
-    std::cout << std::format("num_bits={} != magic_bits={}",
-                            num_bits, magic_bits) << std::endl;
+    std::cerr << "magic_bits("
+              << magic_bits
+              << ") != num_bits("
+              << num_bits << ")"
+              << std::endl;
   }
+
+  if (num_bits < 5 or num_bits > 12)
+    return std::unexpected(Error:MagicBitsOutOfRange);
+
   const auto ncombos = 1u << num_bits;
-  assert(ncombos <= 4096);
-  BitBoard blocking[4096];
-  BitBoard attacks[4096];
+  constexpr unsigned kMaxCombos = 1 << 12;
+  assert(ncombos <= kMaxCombos);
+
+  BitBoard blocking[kMaxCombos];
+  BitBoard attacks[kMaxCombos];
   for (auto i = 0u; i < ncombos; ++i) {
     blocking[i] = PermuteMask(i, num_bits, mask);
     attacks[i] = attacks_fn(sq, blocking[i]);
@@ -92,7 +102,7 @@ FindMagic(
 
   std::vector<BitBoard> attack_table(ncombos);
   for (auto k = 0u; k < loops; ++k) {
-    const auto magic = rand_fn();
+    const auto magic = magic_fn();
 
     const auto num_high_bits = std::popcount((mask*magic) >> 56);
     if (num_high_bits < 6) continue;
@@ -102,7 +112,7 @@ FindMagic(
 
     bool found_collision = false;
     for (auto i = 0u; i < ncombos; ++i) {
-      auto magic_hash = DoMagic(blocking[i], magic, magic_bits);
+      auto magic_hash = DoMagic(blocking[i], magic, num_bits);
 
       if (not attack_table[magic_hash])
         attack_table[magic_hash] = attacks[i];
@@ -115,14 +125,12 @@ FindMagic(
     // Try again if we found a collision.
     if (found_collision) continue;
 
-    return std::make_pair(Magic(std::move(attack_table), magic, magic_bits), k);
+    return std::make_pair(Magic(std::move(attack_table), magic, num_bits), k);
   }
 
   // Unable to find a magic number.
   return std::unexpected(Error::MagicNotFound);
 }
-
-
 
 } // namespace
 

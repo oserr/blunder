@@ -3,7 +3,8 @@
 namespace blunder {
 
 enum class Error {
-  MagicNotFound
+  MagicNotFound,
+  MagicBitsOutOfRange,
 };
 
 } // namespace blunder
