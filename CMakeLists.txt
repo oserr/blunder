@@ -18,6 +18,7 @@ else()
 endif()
 
 add_library(blunder STATIC
+  src/bitboard.cc
   src/bitboard.h
   src/bitboard_io.cc
   src/bitboard_io.h
