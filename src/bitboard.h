@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <cassert>
 #include <cstdint>
 
 namespace blunder {
@@ -248,5 +249,25 @@ inline constexpr std::array<BitBoard, k64Bits> kFileRankMask= {
   kFileG | kRank8,
   kFileH | kRank8,
 };
+
+inline BitBoard
+GetRookMask(std::uint32_t sq) noexcept
+{
+  assert(sq < 64);
+  return kFileRankMask[sq] & ~kOuterSquares & ~(1 << sq);
+}
+
+inline BitBoard
+GetBishopMask(std::uint32_t sq) noexcept
+{
+  assert(sq < 64);
+  return kDiagMask[sq] & ~kOuterSquares & ~(1 << sq);
+}
+
+BitBoard
+GetRookAttacks(std::uint32_t sq, BitBoard blocking) noexcept;
+
+BitBoard
+GetBishopAttacks(std::uint32_t sq, BitBoard blocking) noexcept;
 
 } // blunder
