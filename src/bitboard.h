@@ -250,11 +250,94 @@ inline constexpr std::array<BitBoard, k64Bits> kFileRankMask= {
   kFileH | kRank8,
 };
 
+inline constexpr BitBoard kFileARank8FileH = kFileA | kRank8 | kFileH;
+inline constexpr BitBoard kRank1Rank8FileH = kRank1 | kRank8 | kFileH;
+inline constexpr BitBoard kRank1FileAFileH = kRank1 | kFileA | kFileH;
+inline constexpr BitBoard kFileARank1Rank8 = kFileA | kRank1 | kRank8;
+
+// These masks ignore the outer squares. For example, for a1, we don't care
+// about bits at a8 and h1.
+inline constexpr std::array<BitBoard, k64Bits> kRookMask= {
+  // Rank 1
+  kFileRankMask[0] & ~(1ull | kFileH | kRank8),
+  kFileRankMask[1] & ~((1ull << 1) | kFileARank8FileH),
+  kFileRankMask[2] & ~((1ull << 2) | kFileARank8FileH),
+  kFileRankMask[3] & ~((1ull << 3) | kFileARank8FileH),
+  kFileRankMask[4] & ~((1ull << 4) | kFileARank8FileH),
+  kFileRankMask[5] & ~((1ull << 5) | kFileARank8FileH),
+  kFileRankMask[6] & ~((1ull << 6) | kFileARank8FileH),
+  kFileRankMask[7] & ~((1ull << 7) | kFileA | kRank8),
+  // Rank 2
+  kFileRankMask[8] & ~((1ull << 8) | kRank1Rank8FileH),
+  kFileRankMask[9] & ~((1ull << 9) | kOuterSquares),
+  kFileRankMask[10] & ~((1ull << 10) | kOuterSquares),
+  kFileRankMask[11] & ~((1ull << 11) | kOuterSquares),
+  kFileRankMask[12] & ~((1ull << 12) | kOuterSquares),
+  kFileRankMask[13] & ~((1ull << 13) | kOuterSquares),
+  kFileRankMask[14] & ~((1ull << 14) | kOuterSquares),
+  kFileRankMask[15] & ~((1ull << 15) | kFileARank1Rank8),
+  // Rank 3
+  kFileRankMask[16] & ~((1ull << 16) | kRank1Rank8FileH),
+  kFileRankMask[17] & ~((1ull << 17) | kOuterSquares),
+  kFileRankMask[18] & ~((1ull << 18) | kOuterSquares),
+  kFileRankMask[19] & ~((1ull << 19) | kOuterSquares),
+  kFileRankMask[20] & ~((1ull << 20) | kOuterSquares),
+  kFileRankMask[21] & ~((1ull << 21) | kOuterSquares),
+  kFileRankMask[22] & ~((1ull << 22) | kOuterSquares),
+  kFileRankMask[23] & ~((1ull << 23) | kFileARank1Rank8),
+  // Rank 4
+  kFileRankMask[24] & ~((1ull << 24) | kRank1Rank8FileH),
+  kFileRankMask[25] & ~((1ull << 25) | kOuterSquares),
+  kFileRankMask[26] & ~((1ull << 26) | kOuterSquares),
+  kFileRankMask[27] & ~((1ull << 27) | kOuterSquares),
+  kFileRankMask[28] & ~((1ull << 28) | kOuterSquares),
+  kFileRankMask[29] & ~((1ull << 29) | kOuterSquares),
+  kFileRankMask[30] & ~((1ull << 30) | kOuterSquares),
+  kFileRankMask[31] & ~((1ull << 31) | kFileARank1Rank8),
+  // Rank 5
+  kFileRankMask[32] & ~((1ull << 32) | kRank1Rank8FileH),
+  kFileRankMask[33] & ~((1ull << 33) | kOuterSquares),
+  kFileRankMask[34] & ~((1ull << 34) | kOuterSquares),
+  kFileRankMask[35] & ~((1ull << 35) | kOuterSquares),
+  kFileRankMask[36] & ~((1ull << 36) | kOuterSquares),
+  kFileRankMask[37] & ~((1ull << 37) | kOuterSquares),
+  kFileRankMask[38] & ~((1ull << 38) | kOuterSquares),
+  kFileRankMask[39] & ~((1ull << 39) | kFileARank1Rank8),
+  // Rank 6
+  kFileRankMask[40] & ~((1ull << 40) | kRank1Rank8FileH),
+  kFileRankMask[41] & ~((1ull << 41) | kOuterSquares),
+  kFileRankMask[42] & ~((1ull << 42) | kOuterSquares),
+  kFileRankMask[43] & ~((1ull << 43) | kOuterSquares),
+  kFileRankMask[44] & ~((1ull << 44) | kOuterSquares),
+  kFileRankMask[45] & ~((1ull << 45) | kOuterSquares),
+  kFileRankMask[46] & ~((1ull << 46) | kOuterSquares),
+  kFileRankMask[47] & ~((1ull << 47) | kFileARank1Rank8),
+  // Rank 7
+  kFileRankMask[48] & ~((1ull << 48) | kRank1Rank8FileH),
+  kFileRankMask[49] & ~((1ull << 49) | kOuterSquares),
+  kFileRankMask[50] & ~((1ull << 50) | kOuterSquares),
+  kFileRankMask[51] & ~((1ull << 51) | kOuterSquares),
+  kFileRankMask[52] & ~((1ull << 52) | kOuterSquares),
+  kFileRankMask[53] & ~((1ull << 53) | kOuterSquares),
+  kFileRankMask[54] & ~((1ull << 54) | kOuterSquares),
+  kFileRankMask[55] & ~((1ull << 55) | kFileARank1Rank8),
+  // Rank 8
+  kFileRankMask[56] & ~((1ull << 56) | kRank1 | kFileH),
+  kFileRankMask[57] & ~((1ull << 57) | kRank1FileAFileH),
+  kFileRankMask[58] & ~((1ull << 58) | kRank1FileAFileH),
+  kFileRankMask[59] & ~((1ull << 59) | kRank1FileAFileH),
+  kFileRankMask[60] & ~((1ull << 60) | kRank1FileAFileH),
+  kFileRankMask[61] & ~((1ull << 61) | kRank1FileAFileH),
+  kFileRankMask[62] & ~((1ull << 62) | kRank1FileAFileH),
+  kFileRankMask[63] & ~((1ull << 63) | kRank1 | kFileA)
+};
+
 inline BitBoard
 GetRookMask(std::uint32_t sq) noexcept
 {
   assert(sq < 64);
-  return kFileRankMask[sq] & ~kOuterSquares & ~(1ull << sq);
+  //return kFileRankMask[sq] & ~kOuterSquares & ~(1ull << sq);
+  return kRookMask[sq];
 }
 
 inline BitBoard

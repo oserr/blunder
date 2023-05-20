@@ -87,7 +87,7 @@ FindMagic(
   }
 
   if (num_bits < 5 or num_bits > 12)
-    return std::unexpected(Error:MagicBitsOutOfRange);
+    return std::unexpected(Error::MagicBitsOutOfRange);
 
   const auto ncombos = 1u << num_bits;
   constexpr unsigned kMaxCombos = 1 << 12;
@@ -162,10 +162,32 @@ MagicAttacks::ComputeBishopMagics()
   return MagicAttacks(std::move(magics));
 }
 
-MagicAttacks
+std::expected<MagicAttacks, Error>
 MagicAttacks::ComputeRookMagics()
 {
-  return MagicAttacks(std::vector<Magic>());
+  std::vector<Magic> magics;
+  magics.reserve(64);
+
+  std::random_device rand_dev;
+  std::mt19937_64 rand_gen{rand_dev()};
+  auto rand_fn = [&rand_gen]{ return rand_gen() & rand_gen() & rand_gen(); };
+
+  for (auto s = 0u; s < 64u; ++s) {
+    auto magic_info =
+      FindMagic(s, kRookShifts[s], GetRookMask, GetRookAttacks, rand_fn);
+
+    if (not magic_info) {
+      std::cerr << "Unable to find magic for square=" << s << std::endl;
+      return std::unexpected(magic_info.error());
+    }
+
+    std::cout << std::format("Computed magic={} for square={} in loops={}\n",
+                              magic_info->first.magic, s, magic_info->second);
+
+    magics.push_back(std::move(magic_info->first));
+  }
+
+  return MagicAttacks(std::move(magics));
 }
 
 MagicAttacks

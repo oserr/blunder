@@ -1,5 +1,3 @@
-#include "bitboard_io.h"
-
 #include <algorithm>
 #include <getopt.h>
 #include <functional>
@@ -9,6 +7,7 @@
 #include <unistd.h>
 
 #include "bitboard.h"
+#include "bitboard_io.h"
 
 using namespace blunder;
 
