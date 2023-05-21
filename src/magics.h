@@ -27,10 +27,10 @@ public:
   ComputeRookMagics();
 
   static std::expected<MagicAttacks, Error>
-  InitFromBishopMagics(std::span<std::uint64_t> magics);
+  InitFromBishopMagics(std::span<const std::uint64_t> magics);
 
   static std::expected<MagicAttacks, Error>
-  InitFromRookMagics(std::span<std::uint64_t> magics);
+  InitFromRookMagics(std::span<const std::uint64_t> magics);
 
   BitBoard
   GetAttacks(std::uint8_t square, BitBoard blockers) const noexcept;
