@@ -165,8 +165,8 @@ main(int argc, char** argv)
     ? GenerateMagics()
     : UsePrecomputedMagics();
 
-  auto bmagics = std::span(magic_bishops.GetMagics());
-  auto rmagics = std::span(magic_rooks.GetMagics());
+  auto bmagics = magic_bishops.GetMagics();
+  auto rmagics = magic_rooks.GetMagics();
 
   PrintMagics(bmagics, rmagics);
   WriteMagics(fname, bmagics, rmagics);
