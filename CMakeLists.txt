@@ -24,7 +24,8 @@ add_library(blunder STATIC
   src/bitboard_io.h
   src/error.h
   src/magics.cc
-  src/magics.h)
+  src/magics.h
+  src/pre_computed_magics.h)
 target_compile_features(blunder PRIVATE)
 
 add_executable(bbprinter src/bbprinter.cc)
