@@ -70,21 +70,13 @@ PermuteMask(std::uint32_t num, std::uint32_t num_bits, BitBoard mask) noexcept
 std::expected<std::pair<Magic, std::uint32_t>, Error>
 FindMagic(
     std::uint32_t sq,
-    std::uint32_t magic_bits,
     std::function<BitBoard(std::uint32_t)> mask_fn,
     std::function<BitBoard(std::uint32_t, BitBoard)> attacks_fn,
-    std::function<std::uint64_t()> magic_fn,
-    std::uint32_t loops = 1000000000) {
+    const std::function<std::uint64_t()>& magic_fn,
+    std::uint32_t loops = 1000000000)
+{
   BitBoard mask = mask_fn(sq);
   std::uint32_t num_bits = std::popcount(mask);
-
-  if (num_bits != magic_bits) {
-    std::cerr << "magic_bits("
-              << magic_bits
-              << ") != num_bits("
-              << num_bits << ")"
-              << std::endl;
-  }
 
   if (num_bits < 5 or num_bits > 12)
     return std::unexpected(Error::MagicBitsOutOfRange);
@@ -132,76 +124,79 @@ FindMagic(
   return std::unexpected(Error::MagicNotFound);
 }
 
+std::expected<std::vector<Magic>, Error>
+FindAllMagics(
+    std::function<BitBoard(std::uint32_t)> mask_fn,
+    std::function<BitBoard(std::uint32_t, BitBoard)> attacks_fn,
+    const std::function<std::uint64_t()>& magic_fn,
+    std::uint32_t loops = 1000000000)
+{
+  std::vector<Magic> magics;
+  magics.reserve(64);
+
+  for (auto s = 0u; s < 64u; ++s) {
+    auto magic_info = FindMagic(s, mask_fn, attacks_fn, magic_fn, loops);
+
+    if (not magic_info) {
+      std::cerr << "Unable to find magic for square=" << s << std::endl;
+      return std::unexpected(magic_info.error());
+    }
+
+    std::cout << std::format("Computed magic={} for square={} in loops={}\n",
+                              magic_info->first.magic, s, magic_info->second);
+
+    magics.push_back(std::move(magic_info->first));
+  }
+
+  return magics;
+}
+
+std::function<std::uint64_t()>
+CreateRandFn() noexcept
+{
+  std::random_device rand_dev;
+  std::mt19937_64 rand_gen{rand_dev()};
+  return [rand_gen] mutable { return rand_gen() & rand_gen() & rand_gen(); };
+}
+
 } // namespace
 
 std::expected<MagicAttacks, Error>
 MagicAttacks::ComputeBishopMagics()
 {
-  std::vector<Magic> magics;
-  magics.reserve(64);
-
-  std::random_device rand_dev;
-  std::mt19937_64 rand_gen{rand_dev()};
-  auto rand_fn = [&rand_gen]{ return rand_gen() & rand_gen() & rand_gen(); };
-
-  for (auto s = 0u; s < 64u; ++s) {
-    auto magic_info =
-      FindMagic(s, kBishopShifts[s], GetBishopMask, GetBishopAttacks, rand_fn);
-
-    if (not magic_info) {
-      std::cerr << "Unable to find magic for square=" << s << std::endl;
-      return std::unexpected(magic_info.error());
-    }
-
-    std::cout << std::format("Computed magic={} for square={} in loops={}\n",
-                              magic_info->first.magic, s, magic_info->second);
-
-    magics.push_back(std::move(magic_info->first));
-  }
-
-  return MagicAttacks(std::move(magics));
+  auto magic_fn = CreateRandFn();
+  auto magics = FindAllMagics(GetBishopMask, GetBishopAttacks, magic_fn);
+  if (not magics) return std::unexpected(magics.error());
+  return MagicAttacks(std::move(*magics));
 }
 
 std::expected<MagicAttacks, Error>
 MagicAttacks::ComputeRookMagics()
 {
-  std::vector<Magic> magics;
-  magics.reserve(64);
-
-  std::random_device rand_dev;
-  std::mt19937_64 rand_gen{rand_dev()};
-  auto rand_fn = [&rand_gen]{ return rand_gen() & rand_gen() & rand_gen(); };
-
-  for (auto s = 0u; s < 64u; ++s) {
-    auto magic_info =
-      FindMagic(s, kRookShifts[s], GetRookMask, GetRookAttacks, rand_fn);
-
-    if (not magic_info) {
-      std::cerr << "Unable to find magic for square=" << s << std::endl;
-      return std::unexpected(magic_info.error());
-    }
-
-    std::cout << std::format("Computed magic={} for square={} in loops={}\n",
-                              magic_info->first.magic, s, magic_info->second);
-
-    magics.push_back(std::move(magic_info->first));
-  }
-
-  return MagicAttacks(std::move(magics));
+  auto magic_fn = CreateRandFn();
+  auto magics = FindAllMagics(GetRookMask, GetRookAttacks, magic_fn);
+  if (not magics) return std::unexpected(magics.error());
+  return MagicAttacks(std::move(*magics));
 }
 
-MagicAttacks
+std::expected<MagicAttacks, Error>
 MagicAttacks::InitFromBishopMagics(std::span<std::uint64_t> magics)
 {
-  (void) magics;
-  return MagicAttacks(std::vector<Magic>());
+  assert(magics.size() == 64);
+  auto magic_fn = [sq=0, magics=magics] mutable { return magics[sq++]; };
+  auto all_magics = FindAllMagics(GetRookMask, GetBishopAttacks, magic_fn, 1);
+  if (not all_magics) return std::unexpected(all_magics.error());
+  return MagicAttacks(std::move(*all_magics));
 }
 
-MagicAttacks
+std::expected<MagicAttacks, Error>
 MagicAttacks::InitFromRookMagics(std::span<std::uint64_t> magics)
 {
-  (void) magics;
-  return MagicAttacks(std::vector<Magic>());
+  assert(magics.size() == 64);
+  auto magic_fn = [sq=0, magics=magics] mutable { return magics[sq++]; };
+  auto all_magics = FindAllMagics(GetRookMask, GetBishopAttacks, magic_fn, 1);
+  if (not all_magics) return std::unexpected(all_magics.error());
+  return MagicAttacks(std::move(*all_magics));
 }
 
 BitBoard
@@ -210,12 +205,6 @@ MagicAttacks::GetAttacks(std::uint8_t square, BitBoard blockers) const noexcept
   (void) square;
   (void) blockers;
   return BitBoard();
-}
-
-std::span<const Magic>
-MagicAttacks::GetMagics() const noexcept
-{
-  return std::span(magics_);
 }
 
 } // namespace blunder

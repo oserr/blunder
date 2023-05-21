@@ -78,17 +78,18 @@ public:
   static std::expected<MagicAttacks, Error>
   ComputeRookMagics();
 
-  static MagicAttacks
+  static std::expected<MagicAttacks, Error>
   InitFromBishopMagics(std::span<std::uint64_t> magics);
 
-  static MagicAttacks
+  static std::expected<MagicAttacks, Error>
   InitFromRookMagics(std::span<std::uint64_t> magics);
 
   BitBoard
   GetAttacks(std::uint8_t square, BitBoard blockers) const noexcept;
 
   std::span<const Magic>
-  GetMagics() const noexcept;
+  GetMagics() const noexcept
+  { return std::span(magics_); }
 
 private:
   explicit MagicAttacks(
