@@ -40,7 +40,7 @@ BitBoard
 PermuteMask(std::uint32_t num, std::uint32_t num_bits, BitBoard mask) noexcept
 {
   BitBoard mask_combo = 0;
-  for (std::uint32_t i = 0; i < num_bits; i++) {
+  for (std::uint32_t i = 0; i < num_bits; ++i) {
     if (num & (1 << i))
       mask_combo |= 1ull << std::countr_zero(mask);
     mask &= mask - 1;
