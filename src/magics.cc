@@ -17,8 +17,11 @@
 namespace blunder {
 namespace {
 
-inline constexpr int
-DoMagic(BitBoard blocking, std::uint64_t magic, int magic_bits) noexcept
+inline constexpr std::uint32_t
+GetMagicHash(
+    BitBoard blocking,
+    std::uint64_t magic,
+    std::uint8_t magic_bits) noexcept
 {
   return (blocking * magic) >> (64 - magic_bits);
 }
@@ -83,7 +86,7 @@ FindMagic(
 
     bool found_collision = false;
     for (auto i = 0u; i < ncombos; ++i) {
-      auto magic_hash = DoMagic(blocking[i], magic, num_bits);
+      auto magic_hash = GetMagicHash(blocking[i], magic, num_bits);
 
       if (not attack_table[magic_hash])
         attack_table[magic_hash] = attacks[i];
@@ -188,7 +191,7 @@ MagicAttacks::GetAttacks(std::uint8_t square, BitBoard blockers) const noexcept
   assert(square < 64);
   assert(magics_.size() == 64);
   const auto& [attacks, magic, nbits] = magics_[square];
-  auto magic_hash = DoMagic(bockers, magic, nbits);
+  auto magic_hash = GetMagicHash(blockers, magic, nbits);
   assert(magic_hash < attacks.size());
   return attacks[magic_hash];
 }
