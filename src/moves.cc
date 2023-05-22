@@ -24,24 +24,6 @@ MoveKing(BitBoard king) noexcept
 }
 
 constexpr BitBoard
-MoveQueen(BitBoard queen) noexcept
-{
-  return queen;
-}
-
-constexpr BitBoard
-MoveRook(BitBoard rook) noexcept
-{
-  return rook;
-}
-
-constexpr BitBoard
-MoveBishop(BitBoard bishop) noexcept
-{
-  return bishop;
-}
-
-constexpr BitBoard
 MoveKnight(BitBoard knight) noexcept
 {
   // One square up, two right.
