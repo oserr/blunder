@@ -166,7 +166,7 @@ MagicAttacks::InitFromBishopMagics(std::span<const std::uint64_t> magics)
 {
   assert(magics.size() == 64);
   auto magic_fn = [sq=0, magics=magics] mutable { return magics[sq++]; };
-  auto all_magics = FindAllMagics(GetRookMask, GetBishopAttacks, magic_fn, 1);
+  auto all_magics = FindAllMagics(GetBishopMask, GetBishopAttacks, magic_fn, 1);
   if (not all_magics)
     return std::unexpected(all_magics.error());
   return MagicAttacks(std::move(*all_magics));
