@@ -185,9 +185,12 @@ MagicAttacks::InitFromRookMagics(std::span<const std::uint64_t> magics)
 BitBoard
 MagicAttacks::GetAttacks(std::uint8_t square, BitBoard blockers) const noexcept
 {
-  (void) square;
-  (void) blockers;
-  return BitBoard();
+  assert(square < 64);
+  assert(magics_.size() == 64);
+  const auto& [attacks, magic, nbits] = magics_[square];
+  auto magic_hash = DoMagic(bockers, magic, nbits);
+  assert(magic_hash < attacks.size());
+  return attacks[magic_hash];
 }
 
 } // namespace blunder
