@@ -20,7 +20,7 @@ make
 
 This is in super early stage development. The only artifacts produced by the project are:
 * `bbprinter`: an executable to print common bitboards.
-* `genmagics`: an executable to generate magic numbers for sliding pieces.
+* `genmagic`: an executable to generate magic numbers for sliding pieces.
 
 At the moment, these artificts are meant to help with development and debugging, and as
 foundation for move generation.
