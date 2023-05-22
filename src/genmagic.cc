@@ -129,7 +129,7 @@ main(int argc, char** argv)
   };
 
   while (true) {
-    auto ret = getopt_long(argc, argv, "hf:", longopts, nullptr);
+    auto ret = getopt_long(argc, argv, "hgpf:", longopts, nullptr);
     if (ret == -1) break;
     switch (ret) {
       case 'h':
