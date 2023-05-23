@@ -22,9 +22,11 @@ add_library(blunder STATIC
   src/bitboard.h
   src/bitboard_io.cc
   src/bitboard_io.h
+  src/board_state.h
   src/error.h
   src/magics.cc
   src/magics.h
+  src/pieces.h
   src/pre_computed_magics.h)
 target_compile_features(blunder PRIVATE)
 
