@@ -15,8 +15,8 @@ MoveSouth(BitBoard bb) noexcept { return bb >> 8; }
 constexpr BitBoard
 MoveKing(BitBoard king) noexcept
 {
-  const auto left = (king & ~kFileA) >> 1; 
-  const auto right = (king & ~kFileH) << 1; 
+  const auto left = (king & ~kFileA) >> 1;
+  const auto right = (king & ~kFileH) << 1;
   king |= left | right;
   const auto down = (king & ~kRank1) >> 8;
   const auto up = (king & ~kRank8) << 8;
