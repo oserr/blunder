@@ -13,9 +13,4 @@ enum class Piece : std::uint8_t {
   Pawn
 };
 
-enum class Color : std::uint8_t {
-  White,
-  Black
-};
-
 } // namespace blunder
