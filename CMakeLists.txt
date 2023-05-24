@@ -23,6 +23,7 @@ add_library(blunder STATIC
   src/bitboard_io.cc
   src/bitboard_io.h
   src/board_state.h
+  src/color.h
   src/error.h
   src/magics.cc
   src/magics.h
