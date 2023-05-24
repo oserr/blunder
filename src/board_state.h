@@ -4,7 +4,7 @@
 #include <cstdint>
 
 #include "bitboard.h"
-#include "pieces.h"
+#include "color.h"
 
 namespace blunder {
 
