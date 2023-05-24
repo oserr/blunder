@@ -10,7 +10,8 @@ enum class Piece : std::uint8_t {
   Rook,
   Bishop,
   Knight,
-  Pawn
+  Pawn,
+  None
 };
 
 } // namespace blunder
