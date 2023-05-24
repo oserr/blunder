@@ -27,6 +27,7 @@ add_library(blunder STATIC
   src/error.h
   src/magics.cc
   src/magics.h
+  src/move.h
   src/pieces.h
   src/pre_computed_magics.h)
 target_compile_features(blunder PRIVATE)
