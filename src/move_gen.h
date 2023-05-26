@@ -1,0 +1,57 @@
+#pragma once
+
+#include <utility>
+#include <vector>
+
+#include "board_state.h"
+#include "magics.h"
+#include "move_generator.h"
+
+namespace blunder {
+
+// MoveGen implements MoveGenerator. It uses magic bitboards to generate moves
+// for knights and bishops.
+class MoveGen : public MoveGenerator {
+public:
+  // Initializes MoveGen with magic bitboards for bishops and rooks.
+  MoveGen(MagicAttacks bmagics, MagicAttacks rmagics) noexcept
+    : bmagics_(std::move(bmagics)),
+      rmagics_(std::move(rmagics)) {}
+
+  // Generates all possible moves for a king, including castling with the rook.
+  // These may include moves that put the king in check. It is up to client to
+  // determine which moves put the king in check.
+  std::vector<Move>
+  KingMoves(const BoardState& state) const override;
+
+  // Generates all possible moves for queens on the board.
+  std::vector<Move>
+  QueenMoves(const BoardState& state) const override;
+
+  // Generates all possible moves for rooks on the board, except for castling
+  // moves.
+  std::vector<Move>
+  RookMoves(const BoardState& state) const override;
+
+  // Generates all possible moves for bishops on the board.
+  std::vector<Move>
+  BishopMoves(const BoardState& state) const override;
+
+  // Generates all possible moves for knights on the board.
+  std::vector<Move>
+  KnightMoves(const BoardState& state) const override;
+
+  // Generates all possible moves for pawns on the board.
+  std::vector<Move>
+  PawnMoves(const BoardState& state) const override;
+
+  // Generates all possible moves for all pieces on the board.
+  std::vector<Move>
+  AllMoves(const BoardState& state) const override;
+
+private:
+  MagicAttacks bmagics_;
+  MagicAttacks rmagics_;
+};
+
+} // namespace blunder
