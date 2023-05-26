@@ -28,7 +28,8 @@ struct BoardState {
   // All black pieces.
   BitBoard all_black = 0;
 
-  Color next_to_move;
+  // The next color to move.
+  Color next;
 
   // If set, indicates that en passant is possible.
   std::uint8_t en_passant: 1 = 0;
