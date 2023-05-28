@@ -8,6 +8,8 @@
 
 namespace blunder {
 
+using PieceSet = std::array<BitBoard, 6>;
+
 // BoardState represents the current state of the board. Some of the fields are
 // written from the perspective of the player moving next to simplify move
 // generation.
@@ -24,8 +26,8 @@ struct BoardState {
   //
   // |mine| are the pieces for the player to move next, and |other| are the
   // pieces for the player who just moved.
-  std:array<BitBoard, 6> mine;
-  std:array<BitBoard, 6> other;
+  PieceSet mine;
+  PieceSet other;
 
   // All of the pieces for the player next to move.
   BitBoard all_mine = 0;
