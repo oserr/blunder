@@ -26,6 +26,27 @@ GetNonAttacks(
     moves.emplace_back(p, from_square, to_square);
   }
 }
+
+// Returns all the simple attack moves for |piece| from square |from_square| to
+// squares in |to_squares|. We pass in the |other| pieces to be able to figure
+// out what the attacked pieces are.
+void
+GetSimpleAttacks(
+    Piece piece,
+    std::uint8_t from_square,
+    std::uint8_t to_squares,
+    const PieceSet other,
+    std::vector<Move>& moves)
+{
+  auto p = Uint8(piece);
+  for (; to_squares; to_squares &= to_squares - 1) {
+    auto to_square = std::countr_zero(to_squares);
+    BitBoard attacked = 1ull << to_square;
+    auto to_piece = GetPieceUint8(other, attacked);
+    assert(to_piece >= 0 and to_piece < 6);
+    moves.emplace_back(p, from_square, to_square, to_piece);
+  }
+}
 } // namespace
 
 std::vector<Move>
@@ -60,15 +81,12 @@ MoveGen::QueenMoves(const BoardState& state) const
 
     // Compute attacks.
     to_squares = state.all_other & queen_moves;
-    while (to_squares) {
-      auto to_square = std::countr_zero(to_squares);
-      BitBoard attacked = 1ull << to_square;
-      auto to_piece = GetPieceUint8(state.other, attacked);
-      assert(to_piece >= 0 and to_piece < 6);
-      moves.emplace_back(piece, from_square, to_square, to_piece);
-      // Clear the square we processed.
-      to_squares &= to_squares - 1;
-    }
+    GetSimpleAttackes(
+        Piece::Queen,
+        from_square,
+        to_squares,
+        state.other,
+        moves);
 
     // Clear the queen we processed.
     queens &= queens - 1;
@@ -90,7 +108,7 @@ MoveGen::RookMoves(const BoardState& state) const
   std::vector<Move> moves;
 
   while (rooks) {
-    auto from_square = std::countr_zero(bishops);
+    auto from_square = std::countr_zero(rooks);
     BitBoard rook = 1ull << from_square;
 
     // TODO: figure out how to include the squares at the outer ranks and files,
@@ -103,15 +121,12 @@ MoveGen::RookMoves(const BoardState& state) const
 
     // Compute attacks.
     to_squares = state.all_other & rook_moves;
-    while (to_squares) {
-      auto to_square = std::countr_zero(to_squares);
-      BitBoard attacked = 1ull << to_square;
-      auto to_piece = GetPieceUint8(state.other, attacked);
-      assert(to_piece >= 0 and to_piece < 6);
-      moves.emplace_back(piece, from_square, to_square, to_piece);
-      // Clear the square we processed.
-      to_squares &= to_squares - 1;
-    }
+    GetSimpleAttackes(
+        Piece::Rook,
+        from_square,
+        to_squares,
+        state.other,
+        moves);
 
     // Clear the rook we processed.
     rooks &= rooks - 1;
@@ -144,15 +159,12 @@ MoveGen::BishopMoves(const BoardState& state) const
 
     // Compute attacks.
     to_squares = state.all_other & bishop_moves;
-    while (to_squares) {
-      auto to_square = std::countr_zero(to_squares);
-      BitBoard attacked = 1ull << to_square;
-      auto to_piece = GetPieceUint8(state.other, attacked);
-      assert(to_piece >= 0 and to_piece < 6);
-      moves.emplace_back(piece, from_square, to_square, to_piece);
-      // Clear the square we processed.
-      to_squares &= to_squares - 1;
-    }
+    GetSimpleAttackes(
+        Piece::Bishop,
+        from_square,
+        to_squares,
+        state.other,
+        moves);
 
     // Clear the bishop we processed.
     bishops &= bishops - 1;
@@ -181,15 +193,12 @@ MoveGen::KnightMoves(const BoardState& state) const
 
     // Compute attacks.
     to_squares = state.all_other & knight_moves;
-    while (to_squares) {
-      auto to_square = std::countr_zero(to_squares);
-      BitBoard attacked = 1ull << to_square;
-      auto to_piece = GetPieceUint8(state.other, attacked);
-      assert(to_piece >= 0 and to_piece < 6);
-      moves.emplace_back(piece, from_square, to_square, to_piece);
-      // Clear the square we processed.
-      to_squares &= to_squares - 1;
-    }
+    GetSimpleAttackes(
+        Piece::Bishop,
+        from_square,
+        to_squares,
+        state.other,
+        moves);
 
     // Clear the knight we processed.
     knights &= knights - 1;
