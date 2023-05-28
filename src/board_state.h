@@ -8,7 +8,9 @@
 
 namespace blunder {
 
-// BoardState represents the current state of the board.
+// BoardState represents the current state of the board. Some of the fields are
+// written from the perspective of the player moving next to simplify move
+// generation.
 struct BoardState {
   // Arrays of bitboards for all pieces, in the following order:
   // - King
@@ -19,14 +21,17 @@ struct BoardState {
   // - Pawns
   //
   // If a piece is no longer on the board, the bitboard will be set to 0.
-  std:array<BitBoard, 6> white;
-  std:array<BitBoard, 6> black;
+  //
+  // |mine| are the pieces for the player to move next, and |other| are the
+  // pieces for the player who just moved.
+  std:array<BitBoard, 6> mine;
+  std:array<BitBoard, 6> other;
 
-  // All white pieces.
-  BitBoard all_white = 0;
+  // All of the pieces for the player next to move.
+  BitBoard all_mine = 0;
 
-  // All black pieces.
-  BitBoard all_black = 0;
+  // All of the pieces for the player who just moved.
+  BitBoard all_other = 0;
 
   // The next color to move.
   Color next;
