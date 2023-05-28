@@ -8,6 +8,25 @@
 #include "pieces.h"
 
 namespace blunder {
+namespace {
+
+// Returns all the non-attack moves for |piece| from square |from_square| to all
+// squares in |to_squares|. The moves are returned in |moves|, an output
+// parameter.
+void
+GetNonAttacks(
+    Piece piece,
+    std::uint8_t from_square,
+    std::uint8_t to_squares,
+    std::vector<Move>& moves)
+{
+  auto p = Uint8(piece);
+  for (; to_squares; to_square &= to_squares - 1) {
+    auto to_square = std::countr_zero(to_squares);
+    moves.emplace_back(p, from_square, to_square);
+  }
+}
+} // namespace
 
 std::vector<Move>
 MoveGen::KingMoves(const BoardState& state) const
@@ -37,12 +56,7 @@ MoveGen::QueenMoves(const BoardState& state) const
 
     // Compute moves to empty squares.
     auto to_squares = no_pieces & queen_moves;
-    while (to_squares) {
-      auto to_square = std::countr_zero(to_squares);
-      moves.emplace_back(piece, from_square, to_square);
-      // Clear the square we processed.
-      to_squares &= to_squares - 1;
-    }
+    GetNonAttacks(Piece::Queen, from_square, to_squares, moves);
 
     // Compute attacks.
     to_squares = state.all_other & queen_moves;
@@ -85,12 +99,7 @@ MoveGen::RookMoves(const BoardState& state) const
 
     // Compute moves to empty squares.
     auto to_squares = no_pieces & rook_moves;
-    while (to_squares) {
-      auto to_square = std::countr_zero(to_squares);
-      moves.emplace_back(piece, from_square, to_square);
-      // Clear the square we processed.
-      to_squares &= to_squares - 1;
-    }
+    GetNonAttacks(Piece::Rook, from_square, to_squares, moves);
 
     // Compute attacks.
     to_squares = state.all_other & rook_moves;
@@ -131,12 +140,7 @@ MoveGen::BishopMoves(const BoardState& state) const
 
     // Compute moves to empty squares.
     auto to_squares = no_pieces & bishop_moves;
-    while (to_squares) {
-      auto to_square = std::countr_zero(to_squares);
-      moves.emplace_back(piece, from_square, to_square);
-      // Clear the square we processed.
-      to_squares &= to_squares - 1;
-    }
+    GetNonAttacks(Piece::Bishop, from_square, to_squares, moves);
 
     // Compute attacks.
     to_squares = state.all_other & bishop_moves;
@@ -172,14 +176,8 @@ MoveGen::KnightMoves(const BoardState& state) const
 
     auto knight_moves = MoveKnight(knight);
 
-    // Compute moves to empty squares.
     auto to_squares = no_pieces & knight_moves;
-    while (to_squares) {
-      auto to_square = std::countr_zero(to_squares);
-      moves.emplace_back(piece, from_square, to_square);
-      // Clear the square we processed.
-      to_squares &= to_squares - 1;
-    }
+    GetNonAttacks(Piece::Knight, from_square, to_squares, moves);
 
     // Compute attacks.
     to_squares = state.all_other & knight_moves;
