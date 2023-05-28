@@ -53,7 +53,7 @@ private:
   // Magic bitboards for bishops.
   MagicAttacks bmagics_;
 
-  // Magic bitboards for bishops.
+  // Magic bitboards for rooks.
   MagicAttacks rmagics_;
 };
 
