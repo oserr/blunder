@@ -50,7 +50,10 @@ public:
   AllMoves(const BoardState& state) const override;
 
 private:
+  // Magic bitboards for bishops.
   MagicAttacks bmagics_;
+
+  // Magic bitboards for bishops.
   MagicAttacks rmagics_;
 };
 
