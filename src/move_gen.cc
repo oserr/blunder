@@ -1,5 +1,8 @@
 #include "move_gen.h"
 
+#include <cassert>
+#include <cstdint>
+#include <functional>
 #include <vector>
 
 #include "board_state.h"
@@ -47,6 +50,51 @@ GetSimpleAttacks(
     moves.emplace_back(p, from_square, to_square, to_piece);
   }
 }
+
+// Computes simples moves for Bishops, Kights, Rooks, and Queens. Simple moves
+// consists of non-attack moves and attacks. |piece| is the piece moving,
+// |state| is the current board state, and |moves_fn| is a function to compute
+// moves for the given piece, including non-attacks and attacks.
+void
+GetSimpleMoves(
+    Piece piece
+    const BoardState& state,
+    const std::function<BitBoard(BitBoard)>& moves_fn,
+    std::vector<Move>& moves)
+{
+  auto bb = state.mine[Uint8(piece)];
+  auto all_pieces = state.all_mine | state.all_other;
+  auto no_pieces = ~all_pieces;
+
+  std::vector<Move> moves;
+
+  for (; bb; bb &= bb - 1) {
+    auto from_square = std::countr_zero(bb);
+    auto bb_piece = 1ull << from_square;
+
+    auto bb_moves = move_fn(bb_piece);
+
+    // Compute moves to empty squares.
+    auto to_squares = bb_moves & no_pieces;
+    GetNonAttacks(piece, from_square, to_squares, moves);
+
+    // Compute attacks.
+    to_squares = bb_moves & state.all_other;
+    GetSimpleAttackes(piece, from_square, to_squares, state.other, moves);
+  }
+}
+
+// Same as above, but list of moves is returned as output.
+std::vector<Move>
+GetSimpleMoves(
+    Piece piece
+    const BoardState& state,
+    const std::function<BitBoard(BitBoard)>& moves_fn)
+{
+  std::vector<Move> moves;
+  GetSimpleMoves(piece, state, moves_fn, moves);
+  return moves;
+}
 } // namespace
 
 std::vector<Move>
@@ -59,152 +107,38 @@ MoveGen::KingMoves(const BoardState& state) const
 std::vector<Move>
 MoveGen::QueenMoves(const BoardState& state) const
 {
-  constexpr auto piece = Uint8(Piece::Queen);
-  auto queens = state.mine[piece];
   auto all_pieces = state.all_mine | state.all_other;
-  BitBoard no_pieces = ~all_pieces;
-
-  std::vector<Move> moves;
-
-  while (queens) {
-    auto from_square = std::countr_zero(queens);
-    BitBoard queen = 1ull << from_square;
-
-    // TODO: figure out how to include the squares at the outer ranks and files,
-    // which are ignored by magic bitboards.
-    auto queen_moves = rmagics_.GetAttacks(queen, state.all_pieces);
-    queen_moves |= bmagics_.GetAttacks(queen, state.all_pieces);
-
-    // Compute moves to empty squares.
-    auto to_squares = no_pieces & queen_moves;
-    GetNonAttacks(Piece::Queen, from_square, to_squares, moves);
-
-    // Compute attacks.
-    to_squares = state.all_other & queen_moves;
-    GetSimpleAttackes(
-        Piece::Queen,
-        from_square,
-        to_squares,
-        state.other,
-        moves);
-
-    // Clear the queen we processed.
-    queens &= queens - 1;
-  }
-
-  return moves;
-}
-
+  auto moves_fn = [&](BitBoard bb) {
+    return rmagics_.GetAttacks(bb, all_pieces)
+         | bmagics_.GetAttacks(bb, all_pieces);
+  };
+  return GetSimpleMoves(Piece::Queen, state, moves_fn);
 }
 
 std::vector<Move>
 MoveGen::RookMoves(const BoardState& state) const
 {
-  constexpr auto piece = Uint8(Piece::Rook);
-  auto rooks = state.mine[piece];
   auto all_pieces = state.all_mine | state.all_other;
-  BitBoard no_pieces = ~all_pieces;
-
-  std::vector<Move> moves;
-
-  while (rooks) {
-    auto from_square = std::countr_zero(rooks);
-    BitBoard rook = 1ull << from_square;
-
-    // TODO: figure out how to include the squares at the outer ranks and files,
-    // which are ignored by magic bitboards.
-    auto rook_moves = rmagics_.GetAttacks(rook, state.all_pieces);
-
-    // Compute moves to empty squares.
-    auto to_squares = no_pieces & rook_moves;
-    GetNonAttacks(Piece::Rook, from_square, to_squares, moves);
-
-    // Compute attacks.
-    to_squares = state.all_other & rook_moves;
-    GetSimpleAttackes(
-        Piece::Rook,
-        from_square,
-        to_squares,
-        state.other,
-        moves);
-
-    // Clear the rook we processed.
-    rooks &= rooks - 1;
-  }
-
-  return moves;
+  auto moves_fn = [&](BitBoard bb) {
+    return rmagics_.GetAttacks(bb, all_pieces);
+  };
+  return GetSimpleMoves(Piece::Rook, state, moves_fn);
 }
 
 std::vector<Move>
 MoveGen::BishopMoves(const BoardState& state) const
 {
-  constexpr auto piece = Uint8(Piece::Bishop);
-  auto bishops = state.mine[piece];
   auto all_pieces = state.all_mine | state.all_other;
-  BitBoard no_pieces = ~all_pieces;
-
-  std::vector<Move> moves;
-
-  while (bishops) {
-    auto from_square = std::countr_zero(bishops);
-    BitBoard bishop = 1ull << from_square;
-
-    // TODO: figure out how to include the squares at the outer ranks and files,
-    // which are ignored by magic bitboards.
-    auto bishop_moves = bmagics_.GetAttacks(bishop, state.all_pieces);
-
-    // Compute moves to empty squares.
-    auto to_squares = no_pieces & bishop_moves;
-    GetNonAttacks(Piece::Bishop, from_square, to_squares, moves);
-
-    // Compute attacks.
-    to_squares = state.all_other & bishop_moves;
-    GetSimpleAttackes(
-        Piece::Bishop,
-        from_square,
-        to_squares,
-        state.other,
-        moves);
-
-    // Clear the bishop we processed.
-    bishops &= bishops - 1;
-  }
-
-  return moves;
+  auto moves_fn = [&](BitBoard bb) {
+    return bmagics_.GetAttacks(bb, all_pieces);
+  };
+  return GetSimpleMoves(Piece::Bishop, state, moves_fn);
 }
 
 std::vector<Move>
 MoveGen::KnightMoves(const BoardState& state) const
 {
-  constexpr auto piece = Uint8(Piece::Knight);
-  auto knights = state.mine[piece];
-  BitBoard no_pieces = ~(state.all_mine | state.all_other);
-
-  std::vector<Move> moves;
-
-  while (knights) {
-    auto from_square = std::countr_zero(knights);
-    BitBoard knigth = 1ull << from_square;
-
-    auto knight_moves = MoveKnight(knight);
-
-    auto to_squares = no_pieces & knight_moves;
-    GetNonAttacks(Piece::Knight, from_square, to_squares, moves);
-
-    // Compute attacks.
-    to_squares = state.all_other & knight_moves;
-    GetSimpleAttackes(
-        Piece::Bishop,
-        from_square,
-        to_squares,
-        state.other,
-        moves);
-
-    // Clear the knight we processed.
-    knights &= knights - 1;
-  }
-
-  return moves;
+  return GetSimpleMoves(Piece::Knight, state, MoveKnight);
 }
 
 std::vector<Move>
