@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+#include "pieces.h"
+
 namespace blunder {
 
 // Move contains multiple bitfields to represent a chess move.
@@ -59,6 +61,40 @@ struct Move {
 
   // Default assignment operator.
   Move operator=(Move m) noexcept = default;
+
+  static constexpr Move
+  WhiteKingSideCastle() noexcept
+  {
+    Move m(Uint8(Piece::King), 4, 6);
+    m.castle = 1;
+    m.file = 1;
+    return m;
+  }
+
+  static constexpr Move
+  WhiteQueenSideCastle() noexcept
+  {
+    Move m(Uint8(Piece::King), 4, 2);
+    m.castle = 1;
+    return m;
+  }
+
+  static constexpr Move
+  BlackKingSideCastle() noexcept
+  {
+    Move m(Uint8(Piece::King), 60, 62);
+    m.castle = 1;
+    m.file = 1;
+    return m;
+  }
+
+  static constexpr Move
+  BlackQueenSideCastle() noexcept
+  {
+    Move m(Uint8(Piece::King), 60, 58);
+    m.castle = 1;
+    return m;
+  }
 };
 
 } // namespace blunder
