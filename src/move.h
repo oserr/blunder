@@ -26,13 +26,16 @@ struct Move {
   std::uint8_t from_square: 6 = 0;
   std::uint8_t to_square: 6 = 0;
 
-  // For pawn moves, indicates en-passant.
+  // For pawn moves, indicates en-passant and whether the move is a promotion.
+  // If it is, the promotion piece should be set in to_piece.
   std::uint8_t en_passant: 1 = 0;
+  std::uint8_t is_promo: 1 = 0;
 
   // For king moves, indicates if the king is castling. kside=1 indicates
   // kingside, and kside=0 indicates queenside.
   std::uint8_t castle: 1 = 0;
   std::uint8_t kside: 1 = 0;
+
 
   // Initializes all fields.
   constexpr Move() = default;
