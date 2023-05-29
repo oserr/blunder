@@ -132,20 +132,20 @@ MoveGen::KingMoves(const BoardState& state) const
 
   switch (state.next) {
   case Color::White:
-    if (state.wk_castle) {
-      if (NoneBetweenKingAndRook<Color::White, BoardSide::King>(all_pieces))
-        moves.push_back(Move::WhiteKingSideCastle());
-      if (NoneBetweenKingAndRook<Color::White, BoardSide::Queen>(all_pieces))
-        moves.push_back(Move::WhiteQueenSideCastle());
-    }
+    if (state.wk_castle and
+        NoneBetweenKingAndRook<Color::White, BoardSide::King>(all_pieces))
+      moves.push_back(Move::WhiteKingSideCastle());
+    if (state.wq_castle and
+        NoneBetweenKingAndRook<Color::White, BoardSide::Queen>(all_pieces))
+      moves.push_back(Move::WhiteQueenSideCastle());
     break;
   case Color::Black:
-    if (state.bk_castle) {
-      if (NoneBetweenKingAndRook<Color::Black, BoardSide::King>(all_pieces))
-        moves.push_back(Move::BlackKingSideCastle());
-      if (NoneBetweenKingAndRook<Color::Black, BoardSide::Queen>(all_pieces))
-        moves.push_back(Move::BlackQueenSideCastle());
-    }
+    if (state.bk_castle and
+        NoneBetweenKingAndRook<Color::Black, BoardSide::King>(all_pieces))
+      moves.push_back(Move::BlackKingSideCastle());
+    if (state.bq_castle and
+        NoneBetweenKingAndRook<Color::Black, BoardSide::Queen>(all_pieces))
+      moves.push_back(Move::BlackQueenSideCastle());
     break;
   }
 
