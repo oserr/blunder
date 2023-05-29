@@ -29,11 +29,10 @@ struct Move {
   // For pawn moves, indicates en-passant.
   std::uint8_t en_passant: 1 = 0;
 
-  // For king moves, indicates if the king is castling. If the king is castling,
-  // file=0 indicates the rook moving is from file A, and file=1 indicates from
-  // file H.
+  // For king moves, indicates if the king is castling. kside=1 indicates
+  // kingside, and kside=0 indicates queenside.
   std::uint8_t castle: 1 = 0;
-  std::uint8_t file: 1 = 0;
+  std::uint8_t kside: 1 = 0;
 
   // Initializes all fields.
   constexpr Move() = default;
@@ -67,7 +66,7 @@ struct Move {
   {
     Move m(Uint8(Piece::King), 4, 6);
     m.castle = 1;
-    m.file = 1;
+    m.kside = 1;
     return m;
   }
 
@@ -84,7 +83,7 @@ struct Move {
   {
     Move m(Uint8(Piece::King), 60, 62);
     m.castle = 1;
-    m.file = 1;
+    m.kside = 1;
     return m;
   }
 
