@@ -5,13 +5,40 @@
 #include <functional>
 #include <vector>
 
+#include "bitboard.h"
+#include "board_side.h"
 #include "board_state.h"
+#include "color.h"
 #include "move.h"
 #include "moves.h"
 #include "pieces.h"
 
 namespace blunder {
 namespace {
+
+constexpr bool
+NoneBetweenKingAndRook(BitBoard all_pieces, Color color, BoardSide side)
+noexcept
+{
+  std::uint8_t bits = 0;
+  std::uint8_t mask = 0;
+
+  if constexpr (side == BoardSide::King) {
+    bits = 0b00001001ull;
+    mask = 0b00001111ull;
+  } else {
+    bits = 0b10001000ull;
+    mask = 0b11111000ull;
+  }
+
+  if constexpr (color == Color::Black)
+    all_pieces >>= 56;
+
+  all_pieces &= 0xffull;
+  all_pieces &= mask;
+
+  return bits == all_pieces;
+}
 
 // Returns all the non-attack moves for |piece| from square |from_square| to all
 // squares in |to_squares|. The moves are returned in |moves|, an output
@@ -100,7 +127,25 @@ GetSimpleMoves(
 std::vector<Move>
 MoveGen::KingMoves(const BoardState& state) const
 {
-  return std::vector<Move>();
+  std::vector<Move> moves;
+  GetSimpleMoves(Piece::King, state, MoveKing, moves);
+
+  auto all_pieces = state.all_mine | state.all_other;
+  constexpr auto p = Uint8(Piece::King);
+
+  if (state.next == Color::White and state.wk_castle) {
+    if (NoneBetweenKingAndRook(all_pieces, Color::White, BoardSide::King))
+      moves.emplace(Move::WhiteKingSideCastle());
+    if (NoneBetweenKingAndRook(all_pieces, Color::White, BoardSide::Queen))
+      moves.emplace(Move::WhiteQueenSideCastle());
+  } else if (state.next == Color::Black && state.bk_castle) {
+    if (NoneBetweenKingAndRook(all_pieces, Color::Black, BoardSide::King))
+      moves.emplace(Move::BlackKingSideCastle());
+    if (NoneBetweenKingAndRook(all_pieces, Color::Black, BoardSide::Queen))
+      moves.emplace(Move::BlackQueenSideCastle());
+  }
+
+  return moves;
 }
 
 // Generates all possible moves for queens on the board.
