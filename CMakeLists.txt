@@ -29,6 +29,9 @@ add_library(blunder STATIC
   src/magics.cc
   src/magics.h
   src/move.h
+  src/move_gen.cc
+  src/move_gen.h
+  src/move_generator.h
   src/moves.h
   src/pieces.h
   src/pre_computed_magics.h)

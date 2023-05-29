@@ -51,15 +51,18 @@ struct Move {
   constexpr Move(
       std::uint8_t from_piece,
       std::uint8_t from_square,
-      std::uint8_t to_square
-      std::uint8_t to_piece) noexcept
+      std::uint8_t to_piece,
+      std::uint8_t to_square) noexcept
     : from_piece(from_piece),
+      to_piece(to_piece),
       from_square(from_square),
-      to_square(to_square),
-      to_piece(to_piece) {}
+      to_square(to_square) {}
+
+  // Copy ctor.
+  constexpr Move(const Move& m) noexcept = default;
 
   // Default assignment operator.
-  Move operator=(Move m) noexcept = default;
+  Move& operator=(const Move& m) noexcept = default;
 
   static constexpr Move
   WhiteKingSideCastle() noexcept

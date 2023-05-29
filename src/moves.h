@@ -58,8 +58,8 @@ MoveWhitePawnsSingle(BitBoard pawns, BitBoard empty) noexcept
 constexpr BitBoard
 MoveWhitePawnsDouble(BitBoard pawns, BitBoard empty) noexcept
 {
-  pawns = MovePawnsWhiteSingle(pawns, empty);
-  return MovePawnsWhiteSingle(pawns, empty) & kRank4;
+  pawns = MoveWhitePawnsSingle(pawns, empty);
+  return MoveWhitePawnsSingle(pawns, empty) & kRank4;
 }
 
 // Returns the set of white pawns after attacking diagonal left.

@@ -16,9 +16,9 @@
 namespace blunder {
 namespace {
 
+template<Color color, BoardSide side>
 constexpr bool
-NoneBetweenKingAndRook(BitBoard all_pieces, Color color, BoardSide side)
-noexcept
+NoneBetweenKingAndRook(BitBoard all_pieces) noexcept
 {
   std::uint8_t bits = 0;
   std::uint8_t mask = 0;
@@ -51,7 +51,7 @@ GetNonAttacks(
     std::vector<Move>& moves)
 {
   auto p = Uint8(piece);
-  for (; to_squares; to_square &= to_squares - 1) {
+  for (; to_squares; to_squares &= to_squares - 1) {
     auto to_square = std::countr_zero(to_squares);
     moves.emplace_back(p, from_square, to_square);
   }
@@ -74,7 +74,7 @@ GetSimpleAttacks(
     BitBoard attacked = 1ull << to_square;
     auto to_piece = GetPieceUint8(other, attacked);
     assert(to_piece >= 0 and to_piece < 6);
-    moves.emplace_back(p, from_square, to_square, to_piece);
+    moves.emplace_back(p, from_square, to_piece, to_square);
   }
 }
 
@@ -84,7 +84,7 @@ GetSimpleAttacks(
 // moves for the given piece, including non-attacks and attacks.
 void
 GetSimpleMoves(
-    Piece piece
+    Piece piece,
     const BoardState& state,
     const std::function<BitBoard(BitBoard)>& moves_fn,
     std::vector<Move>& moves)
@@ -93,13 +93,11 @@ GetSimpleMoves(
   auto all_pieces = state.all_mine | state.all_other;
   auto no_pieces = ~all_pieces;
 
-  std::vector<Move> moves;
-
   for (; bb; bb &= bb - 1) {
     auto from_square = std::countr_zero(bb);
     auto bb_piece = 1ull << from_square;
 
-    auto bb_moves = move_fn(bb_piece);
+    auto bb_moves = moves_fn(bb_piece);
 
     // Compute moves to empty squares.
     auto to_squares = bb_moves & no_pieces;
@@ -107,14 +105,14 @@ GetSimpleMoves(
 
     // Compute attacks.
     to_squares = bb_moves & state.all_other;
-    GetSimpleAttackes(piece, from_square, to_squares, state.other, moves);
+    GetSimpleAttacks(piece, from_square, to_squares, state.other, moves);
   }
 }
 
 // Same as above, but list of moves is returned as output.
 std::vector<Move>
 GetSimpleMoves(
-    Piece piece
+    Piece piece,
     const BoardState& state,
     const std::function<BitBoard(BitBoard)>& moves_fn)
 {
@@ -131,23 +129,22 @@ MoveGen::KingMoves(const BoardState& state) const
   GetSimpleMoves(Piece::King, state, MoveKing, moves);
 
   auto all_pieces = state.all_mine | state.all_other;
-  constexpr auto p = Uint8(Piece::King);
 
   switch (state.next) {
   case Color::White:
     if (state.wk_castle) {
-      if (NoneBetweenKingAndRook(all_pieces, Color::White, BoardSide::King))
-        moves.emplace(Move::WhiteKingSideCastle());
-      if (NoneBetweenKingAndRook(all_pieces, Color::White, BoardSide::Queen))
-        moves.emplace(Move::WhiteQueenSideCastle());
+      if (NoneBetweenKingAndRook<Color::White, BoardSide::King>(all_pieces))
+        moves.push_back(Move::WhiteKingSideCastle());
+      if (NoneBetweenKingAndRook<Color::White, BoardSide::Queen>(all_pieces))
+        moves.push_back(Move::WhiteQueenSideCastle());
     }
     break;
   case Color::Black:
     if (state.bk_castle) {
-      if (NoneBetweenKingAndRook(all_pieces, Color::Black, BoardSide::King))
-        moves.emplace(Move::BlackKingSideCastle());
-      if (NoneBetweenKingAndRook(all_pieces, Color::Black, BoardSide::Queen))
-        moves.emplace(Move::BlackQueenSideCastle());
+      if (NoneBetweenKingAndRook<Color::Black, BoardSide::King>(all_pieces))
+        moves.push_back(Move::BlackKingSideCastle());
+      if (NoneBetweenKingAndRook<Color::Black, BoardSide::Queen>(all_pieces))
+        moves.push_back(Move::BlackQueenSideCastle());
     }
     break;
   }
@@ -196,12 +193,14 @@ MoveGen::KnightMoves(const BoardState& state) const
 std::vector<Move>
 MoveGen::PawnMoves(const BoardState& state) const
 {
+  (void)state;
   return std::vector<Move>();
 }
 
 std::vector<Move>
 MoveGen::AllMoves(const BoardState& state) const
 {
+  (void)state;
   return std::vector<Move>();
 }
 
