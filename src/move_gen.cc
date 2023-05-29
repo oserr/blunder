@@ -133,16 +133,23 @@ MoveGen::KingMoves(const BoardState& state) const
   auto all_pieces = state.all_mine | state.all_other;
   constexpr auto p = Uint8(Piece::King);
 
-  if (state.next == Color::White and state.wk_castle) {
-    if (NoneBetweenKingAndRook(all_pieces, Color::White, BoardSide::King))
-      moves.emplace(Move::WhiteKingSideCastle());
-    if (NoneBetweenKingAndRook(all_pieces, Color::White, BoardSide::Queen))
-      moves.emplace(Move::WhiteQueenSideCastle());
-  } else if (state.next == Color::Black && state.bk_castle) {
-    if (NoneBetweenKingAndRook(all_pieces, Color::Black, BoardSide::King))
-      moves.emplace(Move::BlackKingSideCastle());
-    if (NoneBetweenKingAndRook(all_pieces, Color::Black, BoardSide::Queen))
-      moves.emplace(Move::BlackQueenSideCastle());
+  switch (state.next) {
+  case Color::White:
+    if (state.wk_castle) {
+      if (NoneBetweenKingAndRook(all_pieces, Color::White, BoardSide::King))
+        moves.emplace(Move::WhiteKingSideCastle());
+      if (NoneBetweenKingAndRook(all_pieces, Color::White, BoardSide::Queen))
+        moves.emplace(Move::WhiteQueenSideCastle());
+    }
+    break;
+  case Color::Black:
+    if (state.bk_castle) {
+      if (NoneBetweenKingAndRook(all_pieces, Color::Black, BoardSide::King))
+        moves.emplace(Move::BlackKingSideCastle());
+      if (NoneBetweenKingAndRook(all_pieces, Color::Black, BoardSide::Queen))
+        moves.emplace(Move::BlackQueenSideCastle());
+    }
+    break;
   }
 
   return moves;
