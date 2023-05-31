@@ -126,6 +126,36 @@ struct Move {
     m.promo_piece = Uint8(promo);
     return m;
   }
+
+  static Move
+  PawnPromo(
+      std::uint8_t from_square,
+      std::uint8_t to_square,
+      Piece promo) noexcept
+  {
+    assert(to_square < 64);
+
+    Move m(Uint8(Piece::Pawn), from_square, to_square);
+    m.is_promo = 1;
+    m.promo_piece = Uint8(promo);
+    return m;
+  }
+
+  static Move
+  PawnPromo(
+      std::uint8_t from_square,
+      std::uint8_t to_piece,
+      std::uint8_t to_square,
+      Piece promo) noexcept
+  {
+    assert(to_square < 64);
+
+    Move m(Uint8(Piece::Pawn), from_square, to_piece, to_square);
+    m.is_promo = 1;
+    m.promo_piece = Uint8(promo);
+    return m;
+  }
+
 };
 
 } // namespace blunder

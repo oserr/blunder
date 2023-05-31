@@ -120,6 +120,110 @@ GetSimpleMoves(
   GetSimpleMoves(piece, state, moves_fn, moves);
   return moves;
 }
+
+using PawnMovesFn = BitBoard(*)(BitBoard, BitBoard);
+using FromFn = std::uint8_t(*)(std::uint8_t);
+using IsPromoFn = bool(*)(std::uint8_t);
+
+bool
+IsWhitePromo(std::uint8_t to_square) noexcept
+{ return to_square >= 56; }
+
+bool
+IsBlackPromo(std::uint8_t to_square) noexcept
+{ return to_square <= 7; }
+
+std::uint8_t
+FromSingleWhite(std::uint8_t to_square) noexcept
+{ return to_square - 8; }
+
+std::uint8_t
+FromDoubleWhite(std::uint8_t to_square) noexcept
+{ return to_square - 16; }
+
+std::uint8_t
+FromLeftWhite(std::uint8_t to_square) noexcept
+{ return to_square - 7; }
+
+std::uint8_t
+FromRightWhite(std::uint8_t to_square) noexcept
+{ return to_square - 9; }
+
+std::uint8_t
+FromSingleBlack(std::uint8_t to_square) noexcept
+{ return to_square + 8; }
+
+std::uint8_t
+FromDoubleBlack(std::uint8_t to_square) noexcept
+{ return to_square + 16; }
+
+std::uint8_t
+FromLeftBlack(std::uint8_t to_square) noexcept
+{ return to_square + 7; }
+
+std::uint8_t
+FromRightBlack(std::uint8_t to_square) noexcept
+{ return to_square + 9; }
+
+void
+MovePawnsForward(
+    BitBoard pawns,
+    BitBoard no_pieces,
+    PawnMovesFn move_fn,
+    FromFn from_fn,
+    IsPromoFn is_promo_fn,
+    std::vector<Move>& moves)
+{
+  auto pawn_moves = move_fn(pawns, no_pieces);
+
+  for (; pawn_moves; pawn_moves &= pawn_moves - 1) {
+    auto to_square = std::countr_zero(pawn_moves);
+    auto from_square = from_fn(to_square);
+
+    if (not is_promo_fn(to_square))
+      moves.emplace_back(Uint8(Piece::Pawn), from_square, to_square);
+    else {
+      // Pawn is moving to the last rank for promotion.
+      moves.push_back(Move::PawnPromo(from_square, to_square, Piece::Queen));
+      moves.push_back(Move::PawnPromo(from_square, to_square, Piece::Rook));
+      moves.push_back(Move::PawnPromo(from_square, to_square, Piece::Bishop));
+      moves.push_back(Move::PawnPromo(from_square, to_square, Piece::Knight));
+    }
+  }
+}
+
+void
+MovePawnsAttack(
+    BitBoard pawns,
+    BoardState state,
+    PawnMovesFn move_fn,
+    FromFn from_fn,
+    IsPromoFn is_promo_fn,
+    std::vector<Move>& moves)
+{
+  auto pawn_moves = move_fn(pawns, state.all_other);
+
+  for (; pawn_moves; pawn_moves &= pawn_moves - 1) {
+    auto to_square = std::countr_zero(pawn_moves);
+    auto to_bb = 1ull << to_square;
+    auto to_piece = GetPieceUint8(state.other, to_bb);
+    auto from_square = from_fn(to_square);
+
+    if (not is_promo_fn(to_square))
+      moves.emplace_back(Uint8(Piece::Pawn), from_square, to_piece, to_square);
+    else {
+      moves.push_back(Move::PawnPromo(
+            from_square, to_piece, to_square, Piece::Queen));
+      moves.push_back(Move::PawnPromo(
+            from_square, to_piece, to_square, Piece::Rook));
+      moves.push_back(Move::PawnPromo(
+            from_square, to_piece, to_square, Piece::Bishop));
+      moves.push_back(Move::PawnPromo(
+            from_square, to_piece, to_square, Piece::Knight));
+    }
+  }
+}
+
 } // namespace
 
 std::vector<Move>
@@ -193,88 +297,54 @@ MoveGen::KnightMoves(const BoardState& state) const
 std::vector<Move>
 MoveGen::PawnMoves(const BoardState& state) const
 {
-  BitBoard pawn_moves = 0;
-  auto no_pieces = ~(state.all_mine | state.all_other);
-  BitBoard pawns = state.mine[Uint8(Piece::Pawn)];
-  constexpr auto pawn = Uint8(Piece::Pawn);
-
-  std::vector<Move> moves;
+  PawnMovesFn single_fn;
+  PawnMovesFn double_fn;
+  PawnMovesFn attack_left_fn;
+  PawnMovesFn attack_right_fn;
+  FromFn from_single_fn;
+  FromFn from_double_fn;
+  FromFn from_left_fn;
+  FromFn from_right_fn;
+  IsPromoFn is_promo_fn;
 
   switch (state.next) {
   case Color::White:
-    // TODO: need to check if en passant if possible, and if it is, the file
-    // where the pawn can be captured.
-    pawn_moves = MoveWhitePawnsSingle(pawns, no_pieces);
-
-    for (; pawn_moves; pawn_moves &= pawn_moves - 1) {
-      auto to_square = std::countr_zero(pawn_moves);
-
-      if (to_square < 56)
-        moves.emplace_back(pawn, to_square - 8, to_square);
-      else {
-        // Pawn is moving to the last rank for promotion.
-        moves.push_back(Move::WhitePawnPromo(to_square, Piece::Queen));
-        moves.push_back(Move::WhitePawnPromo(to_square, Piece::Rook));
-        moves.push_back(Move::WhitePawnPromo(to_square, Piece::Bishop));
-        moves.push_back(Move::WhitePawnPromo(to_square, Piece::Knight));
-      }
-    }
-
-    pawn_moves = MoveWhitePawnsDouble(pawns, no_pieces);
-
-    for (; pawn_moves; pawn_moves &= pawn_moves - 1) {
-      auto to_square = std::countr_zero(pawn_moves);
-      auto from_square = to_square - 16;
-      moves.emplace_back(pawn, from_square, to_square);
-    }
-
-    pawn_moves = MoveWhitePawnsAttackLeft(pawns, state.all_other);
-
-    for (; pawn_moves; pawn_moves &= pawn_moves - 1) {
-      auto to_square = std::countr_zero(pawn_moves);
-      auto to_bb = 1ull << to_square;
-      auto to_piece = GetPieceUint8(state.other, to_bb);
-      auto from_square = to_square - 7;
-
-      if (to_square < 56)
-        moves.emplace_back(pawn, from_square, to_piece, to_square);
-      else {
-        moves.push_back(Move::WhitePawnPromo(
-              from_square, to_piece, to_square, Piece::Queen));
-        moves.push_back(Move::WhitePawnPromo(
-              from_square, to_piece, to_square, Piece::Rook));
-        moves.push_back(Move::WhitePawnPromo(
-              from_square, to_piece, to_square, Piece::Bishop));
-        moves.push_back(Move::WhitePawnPromo(
-              from_square, to_piece, to_square, Piece::Knight));
-      }
-    }
-
-    pawn_moves = MoveWhitePawnsAttackRight(pawns, state.all_other);
-
-    for (; pawn_moves; pawn_moves &= pawn_moves - 1) {
-      auto to_square = std::countr_zero(pawn_moves);
-      auto to_bb = 1ull << to_square;
-      auto to_piece = GetPieceUint8(state.other, to_bb);
-      auto from_square = to_square - 9;
-
-      if (to_square < 56)
-        moves.emplace_back(pawn, from_square, to_piece, to_square);
-      else {
-        moves.push_back(Move::WhitePawnPromo(
-              from_square, to_piece, to_square, Piece::Queen));
-        moves.push_back(Move::WhitePawnPromo(
-              from_square, to_piece, to_square, Piece::Rook));
-        moves.push_back(Move::WhitePawnPromo(
-              from_square, to_piece, to_square, Piece::Bishop));
-        moves.push_back(Move::WhitePawnPromo(
-              from_square, to_piece, to_square, Piece::Knight));
-      }
-    }
+    single_fn = MoveWhitePawnsSingle;
+    double_fn = MoveWhitePawnsDouble;
+    attack_left_fn = MoveWhitePawnsAttackLeft;
+    attack_right_fn = MoveWhitePawnsAttackRight;
+    from_single_fn = FromSingleWhite;
+    from_double_fn = FromDoubleWhite;
+    from_left_fn = FromLeftWhite;
+    from_right_fn = FromRightWhite;
+    is_promo_fn = IsWhitePromo;
+    break;
   default:
-    // TODO: Add logic for black pieces and see about consolidating logic.
+    single_fn = MoveBlackPawnsSingle;
+    double_fn = MoveBlackPawnsDouble;
+    attack_left_fn = MoveBlackPawnsAttackLeft;
+    attack_right_fn = MoveBlackPawnsAttackRight;
+    from_single_fn = FromSingleBlack;
+    from_double_fn = FromDoubleBlack;
+    from_left_fn = FromLeftBlack;
+    from_right_fn = FromRightBlack;
+    is_promo_fn = IsBlackPromo;
     break;
   }
+
+  BitBoard pawns = state.mine[Uint8(Piece::Pawn)];
+  auto no_pieces = ~(state.all_mine | state.all_other);
+  std::vector<Move> moves;
+
+  // TODO: handle en passant moves
+  MovePawnsForward(
+      pawns, no_pieces, single_fn, from_single_fn, is_promo_fn, moves);
+  MovePawnsForward(
+      pawns, no_pieces, double_fn, from_double_fn, is_promo_fn, moves);
+  MovePawnsAttack(
+      pawns, state, attack_left_fn, from_left_fn, is_promo_fn, moves);
+  MovePawnsAttack(
+      pawns, state, attack_right_fn, from_right_fn, is_promo_fn, moves);
 
   return moves;
 }
