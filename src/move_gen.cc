@@ -230,6 +230,69 @@ std::vector<Move>
 MoveGen::KingMoves(const BoardState& state) const
 {
   std::vector<Move> moves;
+  KingMoves(state, moves);
+  return moves;
+}
+
+// Generates all possible moves for queens on the board.
+std::vector<Move>
+MoveGen::QueenMoves(const BoardState& state) const
+{
+  std::vector<Move> moves;
+  QueenMoves(state, moves);
+  return moves;
+}
+
+std::vector<Move>
+MoveGen::RookMoves(const BoardState& state) const
+{
+  std::vector<Move> moves;
+  RookMoves(state, moves);
+  return moves;
+}
+
+std::vector<Move>
+MoveGen::BishopMoves(const BoardState& state) const
+{
+  std::vector<Move> moves;
+  BishopMoves(state, moves);
+  return moves;
+}
+
+std::vector<Move>
+MoveGen::KnightMoves(const BoardState& state) const
+{
+  return GetSimpleMoves(Piece::Knight, state, MoveKnight);
+}
+
+std::vector<Move>
+MoveGen::PawnMoves(const BoardState& state) const
+{
+  std::vector<Move> moves;
+  PawnMoves(state, moves);
+  return moves;
+}
+
+std::vector<Move>
+MoveGen::AllMoves(const BoardState& state) const
+{
+  // TODO: determine if there are any performance gains from computing the moves
+  // in parallel.
+  std::vector<Move> moves;
+  KingMoves(state, moves);
+  QueenMoves(state, moves);
+  RookMoves(state, moves);
+  BishopMoves(state, moves);
+  KnightMoves(state, moves);
+  PawnMoves(state, moves);
+  return moves;
+}
+
+void
+MoveGen::KingMoves(
+    const BoardState& state,
+    std::vector<Move>& moves) const
+{
   GetSimpleMoves(Piece::King, state, MoveKing, moves);
 
   auto all_pieces = state.all_mine | state.all_other;
@@ -252,50 +315,57 @@ MoveGen::KingMoves(const BoardState& state) const
       moves.push_back(Move::BlackQueenSideCastle());
     break;
   }
-
-  return moves;
 }
 
-// Generates all possible moves for queens on the board.
-std::vector<Move>
-MoveGen::QueenMoves(const BoardState& state) const
+void
+MoveGen::QueenMoves(
+    const BoardState& state,
+    std::vector<Move>& moves) const
 {
   auto all_pieces = state.all_mine | state.all_other;
   auto moves_fn = [&](BitBoard bb) {
     return rmagics_.GetAttacks(bb, all_pieces)
          | bmagics_.GetAttacks(bb, all_pieces);
   };
-  return GetSimpleMoves(Piece::Queen, state, moves_fn);
+  GetSimpleMoves(Piece::Queen, state, moves_fn, moves);
 }
 
-std::vector<Move>
-MoveGen::RookMoves(const BoardState& state) const
+void
+MoveGen::RookMoves(
+    const BoardState& state,
+    std::vector<Move>& moves) const
 {
   auto all_pieces = state.all_mine | state.all_other;
   auto moves_fn = [&](BitBoard bb) {
     return rmagics_.GetAttacks(bb, all_pieces);
   };
-  return GetSimpleMoves(Piece::Rook, state, moves_fn);
+  GetSimpleMoves(Piece::Rook, state, moves_fn, moves);
 }
 
-std::vector<Move>
-MoveGen::BishopMoves(const BoardState& state) const
+void
+MoveGen::BishopMoves(
+    const BoardState& state,
+    std::vector<Move>& moves) const
 {
   auto all_pieces = state.all_mine | state.all_other;
   auto moves_fn = [&](BitBoard bb) {
     return bmagics_.GetAttacks(bb, all_pieces);
   };
-  return GetSimpleMoves(Piece::Bishop, state, moves_fn);
+  GetSimpleMoves(Piece::Bishop, state, moves_fn, moves);
 }
 
-std::vector<Move>
-MoveGen::KnightMoves(const BoardState& state) const
+void
+MoveGen::KnightMoves(
+    const BoardState& state,
+    std::vector<Move>& moves) const
 {
-  return GetSimpleMoves(Piece::Knight, state, MoveKnight);
+  GetSimpleMoves(Piece::Knight, state, MoveKnight, moves);
 }
 
-std::vector<Move>
-MoveGen::PawnMoves(const BoardState& state) const
+void
+MoveGen::PawnMoves(
+    const BoardState& state,
+    std::vector<Move>& moves) const
 {
   PawnMovesFn single_fn;
   PawnMovesFn double_fn;
@@ -334,7 +404,6 @@ MoveGen::PawnMoves(const BoardState& state) const
 
   BitBoard pawns = state.mine[Uint8(Piece::Pawn)];
   auto no_pieces = ~(state.all_mine | state.all_other);
-  std::vector<Move> moves;
 
   // TODO: handle en passant moves
   MovePawnsForward(
@@ -345,15 +414,6 @@ MoveGen::PawnMoves(const BoardState& state) const
       pawns, state, attack_left_fn, from_left_fn, is_promo_fn, moves);
   MovePawnsAttack(
       pawns, state, attack_right_fn, from_right_fn, is_promo_fn, moves);
-
-  return moves;
-}
-
-std::vector<Move>
-MoveGen::AllMoves(const BoardState& state) const
-{
-  (void)state;
-  return std::vector<Move>();
 }
 
 } // namespace blunder

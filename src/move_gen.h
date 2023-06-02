@@ -50,6 +50,33 @@ public:
   AllMoves(const BoardState& state) const override;
 
 private:
+  // Generates all possible moves for a king, including castling with the rook.
+  // These may include moves that put the king in check. It is up to client of
+  // MoveGen to determine which moves put the king in check.
+  void
+  KingMoves(const BoardState& state, std::vector<Move>& moves) const;
+
+  // Generates all possible moves for queens on the board.
+  void
+  QueenMoves(const BoardState& state, std::vector<Move>& moves) const;
+
+  // Generates all possible moves for rooks on the board, except for castling
+  // moves.
+  void
+  RookMoves(const BoardState& state, std::vector<Move>& moves) const;
+
+  // Generates all possible moves for bishops on the board.
+  void
+  BishopMoves(const BoardState& state, std::vector<Move>& moves) const;
+
+  // Generates all possible moves for knights on the board.
+  void
+  KnightMoves(const BoardState& state, std::vector<Move>& moves) const;
+
+  // Generates all possible moves for pawns on the board.
+  void
+  PawnMoves(const BoardState& state, std::vector<Move>& moves) const;
+
   // Magic bitboards for bishops.
   MagicAttacks bmagics_;
 
