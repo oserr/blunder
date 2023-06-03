@@ -17,6 +17,15 @@ else()
   add_compile_options(-Wall -Wextra -Wpedantic -Ofast)
 endif()
 
+include(FetchContent)
+
+# Googletest
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG v1.13.0)
+FetchContent_MakeAvailable(googletest)
+
 add_library(blunder STATIC
   src/bitboard.cc
   src/bitboard.h
@@ -44,3 +53,10 @@ target_link_libraries(bbprinter blunder)
 add_executable(genmagic src/genmagic.cc)
 target_compile_features(genmagic PRIVATE)
 target_link_libraries(genmagic blunder)
+
+include(GoogleTest)
+
+add_executable(moves_test test/moves_test.cc)
+target_include_directories(moves_test PUBLIC src)
+target_compile_features(moves_test PRIVATE)
+target_link_libraries(moves_test blunder GTest::gtest_main)
