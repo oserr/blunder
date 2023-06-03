@@ -1,5 +1,6 @@
 #pragma once
 
+#include <set>
 #include <string>
 
 #include "bitboard.h"
@@ -40,5 +41,8 @@ ToSqStr(unsigned val);
 inline std::string
 ToStr(Sq sq)
 { return ToSqStr(ToUint(sq)); }
+
+std::set<Sq>
+ToSetOfSq(BitBoard bb);
 
 } // namespace blunder

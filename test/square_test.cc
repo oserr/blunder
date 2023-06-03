@@ -1,6 +1,7 @@
 #include "square.h"
 
 #include <array>
+#include <set>
 #include <string_view>
 
 #include "gmock/gmock.h"
@@ -62,4 +63,10 @@ TEST(ToSqStr, ConvertsUnsignedToSquareString)
   for (unsigned i = 0; i < kSquares.size(); ++i) {
     EXPECT_EQ(ToSqStr(i), kSquareStr[i]);
   }
+}
+
+TEST(ToSetOfSq, ConvertsBitBoardToSquares)
+{
+  auto squares = std::set<Sq>{Sq::c1, Sq::f1, Sq::h1};
+  EXPECT_EQ(ToSetOfSq(0b10100100), squares);
 }

@@ -1,5 +1,6 @@
 #include "square.h"
 
+#include <bit>
 #include <cassert>
 
 namespace blunder {
@@ -17,6 +18,17 @@ ToSqStr(unsigned val)
   letters[2] = 0;
 
   return letters;
+}
+
+std::set<Sq>
+ToSetOfSq(BitBoard bb)
+{
+  std::set<Sq> squares;
+  for (; bb; bb &= bb - 1) {
+    unsigned index = std::countr_zero(bb);
+    squares.insert(ToSq(index));
+  }
+  return squares;
 }
 
 } // namespace blunder
