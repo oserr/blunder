@@ -15,12 +15,13 @@ MoveSouth(BitBoard bb) noexcept
 constexpr BitBoard
 MoveKing(BitBoard king) noexcept
 {
-  const auto left = (king & ~kFileA) >> 1;
-  const auto right = (king & ~kFileH) << 1;
-  king |= left | right;
-  const auto down = (king & ~kRank1) >> 8;
-  const auto up = (king & ~kRank8) << 8;
-  return down | up;
+  auto k = king;
+  const auto left = (k & ~kFileA) >> 1;
+  const auto right = (k & ~kFileH) << 1;
+  k |= left | right;
+  const auto down = (k & ~kRank1) >> 8;
+  const auto up = (k & ~kRank8) << 8;
+  return (k | down | up) & ~king;
 }
 
 // Returns the set of squares where a king can move, except for castling.
