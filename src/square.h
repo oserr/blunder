@@ -1,5 +1,6 @@
 #pragma once
 
+#include <initializer_list>
 #include <set>
 #include <string>
 
@@ -44,5 +45,8 @@ ToStr(Sq sq)
 
 std::set<Sq>
 ToSetOfSq(BitBoard bb);
+
+BitBoard
+ToBitBoard(std::initializer_list<Sq> squares) noexcept;
 
 } // namespace blunder

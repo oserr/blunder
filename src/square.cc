@@ -31,4 +31,12 @@ ToSetOfSq(BitBoard bb)
   return squares;
 }
 
+BitBoard
+ToBitBoard(std::initializer_list<Sq> squares) noexcept
+{
+  BitBoard bb = 0;
+  for (auto sq : squares)
+    bb |= ToBitBoard(sq);
+  return bb;
+}
 } // namespace blunder
