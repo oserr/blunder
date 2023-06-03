@@ -99,9 +99,7 @@ TEST(MoveKing, FromE5)
 {
   auto king = ToBitBoard(Sq::e5);
   auto moves = SqList{
-    Sq::d4, Sq::d5, Sq::d6,
-    Sq::e4, Sq::e6,
-    Sq::f4, Sq::f5, Sq::f6};
+    Sq::d4, Sq::d5, Sq::d6, Sq::e4, Sq::e6, Sq::f4, Sq::f5, Sq::f6};
   EXPECT_THAT(MoveKing(king), EqualToSq(moves));
 }
 
@@ -110,4 +108,33 @@ TEST(MoveKing, FromG8)
   auto king = ToBitBoard(Sq::g8);
   auto moves = SqList{Sq::f8, Sq::h8, Sq::f7, Sq::g7, Sq::h7};
   EXPECT_THAT(MoveKing(king), EqualToSq(moves));
+}
+
+TEST(MoveKnight, FromB1)
+{
+  auto knight = ToBitBoard(Sq::b1);
+  auto moves = SqList{Sq::a3, Sq::c3, Sq::d2};
+  EXPECT_THAT(MoveKnight(knight), EqualToSq(moves));
+}
+
+TEST(MoveKnight, FromD4)
+{
+  auto knight = ToBitBoard(Sq::d4);
+  auto moves = SqList{
+    Sq::c2, Sq::b3, Sq::b5, Sq::c6, Sq::e6, Sq::f5, Sq::f3, Sq::e2};
+  EXPECT_THAT(MoveKnight(knight), EqualToSq(moves));
+}
+
+TEST(MoveKnight, FromG5)
+{
+  auto knight = ToBitBoard(Sq::g5);
+  auto moves = SqList{Sq::f3, Sq::e4, Sq::e6, Sq::f7, Sq::h7, Sq::h3};
+  EXPECT_THAT(MoveKnight(knight), EqualToSq(moves));
+}
+
+TEST(MoveKnight, FromA8)
+{
+  auto knight = ToBitBoard(Sq::a8);
+  auto moves = SqList{Sq::b6, Sq::c7};
+  EXPECT_THAT(MoveKnight(knight), EqualToSq(moves));
 }
