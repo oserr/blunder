@@ -43,7 +43,9 @@ add_library(blunder STATIC
   src/move_generator.h
   src/moves.h
   src/pieces.h
-  src/pre_computed_magics.h)
+  src/pre_computed_magics.h
+  src/square.cc
+  src/square.h)
 target_compile_features(blunder PRIVATE)
 
 add_executable(bbprinter src/bbprinter.cc)
@@ -60,3 +62,8 @@ add_executable(moves_test test/moves_test.cc)
 target_include_directories(moves_test PUBLIC src)
 target_compile_features(moves_test PRIVATE)
 target_link_libraries(moves_test blunder GTest::gmock_main)
+
+add_executable(square_test test/square_test.cc)
+target_include_directories(square_test PUBLIC src)
+target_compile_features(square_test PRIVATE)
+target_link_libraries(square_test blunder GTest::gmock_main)
