@@ -70,3 +70,9 @@ TEST(ToSetOfSq, ConvertsBitBoardToSquares)
   auto squares = std::set<Sq>{Sq::c1, Sq::f1, Sq::h1};
   EXPECT_EQ(ToSetOfSq(0b10100100), squares);
 }
+
+TEST(ToBitBoard, ConvertsSquaresToBitBoard)
+{
+  BitBoard bb = 1 | (1 << 8) | (1 << 23) | (1ull << 63);
+  EXPECT_EQ(ToBitBoard({Sq::a1, Sq::a2, Sq::h3, Sq::h8}), bb);
+}
