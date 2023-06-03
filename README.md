@@ -12,6 +12,7 @@ A chess engine written in modern C++.
   `make` or `ninja`.
 * A unix-like environment, e.g. Linux, MacOS. Support for Windows will be added
   later.
+* Google Test for unit testing.
 
 ## Compiling
 
