@@ -47,14 +47,14 @@ std::pair<MagicAttacks, MagicAttacks>
 GenerateMagics()
 {
   // Handle bishops.
-  auto magic_bishops = MagicAttacks::ComputeBishopMagics();
+  auto magic_bishops = ComputeBishopMagics();
   if (not magic_bishops) {
     std::cerr << "Unable to compute magic attacks for bishops." << std::endl;
     std::exit(EXIT_FAILURE);
   }
 
   // Handle rooks.
-  auto magic_rooks = MagicAttacks::ComputeRookMagics();
+  auto magic_rooks = ComputeRookMagics();
   if (not magic_rooks) {
     std::cerr << "Unable to compute magic attacks for rooks." << std::endl;
     std::exit(EXIT_FAILURE);
@@ -67,15 +67,14 @@ std::pair<MagicAttacks, MagicAttacks>
 UsePrecomputedMagics()
 {
   // Handle bishops.
-  auto magic_bishops =
-    MagicAttacks::InitFromBishopMagics(kBishopMagics);
+  auto magic_bishops = InitFromBishopMagics(kBishopMagics);
   if (not magic_bishops) {
     std::cerr << "Unable to use precomputed magics for bishops." << std::endl;
     std::exit(EXIT_FAILURE);
   }
 
   // Handle rooks.
-  auto magic_rooks = MagicAttacks::InitFromRookMagics(kRookMagics);
+  auto magic_rooks = InitFromRookMagics(kRookMagics);
   if (not magic_rooks) {
     std::cerr << "Unable to use precomputed magics for rooks." << std::endl;
     std::exit(EXIT_FAILURE);
