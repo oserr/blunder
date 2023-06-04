@@ -2,7 +2,7 @@
 
 namespace blunder {
 
-enum class Error {
+enum class Err {
   MagicNotFound,
   MagicBitsOutOfRange,
 };

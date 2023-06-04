@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "bitboard.h"
-#include "error.h"
+#include "err.h"
 
 namespace blunder {
 
@@ -20,16 +20,16 @@ struct Magic {
 
 class MagicAttacks {
 public:
-  static std::expected<MagicAttacks, Error>
+  static std::expected<MagicAttacks, Err>
   ComputeBishopMagics();
 
-  static std::expected<MagicAttacks, Error>
+  static std::expected<MagicAttacks, Err>
   ComputeRookMagics();
 
-  static std::expected<MagicAttacks, Error>
+  static std::expected<MagicAttacks, Err>
   InitFromBishopMagics(std::span<const std::uint64_t> magics);
 
-  static std::expected<MagicAttacks, Error>
+  static std::expected<MagicAttacks, Err>
   InitFromRookMagics(std::span<const std::uint64_t> magics);
 
   BitBoard

@@ -34,7 +34,7 @@ add_library(blunder STATIC
   src/board_side.h
   src/board_state.h
   src/color.h
-  src/error.h
+  src/err.h
   src/magics.cc
   src/magics.h
   src/move.h

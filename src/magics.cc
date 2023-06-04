@@ -12,7 +12,7 @@
 #include <utility>
 
 #include "bitboard.h"
-#include "error.h"
+#include "err.h"
 
 namespace blunder {
 namespace {
@@ -48,7 +48,7 @@ PermuteMask(std::uint32_t num, std::uint32_t num_bits, BitBoard mask) noexcept
   return mask_combo;
 }
 
-std::expected<std::pair<Magic, std::uint32_t>, Error>
+std::expected<std::pair<Magic, std::uint32_t>, Err>
 FindMagic(
     std::uint32_t sq,
     std::function<BitBoard(std::uint32_t)> mask_fn,
@@ -60,7 +60,7 @@ FindMagic(
   std::uint32_t num_bits = std::popcount(mask);
 
   if (num_bits < 5 or num_bits > 12)
-    return std::unexpected(Error::MagicBitsOutOfRange);
+    return std::unexpected(Err::MagicBitsOutOfRange);
 
   const auto ncombos = 1u << num_bits;
   constexpr unsigned kMaxCombos = 1 << 12;
@@ -104,10 +104,10 @@ FindMagic(
   }
 
   // Unable to find a magic number.
-  return std::unexpected(Error::MagicNotFound);
+  return std::unexpected(Err::MagicNotFound);
 }
 
-std::expected<std::vector<Magic>, Error>
+std::expected<std::vector<Magic>, Err>
 FindAllMagics(
     std::function<BitBoard(std::uint32_t)> mask_fn,
     std::function<BitBoard(std::uint32_t, BitBoard)> attacks_fn,
@@ -144,7 +144,7 @@ CreateRandFn() noexcept
 
 } // namespace
 
-std::expected<MagicAttacks, Error>
+std::expected<MagicAttacks, Err>
 MagicAttacks::ComputeBishopMagics()
 {
   auto magic_fn = CreateRandFn();
@@ -154,7 +154,7 @@ MagicAttacks::ComputeBishopMagics()
   return MagicAttacks(std::move(*magics));
 }
 
-std::expected<MagicAttacks, Error>
+std::expected<MagicAttacks, Err>
 MagicAttacks::ComputeRookMagics()
 {
   auto magic_fn = CreateRandFn();
@@ -164,7 +164,7 @@ MagicAttacks::ComputeRookMagics()
   return MagicAttacks(std::move(*magics));
 }
 
-std::expected<MagicAttacks, Error>
+std::expected<MagicAttacks, Err>
 MagicAttacks::InitFromBishopMagics(std::span<const std::uint64_t> magics)
 {
   assert(magics.size() == 64);
@@ -175,7 +175,7 @@ MagicAttacks::InitFromBishopMagics(std::span<const std::uint64_t> magics)
   return MagicAttacks(std::move(*all_magics));
 }
 
-std::expected<MagicAttacks, Error>
+std::expected<MagicAttacks, Err>
 MagicAttacks::InitFromRookMagics(std::span<const std::uint64_t> magics)
 {
   auto magic_fn = [sq=0, magics=magics] mutable { return magics[sq++]; };
