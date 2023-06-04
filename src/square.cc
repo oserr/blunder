@@ -32,11 +32,41 @@ ToSetOfSq(BitBoard bb)
 }
 
 BitBoard
-ToBitBoard(std::initializer_list<Sq> squares) noexcept
+ToBitBoard(SqList squares) noexcept
 {
   BitBoard bb = 0;
   for (auto sq : squares)
     bb |= ToBitBoard(sq);
   return bb;
 }
+
+std::string
+ToListStr(const std::set<Sq>& squares)
+{
+  std::string out;
+  out.reserve(squares.size() * 6);
+
+  out += '[';
+
+  auto first = squares.begin();
+  auto last = squares.end();
+
+  if (first != last)
+    out += ToStr(*first++);
+
+  while (first != last)
+    out += ", " + ToStr(*first++);
+
+  out += ']';
+
+  return out;
+}
+
+std::string
+ToListStr(SqList squares)
+{
+  std::set<Sq> sqs{squares.begin(), squares.end()};
+  return ToListStr(sqs);
+}
+
 } // namespace blunder

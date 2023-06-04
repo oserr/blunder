@@ -20,6 +20,8 @@ enum class Sq {
   a8, b8, c8, d8, e8, f8, g8, h8,
 };
 
+using SqList = std::initializer_list<Sq>;
+
 inline unsigned
 ToUint(Sq sq) noexcept
 { return static_cast<unsigned>(sq); }
@@ -47,6 +49,12 @@ std::set<Sq>
 ToSetOfSq(BitBoard bb);
 
 BitBoard
-ToBitBoard(std::initializer_list<Sq> squares) noexcept;
+ToBitBoard(SqList squares) noexcept;
+
+std::string
+ToListStr(const std::set<Sq>& squares);
+
+std::string
+ToListStr(SqList squares);
 
 } // namespace blunder

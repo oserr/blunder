@@ -8,37 +8,6 @@
 
 using namespace blunder;
 
-using SqList = std::initializer_list<Sq>;
-
-std::string
-ToListStr(const std::set<Sq>& squares)
-{
-  std::string out;
-  out.reserve(squares.size() * 6);
-
-  out += '[';
-
-  auto first = squares.begin();
-  auto last = squares.end();
-
-  if (first != last)
-    out += ToStr(*first++);
-
-  while (first != last)
-    out += ", " + ToStr(*first++);
-
-  out += ']';
-
-  return out;
-}
-
-std::string
-ToListStr(SqList squares)
-{
-  std::set<Sq> sqs{squares.begin(), squares.end()};
-  return ToListStr(sqs);
-}
-
 MATCHER_P(EqualToSq, squares, "has the following squares set: "
     + ToListStr(squares))
 {
