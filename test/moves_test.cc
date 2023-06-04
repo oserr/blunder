@@ -138,3 +138,59 @@ TEST(MoveKnight, FromA8)
   auto moves = SqList{Sq::b6, Sq::c7};
   EXPECT_THAT(MoveKnight(knight), EqualToSq(moves));
 }
+
+TEST(MoveWhitePawnsSingle, OneSquareForward)
+{
+  auto pawns = ToBitBoard({Sq::a2, Sq::c6, Sq::d5, Sq::g7, Sq::h8});
+  auto moves = SqList{Sq::a3, Sq::c7, Sq::d6, Sq::g8};
+  EXPECT_THAT(MoveWhitePawnsSingle(pawns, ~0ull), EqualToSq(moves));
+}
+
+TEST(MoveWhitePawnsDouble, TwoSquaresForward)
+{
+  auto pawns = ToBitBoard({Sq::a2, Sq::c6, Sq::d5, Sq::g2, Sq::h2});
+  auto moves = SqList{Sq::a4, Sq::g4, Sq::h4};
+  EXPECT_THAT(MoveWhitePawnsDouble(pawns, ~0ull), EqualToSq(moves));
+}
+
+TEST(MoveWhitePawnsAttackLeft, AttackLeft)
+{
+  auto pawns = ToBitBoard({Sq::a2, Sq::c6, Sq::g2, Sq::h4});
+  auto moves = SqList{Sq::b7, Sq::f3, Sq::g5};
+  EXPECT_THAT(MoveWhitePawnsAttackLeft(pawns, ~0ull), EqualToSq(moves));
+}
+
+TEST(MoveWhitePawnsAttackRight, AttackRight)
+{
+  auto pawns = ToBitBoard({Sq::a2, Sq::c6, Sq::g2, Sq::h4});
+  auto moves = SqList{Sq::b3, Sq::d7, Sq::h3};
+  EXPECT_THAT(MoveWhitePawnsAttackRight(pawns, ~0ull), EqualToSq(moves));
+}
+
+TEST(MoveBlackPawnsSingle, OneSquareForward)
+{
+  auto pawns = ToBitBoard({Sq::b7, Sq::c6, Sq::d7, Sq::g8, Sq::h3});
+  auto moves = SqList{Sq::b6, Sq::c5, Sq::d6, Sq::g7, Sq::h2};
+  EXPECT_THAT(MoveBlackPawnsSingle(pawns, ~0ull), EqualToSq(moves));
+}
+
+TEST(MoveBlackPawnsDouble, TwoSquaresForward)
+{
+  auto pawns = ToBitBoard({Sq::b7, Sq::c6, Sq::d7, Sq::g8, Sq::h3});
+  auto moves = SqList{Sq::b5, Sq::d5};
+  EXPECT_THAT(MoveBlackPawnsDouble(pawns, ~0ull), EqualToSq(moves));
+}
+
+TEST(MoveBlackPawnsAttackLeft, AttackLeft)
+{
+  auto pawns = ToBitBoard({Sq::b7, Sq::c6, Sq::d7, Sq::h3});
+  auto moves = SqList{Sq::c6, Sq::d5, Sq::e6};
+  EXPECT_THAT(MoveBlackPawnsAttackLeft(pawns, ~0ull), EqualToSq(moves));
+}
+
+TEST(MoveBlackPawnsAttackRight, AttackRight)
+{
+  auto pawns = ToBitBoard({Sq::a7, Sq::c6, Sq::d7, Sq::h3});
+  auto moves = SqList{Sq::b5, Sq::c6, Sq::g2};
+  EXPECT_THAT(MoveBlackPawnsAttackRight(pawns, ~0ull), EqualToSq(moves));
+}
