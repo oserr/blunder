@@ -324,8 +324,9 @@ MoveGen::QueenMoves(
 {
   auto all_pieces = state.all_mine | state.all_other;
   auto moves_fn = [&](BitBoard bb) {
-    return rmagics_.GetAttacks(bb, all_pieces)
-         | bmagics_.GetAttacks(bb, all_pieces);
+    auto from_square = std::countr_zero(bb);
+    return rmagics_.GetAttacks(from_square, all_pieces)
+         | bmagics_.GetAttacks(from_square, all_pieces);
   };
   GetSimpleMoves(Piece::Queen, state, moves_fn, moves);
 }
@@ -337,7 +338,8 @@ MoveGen::RookMoves(
 {
   auto all_pieces = state.all_mine | state.all_other;
   auto moves_fn = [&](BitBoard bb) {
-    return rmagics_.GetAttacks(bb, all_pieces);
+    auto from_square = std::countr_zero(bb);
+    return rmagics_.GetAttacks(from_square, all_pieces);
   };
   GetSimpleMoves(Piece::Rook, state, moves_fn, moves);
 }
@@ -349,6 +351,7 @@ MoveGen::BishopMoves(
 {
   auto all_pieces = state.all_mine | state.all_other;
   auto moves_fn = [&](BitBoard bb) {
+    auto from_square = std::countr_zero(bb);
     return bmagics_.GetAttacks(bb, all_pieces);
   };
   GetSimpleMoves(Piece::Bishop, state, moves_fn, moves);
@@ -367,6 +370,10 @@ MoveGen::PawnMoves(
     const BoardState& state,
     std::vector<Move>& moves) const
 {
+  BitBoard pawns = state.mine[Uint8(Piece::Pawn)];
+
+  if (not pawns) return;
+
   PawnMovesFn single_fn;
   PawnMovesFn double_fn;
   PawnMovesFn attack_left_fn;
@@ -402,7 +409,6 @@ MoveGen::PawnMoves(
     break;
   }
 
-  BitBoard pawns = state.mine[Uint8(Piece::Pawn)];
   auto no_pieces = ~(state.all_mine | state.all_other);
 
   // TODO: handle en passant moves
