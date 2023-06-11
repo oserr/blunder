@@ -5,20 +5,9 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "square.h"
+#include "utils.h"
 
 using namespace blunder;
-
-MATCHER_P(EqualToSq, squares, "has the following squares set: "
-    + ToListStr(squares))
-{
-  auto bb = ToBitBoard(squares);
-  if (bb == arg) return true;
-
-  auto sq_set = ToSetOfSq(arg);
-  *result_listener << ToListStr(sq_set);
-
-  return false;
-}
 
 TEST(MoveNorth, ShiftsFromA1ToA2)
 {
