@@ -352,7 +352,7 @@ MoveGen::BishopMoves(
   auto all_pieces = state.all_mine | state.all_other;
   auto moves_fn = [&](BitBoard bb) {
     auto from_square = std::countr_zero(bb);
-    return bmagics_.GetAttacks(bb, all_pieces);
+    return bmagics_.GetAttacks(from_square, all_pieces);
   };
   GetSimpleMoves(Piece::Bishop, state, moves_fn, moves);
 }
