@@ -44,7 +44,7 @@ main(int argc, char** argv)
   };
 
   while (true) {
-    auto ret = getopt_long(argc, argv, "hdfs:", longopts, nullptr);
+    auto ret = getopt_long(argc, argv, "hdfs:br", longopts, nullptr);
 
     if (ret == -1) break;
 
