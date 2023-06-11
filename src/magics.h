@@ -1,6 +1,5 @@
 #pragma once
 
-#include <array>
 #include <cstdint>
 #include <expected>
 #include <span>
@@ -14,6 +13,7 @@ namespace blunder {
 
 struct Magic {
   std::vector<BitBoard> attacks;
+  BitBoard mask = 0;
   std::uint64_t magic = 0;
   std::uint8_t nbits = 0;
 };

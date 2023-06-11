@@ -100,7 +100,7 @@ FindMagic(
     if (found_collision)
       continue;
 
-    return std::make_pair(Magic(std::move(attack_table), magic, num_bits), k);
+    return std::make_pair(Magic(std::move(attack_table), mask, magic, num_bits), k);
   }
 
   // Unable to find a magic number.
@@ -144,13 +144,15 @@ CreateRandFn() noexcept
 
 } // namespace
 
+// TODO: handle edge squares because magics don't account for edge squares to
+// save space on precomputed attack tables.
 BitBoard
 MagicAttacks::GetAttacks(std::uint8_t square, BitBoard blockers) const noexcept
 {
   assert(square < 64);
   assert(magics_.size() == 64);
-  const auto& [attacks, magic, nbits] = magics_[square];
-  auto magic_hash = GetMagicHash(blockers, magic, nbits);
+  const auto& [attacks, mask, magic, nbits] = magics_[square];
+  auto magic_hash = GetMagicHash(blockers & mask, magic, nbits);
   assert(magic_hash < attacks.size());
   return attacks[magic_hash];
 }
@@ -190,7 +192,7 @@ std::expected<MagicAttacks, Err>
 InitFromRookMagics(std::span<const std::uint64_t> magics)
 {
   auto magic_fn = [sq=0, magics=magics] mutable { return magics[sq++]; };
-  auto all_magics = FindAllMagics(GetRookMask, GetBishopAttacks, magic_fn, 1);
+  auto all_magics = FindAllMagics(GetRookMask, GetRookAttacks, magic_fn, 1);
   if (not all_magics)
     return std::unexpected(all_magics.error());
   return MagicAttacks(std::move(*all_magics));
