@@ -58,19 +58,15 @@ target_link_libraries(genmagic blunder)
 
 include(GoogleTest)
 
-# TODO: use for loop to build unit tests.
+# Simple function to create a test target.
+function(create_test target_name)
+  add_executable(${target_name} test/${target_name}.cc)
+  target_include_directories(${target_name} PUBLIC src)
+  target_compile_features(${target_name} PRIVATE)
+  target_link_libraries(${target_name} blunder GTest::gmock_main)
+endfunction()
 
-add_executable(moves_test test/moves_test.cc)
-target_include_directories(moves_test PUBLIC src)
-target_compile_features(moves_test PRIVATE)
-target_link_libraries(moves_test blunder GTest::gmock_main)
-
-add_executable(square_test test/square_test.cc)
-target_include_directories(square_test PUBLIC src)
-target_compile_features(square_test PRIVATE)
-target_link_libraries(square_test blunder GTest::gmock_main)
-
-add_executable(magics_test test/magics_test.cc)
-target_include_directories(magics_test PUBLIC src)
-target_compile_features(magics_test PRIVATE)
-target_link_libraries(magics_test blunder GTest::gmock_main)
+create_test(moves_test)
+create_test(square_test)
+create_test(magics_test)
+create_test(bitboard_test)
