@@ -100,7 +100,8 @@ FindMagic(
     if (found_collision)
       continue;
 
-    return std::make_pair(Magic(std::move(attack_table), mask, magic, num_bits), k);
+    return std::make_pair(
+        Magic(std::move(attack_table), mask, magic, num_bits), k);
   }
 
   // Unable to find a magic number.
