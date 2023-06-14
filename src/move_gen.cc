@@ -47,7 +47,7 @@ void
 GetNonAttacks(
     Piece piece,
     std::uint8_t from_square,
-    std::uint8_t to_squares,
+    BitBoard to_squares,
     std::vector<Move>& moves)
 {
   auto p = Uint8(piece);
@@ -64,7 +64,7 @@ void
 GetSimpleAttacks(
     Piece piece,
     std::uint8_t from_square,
-    std::uint8_t to_squares,
+    BitBoard to_squares,
     const PieceSet other,
     std::vector<Move>& moves)
 {
