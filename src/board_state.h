@@ -35,6 +35,9 @@ struct BoardState {
   // All of the pieces for the player who just moved.
   BitBoard all_other = 0;
 
+  std::uint16_t half_move = 0;
+  std::uint16_t full_move = 0;
+
   // The next color to move.
   Color next;
 
@@ -55,6 +58,14 @@ struct BoardState {
 
   // Indicates if black can castle on queenside.
   std::uint8_t bq_castle: 1 = 1;
+
+  // Sets |all_mine|, i.e. a BitBoard with all pieces from |mine|.
+  void
+  SetAllMine() noexcept;
+
+  // Sets |all_other|, i.e. a BitBoard with all pieces from |other|.
+  void
+  SetAllOther() noexcept;
 };
 
 } // namespace blunder
