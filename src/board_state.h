@@ -10,6 +10,10 @@ namespace blunder {
 
 using PieceSet = std::array<BitBoard, 6>;
 
+// Computes the union of all the bitboards in |pieces|.
+BitBoard
+AllMask(const PieceSet& pieces) noexcept;
+
 // BoardState represents the current state of the board. Some of the fields are
 // written from the perspective of the player moving next to simplify move
 // generation.
@@ -48,24 +52,30 @@ struct BoardState {
   std::uint8_t en_passant_file: 3 = 0;
 
   // Indicates if white can castle on kingside.
-  std::uint8_t wk_castle: 1 = 1;
+  std::uint8_t wk_castle: 1 = 0;
 
   // Indicates if white can castle on queenside.
-  std::uint8_t wq_castle: 1 = 1;
+  std::uint8_t wq_castle: 1 = 0;
 
   // Indicates if black can castle on kingside.
-  std::uint8_t bk_castle: 1 = 1;
+  std::uint8_t bk_castle: 1 = 0;
 
   // Indicates if black can castle on queenside.
-  std::uint8_t bq_castle: 1 = 1;
+  std::uint8_t bq_castle: 1 = 0;
 
   // Sets |all_mine|, i.e. a BitBoard with all pieces from |mine|.
   void
-  SetAllMine() noexcept;
+  SetAllMine() noexcept
+  { all_mine = AllMask(mine); }
 
   // Sets |all_other|, i.e. a BitBoard with all pieces from |other|.
   void
-  SetAllOther() noexcept;
+  SetAllOther() noexcept
+  { all_other = AllMask(other); }
 };
+
+// Initializes a BoardState for a new game.
+BoardState
+NewBoardState() noexcept;
 
 } // namespace blunder
