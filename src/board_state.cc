@@ -72,8 +72,8 @@ NewBoardState() noexcept
   state.all_mine = kWhitePieces;
   state.all_other = kBlackPieces;
 
-  state.half_move = 1;
-  state.full_move = 0;
+  state.half_move = 0;
+  state.full_move = 1;
 
   state.next = Color::White;
 
