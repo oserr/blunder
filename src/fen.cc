@@ -1,10 +1,13 @@
 #include "fen.h"
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cctype>
 #include <charconv>
 #include <expected>
+#include <functional>
+#include <iostream>
 #include <tuple>
 #include <utility>
 
@@ -13,7 +16,7 @@
 namespace blunder {
 namespace {
 
-using std::ranges::find_if;
+namespace rng = std::ranges;
 
 // A structure for parsing the castling rights.
 struct Castling {
@@ -54,16 +57,75 @@ GetNextField(std::string_view chunk) noexcept
   while (not chunk.empty() and IsSpace(chunk[0]))
     chunk.remove_prefix(1);
 
-  auto iter = find_if(chunk, [](unsigned char c) { return IsSpace(c); });
+  auto iter = rng::find_if(chunk, [](unsigned char c) { return IsSpace(c); });
 
   if (iter == chunk.end() and chunk.empty())
     return std::unexpected(FenErr::MissingField);
   else if (iter == chunk.end())
     return NextField{chunk};
-  
+
   auto index = iter - chunk.begin();
 
   return NextField{chunk.substr(0, index), chunk.substr(index)};
+}
+
+// Splits the rows in the field containing the pieces, where / splits the rows.
+// The rows are returned in reverse order, i.e. 1, 2, 3, ..., instead of 8, 7,
+// 6, ..., which is how they appear in a FEN string. Returns an error if we are
+// unable to split 8 rows and consume all the bytes.
+std::expected<std::array<std::string_view, 8>, FenErr>
+SplitRows(std::string_view pieces) noexcept
+{
+  std::array<std::string_view, 8> rows;
+  unsigned num_rows = 0;
+
+  while (!pieces.empty() and num_rows <= 8) {
+    auto index = pieces.find('/');
+    auto row = pieces.substr(0, index);
+
+    if (row.empty() or row.size() > 8)
+      return std::unexpected(FenErr::InvalidRow);
+
+    rows[num_rows++] = row;
+
+    if (index == std::string_view::npos)
+      pieces.remove_prefix(pieces.size());
+    else {
+      index = std::min(index+1, pieces.size());
+      pieces.remove_prefix(index);
+    }
+  }
+
+  // We expect to consume everything.
+  if (!pieces.empty())
+    return std::unexpected(FenErr::ExtraRows);
+
+  // We expect to consume 8 rows.
+  if (num_rows != 8)
+    return std::unexpected(FenErr::MissingRows);
+
+  rng::reverse(rows);
+  return rows;
+}
+
+// Checks the following:
+// - only 1 king
+// - no more than 16 total pieces
+// - no more than 8 pawns
+// - no more than 10 rooks
+// - no more than 10 bishops
+// - no more than 10 knights
+// - no more than 9 queens
+bool
+AreLogical(const PieceSet pieces) noexcept
+{
+  return std::popcount(pieces[Uint8(Piece::King)]) == 1
+     and std::popcount(pieces[Uint8(Piece::Queen)]) <= 9
+     and std::popcount(pieces[Uint8(Piece::Rook)]) <= 10
+     and std::popcount(pieces[Uint8(Piece::Bishop)]) <= 10
+     and std::popcount(pieces[Uint8(Piece::Knight)]) <= 10
+     and std::popcount(pieces[Uint8(Piece::Pawn)]) <= 10
+     and std::popcount(AllMask(pieces)) <= 16;
 }
 
 std::expected<std::pair<PieceSet, PieceSet>, FenErr>
@@ -74,22 +136,17 @@ ParsePieces(std::string_view field) noexcept
   white.fill(0ull);
   black.fill(0ull);
 
-  auto iter = field.begin();
-  auto last = field.end();
+  auto rows = SplitRows(field);
+  if (not rows)
+    return std::unexpected(rows.error());
 
-  // Use this to check that we processed 64 squares at the end of the loops.
-  int num_squares = 0;
-  for (int r = 7; r >= 0 and iter != last; --r) {
-    for (int f = r * 8, l = f + 8; iter != last and f < l; ++iter) {
-      auto letter = *iter;
-
-      if (letter == '/')
-        break;
+  // Current square being processed.
+  unsigned square = 0;
+  for (auto row : *rows) {
+    for (auto letter : row) {
 
       if (letter >= '1' and letter <= '8') {
-        auto num_empty = letter - '0';
-        f += num_empty;
-        num_squares += num_empty;
+        square += letter - '0';
         continue;
       }
 
@@ -115,21 +172,26 @@ ParsePieces(std::string_view field) noexcept
            piece = Piece::Pawn;
            break;
         default:
-           return std::unexpected(FenErr::Pieces);
+           return std::unexpected(FenErr::UnknownPiece);
       }
 
       if (IsUpper(letter))
-        white[Uint8(piece)] |= 1ull << f;
+        white[Uint8(piece)] |= 1ull << square;
       else
-        black[Uint8(piece)] |= 1ull << f;
+        black[Uint8(piece)] |= 1ull << square;
 
-      ++f;
-      ++num_squares;
+      ++square;
     }
   }
 
-  if (num_squares != 64)
-    return std::unexpected(FenErr::Pieces);
+  if (square != 64)
+    return std::unexpected(FenErr::Not64Squares);
+
+  if (not AreLogical(white))
+    return std::unexpected(FenErr::WhiteNotLogical);
+
+  if (not AreLogical(black))
+    return std::unexpected(FenErr::BlackNotLogical);
 
   return std::make_pair(white, black);
 }
@@ -138,7 +200,7 @@ std::expected<Color, FenErr>
 ParseColor(std::string_view field) noexcept
 {
   if (field.size() != 1)
-    return std::unexpected(FenErr::Color);
+    return std::unexpected(FenErr::InvalidColor);
 
   switch (field[0]) {
     case 'w':
@@ -146,7 +208,7 @@ ParseColor(std::string_view field) noexcept
     case 'b':
       return Color::Black;
     default:
-      return std::unexpected(FenErr::Color);
+      return std::unexpected(FenErr::InvalidColor);
   }
 }
 
@@ -154,7 +216,7 @@ std::expected<Castling, FenErr>
 ParseCastling(std::string_view field) noexcept
 {
   if (field.size() < 1 or field.size() > 4)
-    return std::unexpected(FenErr::Castling);
+    return std::unexpected(FenErr::InvalidCastling);
 
   Castling castling;
 
@@ -176,7 +238,7 @@ ParseCastling(std::string_view field) noexcept
         castling.bqueen = true;
         break;
       default:
-        return std::unexpected(FenErr::Castling);
+        return std::unexpected(FenErr::InvalidCastling);
     }
   }
 
@@ -207,14 +269,14 @@ ParseEnPassant(std::string_view field) noexcept
     default:
       break;
   }
-  return std::unexpected(FenErr::EnPassant);
+  return std::unexpected(FenErr::InvalidEnPassant);
 }
 
 std::expected<unsigned, FenErr>
-ParseNumber(std::string_view field, FenErr err) noexcept
+ParseNumber(std::string_view field) noexcept
 {
   if (field.empty())
-    return std::unexpected(err);
+    return std::unexpected(FenErr::InvalidNum);
 
   unsigned num_moves;
   auto first = field.data();
@@ -225,7 +287,7 @@ ParseNumber(std::string_view field, FenErr err) noexcept
   if (from_err == std::errc())
     return num_moves;
 
-  return std::unexpected(err);
+  return std::unexpected(FenErr::InvalidNum);
 }
 
 enum class FieldType {
@@ -236,6 +298,28 @@ enum class FieldType {
   HalfMove,
   FullMove
 };
+
+std::unexpected<FenErr>
+MissingField(FieldType field_type) noexcept
+{
+  switch (field_type) {
+    case FieldType::Pieces:
+      return std::unexpected(FenErr::NoPieces);
+    case FieldType::Color:
+      return std::unexpected(FenErr::NoColor);
+    case FieldType::Castling:
+      return std::unexpected(FenErr::NoCastling);
+    case FieldType::EnPassant:
+      return std::unexpected(FenErr::NoEnPassant);
+    case FieldType::HalfMove:
+      return std::unexpected(FenErr::NoHalfMove);
+    case FieldType::FullMove:
+      return std::unexpected(FenErr::NoFullMove);
+    default:
+      assert(false and "Unexpected value for FieldType.");
+  }
+  return std::unexpected(FenErr::Internal);
+}
 
 } // namespace
 
@@ -263,7 +347,7 @@ ReadFen(std::string_view fen) noexcept
     auto next_field = GetNextField(fen);
 
     if (not next_field)
-      return std::unexpected(next_field.error());
+      return MissingField(field_type);
 
     auto [field, chunk] = *next_field;
 
@@ -298,16 +382,16 @@ ReadFen(std::string_view fen) noexcept
         break;
       }
       case FieldType::HalfMove: {
-        auto num = ParseNumber(field, FenErr::HalfMove);
+        auto num = ParseNumber(field);
         if (not num)
-          return std::unexpected(num.error());
+          return std::unexpected(FenErr::InvalidHalfMove);
         half_move = *num;
         break;
       }
       case FieldType::FullMove: {
-        auto num = ParseNumber(field, FenErr::FullMove);
+        auto num = ParseNumber(field);
         if (not num)
-          return std::unexpected(num.error());
+          return std::unexpected(FenErr::InvalidFullMove);
         full_move = *num;
         break;
       }
@@ -344,6 +428,56 @@ ReadFen(std::string_view fen) noexcept
   state.SetAllOther();
 
   return state;
+}
+
+std::string_view
+StrView(FenErr err) noexcept
+{
+  switch (err) {
+    case FenErr::NoPieces:
+      return "NoPieces";
+    case FenErr::NoColor:
+      return "NoColor";
+    case FenErr::NoCastling:
+      return "NoCastling";
+    case FenErr::NoEnPassant:
+      return "NoEnPassant";
+    case FenErr::NoHalfMove:
+      return "NoHalfMove";
+    case FenErr::NoFullMove:
+      return "NoFullMove";
+    case FenErr::InvalidColor:
+      return "InvalidColor";
+    case FenErr::InvalidCastling:
+      return "InvalidCastling";
+    case FenErr::InvalidEnPassant:
+      return "InvalidEnPassant";
+    case FenErr::InvalidHalfMove:
+      return "InvalidHalfMove";
+    case FenErr::InvalidFullMove:
+      return "InvalidFullMove";
+    case FenErr::MissingField:
+      return "MissingField";
+    case FenErr::UnknownPiece:
+      return "UnknownPiece";
+    case FenErr::WhiteNotLogical:
+      return "WhiteNotLogical";
+    case FenErr::BlackNotLogical:
+      return "BlackNotLogical";
+    case FenErr::Not64Squares:
+      return "Not64Squares";
+    case FenErr::InvalidRow:
+      return "InvalidRow";
+    case FenErr::MissingRows:
+      return "MissingRows";
+    case FenErr::ExtraRows:
+      return "ExtraRows";
+    case FenErr::InvalidNum:
+      return "InvalidNum";
+    default:
+      assert(false and "Unexpected value for FenErr.");
+  }
+  return "UNKNOWN_ENUM_VALUE";
 }
 
 } // namespace blunder
