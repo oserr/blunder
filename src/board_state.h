@@ -79,9 +79,58 @@ struct BoardState {
   White() const noexcept
   { return next == Color::White ? mine : other; }
 
+  BitBoard
+  WhiteKing() const noexcept
+  { return White()[Uint8(Piece::King)]; }
+
+  BitBoard
+  WhiteQueens() const noexcept
+  { return White()[Uint8(Piece::Queen)]; }
+
+  BitBoard
+  WhiteRooks() const noexcept
+  { return White()[Uint8(Piece::Rook)]; }
+
+  BitBoard
+  WhiteBishops() const noexcept
+  { return White()[Uint8(Piece::Bishop)]; }
+
+  BitBoard
+  WhiteKnights() const noexcept
+  { return White()[Uint8(Piece::Knight)]; }
+
+  BitBoard
+  WhitePawns() const noexcept
+  { return White()[Uint8(Piece::Pawns)]; }
+
   const PieceSet&
   Black() const noexcept
   { return next == Color::White ? other : mine; }
+
+  BitBoard
+  BlackKing() const noexcept
+  { return Black()[Uint8(Piece::King)]; }
+
+  BitBoard
+  BlackQueens() const noexcept
+  { return Black()[Uint8(Piece::Queen)]; }
+
+  BitBoard
+  BlackRooks() const noexcept
+  { return Black()[Uint8(Piece::Rook)]; }
+
+  BitBoard
+  BlackBishops() const noexcept
+  { return Black()[Uint8(Piece::Bishop)]; }
+
+  BitBoard
+  BlackKnights() const noexcept
+  { return Black()[Uint8(Piece::Knight)]; }
+
+  BitBoard
+  BlackPawns() const noexcept
+  { return Black()[Uint8(Piece::Pawns)]; }
+
 };
 
 // Initializes a BoardState for a new game.
