@@ -2,6 +2,8 @@
 
 #include <algorithm>
 #include <bit>
+#include <format>
+#include <iterator>
 
 #include "bitboard.h"
 #include "pieces.h"
@@ -128,10 +130,11 @@ DebugStr(const BoardState& state)
       buff += '\n';
   }
 
-  buff += "Col:";
+  buff += "Color:";
   buff += state.next == Color::White ? 'w' : 'b';
-  buff += ' ';
-  buff += "Cast:";
+  buff += '\n';
+
+  buff += "Castling:";
   if (state.wk_castle)
     buff += 'K';
   if (state.wq_castle)
@@ -142,6 +145,13 @@ DebugStr(const BoardState& state)
     buff += 'q';
 
   buff += '\n';
+
+  std::format_to(std::back_inserter(buff), "HalfMove: {}\n", state.half_move);
+  std::format_to(std::back_inserter(buff), "FullMove: {}\n", state.full_move);
+
+  if (state.en_passant)
+    std::format_to(
+        std::back_inserter(buff), "EnPassant: {}\n", state.en_passant_file);
 
   return buff;
 }
