@@ -1,6 +1,8 @@
 #include "fen.h"
 
 #include "gmock/gmock.h"
+#include "square.h"
+#include "utils.h"
 
 using namespace blunder;
 
@@ -121,5 +123,21 @@ TEST(ReadFen, PawnsAndKing)
 {
   auto state = ReadFen("8/5k2/3p4/1p1Pp2p/pP2Pp1P/P4P1K/8/8 b - - 99 50");
   ASSERT_TRUE(state);
-  EXPECT_EQ(*state, NewBoardState());
+
+  EXPECT_EQ(state->NumWhite(), state->NumWhitePawn() + 1);
+  EXPECT_THAT(state->WhiteKing(), EqualToSq(SqList{Sq::h3}));
+  EXPECT_THAT(state->WhitePawn(),
+      EqualToSq(SqList{Sq::a3, Sq::b4, Sq::d5, Sq::e4, Sq::f3, Sq::h4}));
+  EXPECT_FALSE(state->wk_castle);
+  EXPECT_FALSE(state->wq_castle);
+
+  EXPECT_EQ(state->NumBlack(), state->NumBlackPawn() + 1);
+  EXPECT_THAT(state->BlackKing(), EqualToSq(SqList{Sq::f7}));
+  EXPECT_THAT(state->BlackPawn(),
+      EqualToSq(SqList{Sq::a4, Sq::b5, Sq::d6, Sq::e5, Sq::f4, Sq::h5}));
+  EXPECT_FALSE(state->bk_castle);
+  EXPECT_FALSE(state->bq_castle);
+
+  EXPECT_EQ(state->half_move, 99);
+  EXPECT_EQ(state->full_move, 50);
 }
