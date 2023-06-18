@@ -5,6 +5,7 @@
 #include <type_traits>
 
 #include "bitboard.h"
+#include "color.h"
 
 namespace blunder {
 
@@ -35,5 +36,8 @@ ToPiece(T val)
 
 std::uint8_t
 GetPieceUint8(const std::array<BitBoard, 6> pieces, BitBoard piece) noexcept;
+
+std::uint8_t
+AsciiLetter(Piece piece, Color color) noexcept;
 
 } // namespace blunder
