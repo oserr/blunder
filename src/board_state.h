@@ -81,48 +81,48 @@ struct BoardState {
   { return next == Color::White ? mine : other; }
 
   BitBoard
-  WhiteKiings() const noexcept
+  WhiteKing() const noexcept
   { return White()[Uint8(Piece::King)]; }
 
   BitBoard
-  WhiteQueens() const noexcept
+  WhiteQueen() const noexcept
   { return White()[Uint8(Piece::Queen)]; }
 
   BitBoard
-  WhiteRooks() const noexcept
+  WhiteRook() const noexcept
   { return White()[Uint8(Piece::Rook)]; }
 
   BitBoard
-  WhiteBishops() const noexcept
+  WhiteBishop() const noexcept
   { return White()[Uint8(Piece::Bishop)]; }
 
   BitBoard
-  WhiteKnights() const noexcept
+  WhiteKnight() const noexcept
   { return White()[Uint8(Piece::Knight)]; }
 
   BitBoard
-  WhitePawns() const noexcept
+  WhitePawn() const noexcept
   { return White()[Uint8(Piece::Pawn)]; }
 
   unsigned
-  NumWhiteQueens() const noexcept
-  { return std::popcount(WhiteQueens()); }
+  NumWhiteQueen() const noexcept
+  { return std::popcount(WhiteQueen()); }
 
   unsigned
-  NumWhiteRooks() const noexcept
-  { return std::popcount(WhiteRooks()); }
+  NumWhiteRook() const noexcept
+  { return std::popcount(WhiteRook()); }
 
   unsigned
-  NumWhiteBishops() const noexcept
-  { return std::popcount(WhiteBishops()); }
+  NumWhiteBishop() const noexcept
+  { return std::popcount(WhiteBishop()); }
 
   unsigned
-  NumWhiteKnights() const noexcept
-  { return std::popcount(WhiteKnights()); }
+  NumWhiteKnight() const noexcept
+  { return std::popcount(WhiteKnight()); }
 
   unsigned
-  NumWhitePawns() const noexcept
-  { return std::popcount(WhitePawns()); }
+  NumWhitePawn() const noexcept
+  { return std::popcount(WhitePawn()); }
 
   unsigned
   NumWhite() const noexcept
@@ -137,44 +137,44 @@ struct BoardState {
   { return Black()[Uint8(Piece::King)]; }
 
   BitBoard
-  BlackQueens() const noexcept
+  BlackQueen() const noexcept
   { return Black()[Uint8(Piece::Queen)]; }
 
   BitBoard
-  BlackRooks() const noexcept
+  BlackRook() const noexcept
   { return Black()[Uint8(Piece::Rook)]; }
 
   BitBoard
-  BlackBishops() const noexcept
+  BlackBishop() const noexcept
   { return Black()[Uint8(Piece::Bishop)]; }
 
   BitBoard
-  BlackKnights() const noexcept
+  BlackKnight() const noexcept
   { return Black()[Uint8(Piece::Knight)]; }
 
   BitBoard
-  BlackPawns() const noexcept
+  BlackPawn() const noexcept
   { return Black()[Uint8(Piece::Pawn)]; }
 
   unsigned
-  NumBlackQueens() const noexcept
-  { return std::popcount(BlackQueens()); }
+  NumBlackQueen() const noexcept
+  { return std::popcount(BlackQueen()); }
 
   unsigned
-  NumBlackRooks() const noexcept
-  { return std::popcount(BlackRooks()); }
+  NumBlackRook() const noexcept
+  { return std::popcount(BlackRook()); }
 
   unsigned
-  NumBlackBishops() const noexcept
-  { return std::popcount(BlackBishops()); }
+  NumBlackBishop() const noexcept
+  { return std::popcount(BlackBishop()); }
 
   unsigned
-  NumBlackKnights() const noexcept
-  { return std::popcount(BlackKnights()); }
+  NumBlackKnight() const noexcept
+  { return std::popcount(BlackKnight()); }
 
   unsigned
-  NumBlackPawns() const noexcept
-  { return std::popcount(BlackPawns()); }
+  NumBlackPawn() const noexcept
+  { return std::popcount(BlackPawn()); }
 
   unsigned
   NumBlack() const noexcept
