@@ -2,6 +2,8 @@
 
 #include <array>
 #include <cstdint>
+#include <ostream>
+#include <string>
 
 #include "bitboard.h"
 #include "color.h"
@@ -72,10 +74,31 @@ struct BoardState {
   void
   SetAllOther() noexcept
   { all_other = AllMask(other); }
+
+  const PieceSet&
+  White() const noexcept
+  { return next == Color::White ? mine : other; }
+
+  const PieceSet&
+  Black() const noexcept
+  { return next == Color::White ? other : mine; }
 };
 
 // Initializes a BoardState for a new game.
 BoardState
 NewBoardState() noexcept;
+
+bool
+operator==(const BoardState& left, const BoardState& right) noexcept;
+
+std::string
+DebugStr(const BoardState& state);
+
+inline std::ostream&
+operator<<(std::ostream& os, const BoardState& state)
+{
+  os << DebugStr(state);
+  return os;
+}
 
 } // namespace blunder
