@@ -7,6 +7,7 @@
 
 #include "bitboard.h"
 #include "color.h"
+#include "pieces.h"
 
 namespace blunder {
 
@@ -80,7 +81,7 @@ struct BoardState {
   { return next == Color::White ? mine : other; }
 
   BitBoard
-  WhiteKing() const noexcept
+  WhiteKiings() const noexcept
   { return White()[Uint8(Piece::King)]; }
 
   BitBoard
@@ -101,7 +102,31 @@ struct BoardState {
 
   BitBoard
   WhitePawns() const noexcept
-  { return White()[Uint8(Piece::Pawns)]; }
+  { return White()[Uint8(Piece::Pawn)]; }
+
+  unsigned
+  NumWhiteQueens() const noexcept
+  { return std::popcount(WhiteQueens()); }
+
+  unsigned
+  NumWhiteRooks() const noexcept
+  { return std::popcount(WhiteRooks()); }
+
+  unsigned
+  NumWhiteBishops() const noexcept
+  { return std::popcount(WhiteBishops()); }
+
+  unsigned
+  NumWhiteKnights() const noexcept
+  { return std::popcount(WhiteKnights()); }
+
+  unsigned
+  NumWhitePawns() const noexcept
+  { return std::popcount(WhitePawns()); }
+
+  unsigned
+  NumWhite() const noexcept
+  { return std::popcount(AllMask(White())); }
 
   const PieceSet&
   Black() const noexcept
@@ -129,7 +154,31 @@ struct BoardState {
 
   BitBoard
   BlackPawns() const noexcept
-  { return Black()[Uint8(Piece::Pawns)]; }
+  { return Black()[Uint8(Piece::Pawn)]; }
+
+  unsigned
+  NumBlackQueens() const noexcept
+  { return std::popcount(BlackQueens()); }
+
+  unsigned
+  NumBlackRooks() const noexcept
+  { return std::popcount(BlackRooks()); }
+
+  unsigned
+  NumBlackBishops() const noexcept
+  { return std::popcount(BlackBishops()); }
+
+  unsigned
+  NumBlackKnights() const noexcept
+  { return std::popcount(BlackKnights()); }
+
+  unsigned
+  NumBlackPawns() const noexcept
+  { return std::popcount(BlackPawns()); }
+
+  unsigned
+  NumBlack() const noexcept
+  { return std::popcount(AllMask(Black())); }
 
 };
 
