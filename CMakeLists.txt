@@ -45,6 +45,7 @@ add_library(blunder STATIC
   src/move_gen.h
   src/move_generator.h
   src/moves.h
+  src/pieces.cc
   src/pieces.h
   src/pre_computed_magics.h
   src/square.cc
@@ -62,14 +63,15 @@ target_link_libraries(genmagic blunder)
 include(GoogleTest)
 
 # Simple function to create a test target.
-function(create_test target_name)
-  add_executable(${target_name} test/${target_name}.cc)
-  target_include_directories(${target_name} PUBLIC src)
-  target_compile_features(${target_name} PRIVATE)
-  target_link_libraries(${target_name} blunder GTest::gmock_main)
+function(create_test target)
+  add_executable(${target}_test test/${target}_test.cc)
+  target_include_directories(${target}_test PUBLIC src)
+  target_compile_features(${target}_test PRIVATE)
+  target_link_libraries(${target}_test blunder GTest::gmock_main)
 endfunction()
 
-create_test(moves_test)
-create_test(square_test)
-create_test(magics_test)
-create_test(bitboard_test)
+create_test(moves)
+create_test(square)
+create_test(magics)
+create_test(bitboard)
+create_test(fen)
