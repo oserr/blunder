@@ -278,14 +278,11 @@ ParseNumber(std::string_view field) noexcept
   if (field.empty())
     return std::unexpected(FenErr::InvalidNum);
 
-  unsigned num_moves;
-  auto first = field.data();
-  auto last = first + field.size();
-
-  auto [ptr, from_err] = std::from_chars(first, last, num_moves);
+  unsigned num;
+  auto [ptr, from_err] = std::from_chars(field.begin(), field.end(), num);
 
   if (from_err == std::errc())
-    return num_moves;
+    return num;
 
   return std::unexpected(FenErr::InvalidNum);
 }
@@ -384,6 +381,8 @@ ReadFen(std::string_view fen) noexcept
       case FieldType::HalfMove: {
         auto num = ParseNumber(field);
         if (not num)
+          return std::unexpected(FenErr::InvalidHalfMove);
+        if (*num > 100)
           return std::unexpected(FenErr::InvalidHalfMove);
         half_move = *num;
         break;
