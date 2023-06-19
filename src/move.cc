@@ -49,14 +49,15 @@ DebugStr(const Move& mv)
     buff += "->";
     buff += ToStr(ToSq(to_sq));
   }
-  else if (mv.is_promo) {
-    buff += ", ^";
-    buff += AsciiLetter(ToPiece(mv.promo_piece));
-  }
 
   if (auto to_piece = ToPiece(mv.to_piece); to_piece != Piece::None) {
     buff += ", !";
     buff += AsciiLetter(to_piece);
+  }
+
+  if (mv.is_promo) {
+    buff += ", ^";
+    buff += AsciiLetter(ToPiece(mv.promo_piece));
   }
 
   buff += '}';

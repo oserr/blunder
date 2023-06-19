@@ -162,6 +162,12 @@ struct Move {
 bool
 operator==(const Move& left, const Move& right) noexcept;
 
+// Cretes a printable debug string for Move in the form
+//
+//   {P:from_square -> to_square, ...}
+//
+// where P is a color agnostic piece type, and ... may contain the rook move in
+// a castling move, a captured piece !P, and a promoted pawn piece ^P.
 std::string
 DebugStr(const Move& mv);
 
