@@ -1,5 +1,8 @@
 #include "move.h"
 
+#include "pieces.h"
+#include "square.h"
+
 namespace blunder {
 
 bool
@@ -14,6 +17,51 @@ operator==(const Move& left, const Move& right) noexcept
      and left.en_passant == right.en_passant
      and left.is_promo == right.is_promo
      and left.promo_piece == right.promo_piece;
+}
+
+std::string
+DebugStr(const Move& mv)
+{
+  std::string buff;
+  buff.reserve(128);
+
+  buff += '{';
+  buff += AsciiLetter(ToPiece(mv.from_piece));
+  buff += ':';
+  buff += ToStr(ToSq(mv.from_square));
+  buff += "->";
+  buff += ToStr(ToSq(mv.to_square));
+
+  if (mv.castle) {
+    std::uint8_t from_sq = mv.from_square;
+    std::uint8_t to_sq = mv.to_square;
+    if (mv.kside) {
+      from_sq += 3;
+      --to_sq;
+    } else {
+      from_sq -= 4;
+      ++to_sq;
+    }
+
+    buff += ", ";
+    buff += AsciiLetter(Piece::Rook);
+    buff += ToStr(ToSq(from_sq));
+    buff += "->";
+    buff += ToStr(ToSq(to_sq));
+  }
+  else if (mv.is_promo) {
+    buff += ", ^";
+    buff += AsciiLetter(ToPiece(mv.promo_piece));
+  }
+
+  if (auto to_piece = ToPiece(mv.to_piece); to_piece != Piece::None) {
+    buff += ", !";
+    buff += AsciiLetter(to_piece);
+  }
+
+  buff += '}';
+
+  return buff;
 }
 
 } // namespace blunder
