@@ -158,4 +158,7 @@ struct Move {
 
 };
 
+bool
+operator==(const Move& left, const Move& right) noexcept;
+
 } // namespace blunder

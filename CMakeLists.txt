@@ -40,6 +40,7 @@ add_library(blunder STATIC
   src/fen.h
   src/magics.cc
   src/magics.h
+  src/move.cc
   src/move.h
   src/move_gen.cc
   src/move_gen.h
