@@ -165,4 +165,11 @@ operator==(const Move& left, const Move& right) noexcept;
 std::string
 DebugStr(const Move& mv);
 
+inline std::ostream&
+operator<<(std::ostream& os, const Move& mv)
+{
+  os << DebugStr(mv);
+  return os;
+}
+
 } // namespace blunder
