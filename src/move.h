@@ -8,7 +8,8 @@
 
 namespace blunder {
 
-// Move contains multiple bitfields to represent a chess move.
+// Move contains multiple bitfields to represent a chess move, taking less than
+// 4 total bytes.
 struct Move {
   // Represents the piece being moved.
   // - 0: King
@@ -169,7 +170,7 @@ struct Move {
 };
 
 bool
-operator==(const Move& left, const Move& right) noexcept;
+operator==(Move left, Move right) noexcept;
 
 // Cretes a printable debug string for Move in the form
 //
@@ -178,10 +179,10 @@ operator==(const Move& left, const Move& right) noexcept;
 // where P is a color agnostic piece type, and ... may contain the rook move in
 // a castling move, a captured piece !P, and a promoted pawn piece ^P.
 std::string
-DebugStr(const Move& mv);
+DebugStr(Move mv);
 
 inline std::ostream&
-operator<<(std::ostream& os, const Move& mv)
+operator<<(std::ostream& os, Move mv)
 {
   os << DebugStr(mv);
   return os;

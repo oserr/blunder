@@ -6,7 +6,7 @@
 namespace blunder {
 
 bool
-operator==(const Move& left, const Move& right) noexcept
+operator==(Move left, Move right) noexcept
 {
   return left.from_piece == right.from_piece
      and left.to_piece == right.to_piece
@@ -20,7 +20,7 @@ operator==(const Move& left, const Move& right) noexcept
 }
 
 std::string
-DebugStr(const Move& mv)
+DebugStr(Move mv)
 {
   std::string buff;
   buff.reserve(128);
