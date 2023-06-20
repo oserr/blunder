@@ -1,26 +1,37 @@
 #include "move_gen.h"
 
+#include <memory>
 #include <vector>
 
 #include "board_state.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
+#include "pre_computed_magics.h"
 #include "magic.h"
 
 using namespace blunder;
 
+using testing::IsEmpty;
 using testing::UnorderedElementsAreArray;
+
+// Only init MoveGen once because it's expensive to init the magics.
+constinit std::unique_ptr<MoveGen> move_gen = nullptr;
 
 class MoveGenTest : public testing::Test
 {
 protected:
-  // TODO: initialize MoveGen with mock MagicAttacks.
-  MoveGenTest()
-    : move_gen_(
-        MagicAttacks(std::vector<Magic>()),
-        MagicAttacks(std::vector<Magic>())) {}
-
-  MoveGen move_gen_;
+  void
+  SetUp() override
+  {
+    if (not move_gen) {
+      auto bmagics = InitFromBishopMagics(kBishopMagics);
+      auto rmagics = InitFromRookMagics(kRookMagics);
+      ASSERT_TRUE(bmagics) << "Unable to init bishop magics for MoveGen.";
+      ASSERT_TRUE(rmagics) << "Unable to init rook magics for MoveGen.";
+      move_gen = std::make_unique<MoveGen>(
+          std::move(*bmagics), std::move(*rmagics));
+    }
+  }
 };
 
 TEST_F(MoveGenTest, InitGamePawnMoves)
@@ -44,5 +55,72 @@ TEST_F(MoveGenTest, InitGamePawnMoves)
   moves.emplace_back(Piece::Pawn, Sq::h2, Sq::h4);
 
   auto state = NewBoardState();
-  EXPECT_THAT(move_gen_.PawnMoves(state), UnorderedElementsAreArray(moves));
+  EXPECT_THAT(move_gen->PawnMoves(state), UnorderedElementsAreArray(moves));
+}
+
+TEST_F(MoveGenTest, InitGameKingMoves)
+{
+  auto state = NewBoardState();
+  EXPECT_THAT(move_gen->KingMoves(state), IsEmpty());
+}
+
+TEST_F(MoveGenTest, InitGameKnightMoves)
+{
+  std::vector<Move> moves;
+  moves.emplace_back(Piece::Knight, Sq::b1, Sq::a3);
+  moves.emplace_back(Piece::Knight, Sq::b1, Sq::c3);
+  moves.emplace_back(Piece::Knight, Sq::g1, Sq::f3);
+  moves.emplace_back(Piece::Knight, Sq::g1, Sq::h3);
+
+  auto state = NewBoardState();
+  EXPECT_THAT(move_gen->KnightMoves(state), UnorderedElementsAreArray(moves));
+}
+
+TEST_F(MoveGenTest, InitGameQueenMoves)
+{
+  auto state = NewBoardState();
+  EXPECT_THAT(move_gen->QueenMoves(state), IsEmpty());
+}
+
+TEST_F(MoveGenTest, InitGameRookMoves)
+{
+  auto state = NewBoardState();
+  EXPECT_THAT(move_gen->RookMoves(state), IsEmpty());
+}
+
+TEST_F(MoveGenTest, InitGameBishopMoves)
+{
+  auto state = NewBoardState();
+  EXPECT_THAT(move_gen->BishopMoves(state), IsEmpty());
+}
+
+TEST_F(MoveGenTest, InitGameAllMoves)
+{
+  std::vector<Move> moves;
+  // Pawn moves
+  moves.emplace_back(Piece::Pawn, Sq::a2, Sq::a3);
+  moves.emplace_back(Piece::Pawn, Sq::a2, Sq::a4);
+  moves.emplace_back(Piece::Pawn, Sq::b2, Sq::b3);
+  moves.emplace_back(Piece::Pawn, Sq::b2, Sq::b4);
+  moves.emplace_back(Piece::Pawn, Sq::c2, Sq::c3);
+  moves.emplace_back(Piece::Pawn, Sq::c2, Sq::c4);
+  moves.emplace_back(Piece::Pawn, Sq::d2, Sq::d3);
+  moves.emplace_back(Piece::Pawn, Sq::d2, Sq::d4);
+  moves.emplace_back(Piece::Pawn, Sq::e2, Sq::e3);
+  moves.emplace_back(Piece::Pawn, Sq::e2, Sq::e4);
+  moves.emplace_back(Piece::Pawn, Sq::f2, Sq::f3);
+  moves.emplace_back(Piece::Pawn, Sq::f2, Sq::f4);
+  moves.emplace_back(Piece::Pawn, Sq::g2, Sq::g3);
+  moves.emplace_back(Piece::Pawn, Sq::g2, Sq::g4);
+  moves.emplace_back(Piece::Pawn, Sq::h2, Sq::h3);
+  moves.emplace_back(Piece::Pawn, Sq::h2, Sq::h4);
+
+  // Knight moves
+  moves.emplace_back(Piece::Knight, Sq::b1, Sq::a3);
+  moves.emplace_back(Piece::Knight, Sq::b1, Sq::c3);
+  moves.emplace_back(Piece::Knight, Sq::g1, Sq::f3);
+  moves.emplace_back(Piece::Knight, Sq::g1, Sq::h3);
+
+  auto state = NewBoardState();
+  EXPECT_THAT(move_gen->AllMoves(state), UnorderedElementsAreArray(moves));
 }
