@@ -4,6 +4,7 @@
 #include <string>
 
 #include "pieces.h"
+#include "square.h"
 
 namespace blunder {
 
@@ -50,6 +51,14 @@ struct Move {
     : from_piece(from_piece),
       from_square(from_square),
       to_square(to_square) {}
+
+  // Most common scenario for a move, i.e. we move a piece from one square to
+  // another without attacking.
+  constexpr Move(
+      Piece from_piece,
+      Sq from_square,
+      Sq to_square) noexcept
+    : Move(Uint8(from_piece), ToUint(from_square), ToUint(to_square)) {}
 
   // Next most common scenario, we move a piece with capture.
   constexpr Move(
