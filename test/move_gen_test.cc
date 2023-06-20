@@ -32,8 +32,8 @@ TEST_F(MoveGenTest, InitGamePawnMoves)
   moves.emplace_back(Piece::Pawn, Sq::b2, Sq::b4);
   moves.emplace_back(Piece::Pawn, Sq::c2, Sq::c3);
   moves.emplace_back(Piece::Pawn, Sq::c2, Sq::c4);
-  moves.emplace_back(Piece::Pawn, Sq::d2, Sq::c3);
-  moves.emplace_back(Piece::Pawn, Sq::d2, Sq::c4);
+  moves.emplace_back(Piece::Pawn, Sq::d2, Sq::d3);
+  moves.emplace_back(Piece::Pawn, Sq::d2, Sq::d4);
   moves.emplace_back(Piece::Pawn, Sq::e2, Sq::e3);
   moves.emplace_back(Piece::Pawn, Sq::e2, Sq::e4);
   moves.emplace_back(Piece::Pawn, Sq::f2, Sq::f3);
