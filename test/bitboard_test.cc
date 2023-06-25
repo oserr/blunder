@@ -30,7 +30,8 @@ TEST(GetRookAttacks, FromB2WithTwoBlockers) {
   EXPECT_THAT(
       GetRookAttacks(square, blockers),
       EqualToSq(SqList{
-        Sq::c2, Sq::d2, Sq::e2, Sq::f2, Sq::b3, Sq::b4, Sq::b5, Sq::b6}));
+        Sq::b1, Sq::a2, Sq::c2, Sq::d2, Sq::e2,
+        Sq::f2, Sq::b3, Sq::b4, Sq::b5, Sq::b6}));
 }
 
 TEST(GetRookAttacks, FromH6WithThreeBlockers) {
@@ -38,7 +39,7 @@ TEST(GetRookAttacks, FromH6WithThreeBlockers) {
   auto blockers = ToBitBoard(SqList{Sq::g6, Sq::h3});
   EXPECT_THAT(
       GetRookAttacks(square, blockers),
-      EqualToSq(SqList{ Sq::g6, Sq::h3, Sq::h4, Sq::h5, Sq::h7}));
+      EqualToSq(SqList{Sq::g6, Sq::h3, Sq::h4, Sq::h5, Sq::h7, Sq::h8}));
 }
 
 TEST(GetBishopAttacks, FromE4AllBlocked) {

@@ -104,5 +104,7 @@ TEST_F(RookMagicsTest, FromF5)
   EXPECT_THAT(
       rmagics->GetAttacks(square, blockers),
       EqualToSq(SqList{
-        Sq::f3, Sq::f4, Sq::f6, Sq::f7, Sq::e5, Sq::d5, Sq::g5}));
+        Sq::f3, Sq::f4, Sq::f6, Sq::f7,
+        Sq::f8, Sq::e5, Sq::d5, Sq::g5,
+        Sq::h5}));
 }
