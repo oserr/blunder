@@ -45,6 +45,7 @@ DebugStr(Move mv)
 
     buff += ", ";
     buff += AsciiLetter(Piece::Rook);
+    buff += ':';
     buff += ToStr(ToSq(from_sq));
     buff += "->";
     buff += ToStr(ToSq(to_sq));
