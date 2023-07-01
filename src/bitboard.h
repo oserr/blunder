@@ -89,7 +89,7 @@ public:
   index_bb_and_clear() noexcept
   {
     auto index = first_bit_and_clear();
-    return {index, with_index(index)};
+    return {index, from_index(index)};
   }
 
   // Returns true if any bit is set, false otherwise.
@@ -224,7 +224,7 @@ public:
 
   // Creates a BitBoard with one bit set at the given index.
   static BitBoard
-  with_index(unsigned index) noexcept
+  from_index(unsigned index) noexcept
   { return BitBoard().set_bit(index); }
 
 private:

@@ -47,7 +47,7 @@ TEST(ToSq, ConvertsUnsignedToSquare)
 TEST(ToBitBoard, ConvertsSquareToBitboard)
 {
   for (unsigned i = 0; i < kSquares.size(); ++i) {
-    EXPECT_EQ(ToBitBoard(kSquares[i]), BitBoard::with_index(i));
+    EXPECT_EQ(ToBitBoard(kSquares[i]), BitBoard::from_index(i));
   }
 }
 

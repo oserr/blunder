@@ -36,7 +36,7 @@ ToSq(unsigned val) noexcept
 // Converts a Sq to a BitBoard.
 inline BitBoard
 ToBitBoard(Sq sq) noexcept
-{ return BitBoard::with_index(ToUint(sq)); }
+{ return BitBoard::from_index(ToUint(sq)); }
 
 std::string
 ToSqStr(unsigned val);
