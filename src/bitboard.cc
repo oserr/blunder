@@ -1,9 +1,38 @@
 #include "bitboard.h"
 
+#include <algorithm>
+#include <array>
+#include <bit>
 #include <cassert>
+#include <cstddef>
 #include <cstdint>
+#include <string>
 
 namespace blunder {
+
+std::string
+BitBoard::fancy_str() const
+{
+  // Reverse the bytes to start from rank 8.
+  auto arr_bits = std::bit_cast<std::array<std::byte, sizeof(bits)>>(bits);
+  std::ranges::reverse(arr_bits);
+  auto rev_bits = std::bit_cast<std::uint64_t>(arr_bits);
+
+  std::string buff;
+  buff.reserve(1024);
+
+  for (size_t i = 0; i < 8; ++i, rev_bits >>= 8) {
+    buff +=  "+---+---+---+---+---+---+---+---+\n|";
+    auto row_bits = rev_bits & 0xff;
+    for (size_t j = 0; j < 8; ++j, row_bits >>= 1)
+      buff += row_bits & 1 ? " 1 |" : "   |";
+    buff += '\n';
+  }
+
+  buff +=  "+---+---+---+---+---+---+---+---+\n";
+
+  return buff;
+}
 
 BitBoard
 GetRookAttacks(std::uint32_t sq, BitBoard blocking) noexcept
