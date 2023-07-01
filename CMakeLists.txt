@@ -29,8 +29,6 @@ FetchContent_MakeAvailable(googletest)
 add_library(blunder STATIC
   src/bitboard.cc
   src/bitboard.h
-  src/bitboard_io.cc
-  src/bitboard_io.h
   src/board_side.h
   src/board_state.cc
   src/board_state.h
