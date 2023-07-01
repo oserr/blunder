@@ -7,7 +7,6 @@
 #include <unistd.h>
 
 #include "bitboard.h"
-#include "bitboard_io.h"
 
 using namespace blunder;
 
@@ -107,22 +106,22 @@ main(int argc, char** argv)
 
   if (print_dmask and print_fmask) {
     std::cout << "Diagonal, rank, and file mask...\n";
-    std::cout << ToMailboxStr(diag_mask | file_mask) << std::endl;
+    std::cout << (diag_mask | file_mask).fancy_str() << std::endl;
   } else if (print_dmask) {
     std::cout << "Diagonal mask...\n";
-    std::cout << ToMailboxStr(diag_mask) << std::endl;
+    std::cout << diag_mask.fancy_str() << std::endl;
   } else if (print_fmask) {
     std::cout << "Rank and file mask...\n";
-    std::cout << ToMailboxStr(file_mask) << std::endl;
+    std::cout << file_mask.fancy_str() << std::endl;
   }
 
   if (print_bmask) {
     std::cout << "Bishop mask for magic numbers...\n";
-    std::cout << ToMailboxStr(GetBishopMask(square)) << std::endl;
+    std::cout << GetBishopMask(square).fancy_str() << std::endl;
   }
   if (print_rmask) {
     std::cout << "Rook mask for magic numbers...\n";
-    std::cout << ToMailboxStr(GetRookMask(square)) << std::endl;
+    std::cout << GetRookMask(square).fancy_str() << std::endl;
   }
 
   return EXIT_SUCCESS;
