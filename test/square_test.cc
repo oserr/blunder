@@ -47,7 +47,7 @@ TEST(ToSq, ConvertsUnsignedToSquare)
 TEST(ToBitBoard, ConvertsSquareToBitboard)
 {
   for (unsigned i = 0; i < kSquares.size(); ++i) {
-    EXPECT_EQ(ToBitBoard(kSquares[i]), 1ull << i);
+    EXPECT_EQ(ToBitBoard(kSquares[i]), BitBoard::with_index(i));
   }
 }
 
@@ -68,11 +68,16 @@ TEST(ToSqStr, ConvertsUnsignedToSquareString)
 TEST(ToSetOfSq, ConvertsBitBoardToSquares)
 {
   auto squares = std::set<Sq>{Sq::c1, Sq::f1, Sq::h1};
-  EXPECT_EQ(ToSetOfSq(0b10100100), squares);
+  EXPECT_EQ(ToSetOfSq(BitBoard(0b10100100)), squares);
 }
 
 TEST(ToBitBoard, ConvertsSquaresToBitBoard)
 {
-  BitBoard bb = 1 | (1 << 8) | (1 << 23) | (1ull << 63);
+  BitBoard bb =
+    BitBoard()
+      .set_bit(0)
+      .set_bit(8)
+      .set_bit(23)
+      .set_bit(63);
   EXPECT_EQ(ToBitBoard({Sq::a1, Sq::a2, Sq::h3, Sq::h8}), bb);
 }

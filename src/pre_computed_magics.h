@@ -1,9 +1,11 @@
 #pragma once
 
+#include <cstdint>
+
 namespace blunder {
 
 // Precomputed magic numbers for bishop attacks.
-inline constexpr std::array<BitBoard, 64> kBishopMagics = {
+inline constexpr std::array<std::uint64_t, 64> kBishopMagics = {
   0x8040080801004408, 0x410040840400410, 0x2201080091080144,
   0x81c2424004000900, 0x64140000120400, 0x28040308050208,
   0x8001281310000000, 0x45804c50100010, 0x808ce20414180021,
@@ -29,7 +31,7 @@ inline constexpr std::array<BitBoard, 64> kBishopMagics = {
 };
 
 // Precomputed magic numbers for rook attacks.
-inline constexpr std::array<BitBoard, 64> kRookMagics = {
+inline constexpr std::array<std::uint64_t, 64> kRookMagics = {
   0xa80008240011022, 0x840400020001000, 0x4880200009811000,
   0x6080048008031000, 0x8200042010020008, 0x1100210024000822,
   0x410000a412004100, 0x8000c628800100, 0x20028000400081a0,

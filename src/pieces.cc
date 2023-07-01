@@ -1,6 +1,5 @@
 #include "pieces.h"
 
-#include <bit>
 #include <cassert>
 #include <cctype>
 
@@ -9,7 +8,7 @@ namespace blunder {
 std::uint8_t
 GetPieceUint8(const std::array<BitBoard, 6> pieces, BitBoard piece) noexcept
 {
-  assert(std::has_single_bit(piece));
+  assert(piece.has_single_bit());
 
   for (std::uint8_t i = 0; i < pieces.size(); ++i) {
     if (piece & pieces[i])

@@ -44,7 +44,7 @@ FillAsciiBoard(
 BitBoard
 AllMask(const PieceSet& pieces) noexcept
 {
-  BitBoard mask = 0ull;
+  BitBoard mask;
   for (auto piece : pieces)
     mask |= piece;
   return mask;

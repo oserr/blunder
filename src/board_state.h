@@ -37,10 +37,10 @@ struct BoardState {
   PieceSet other;
 
   // All of the pieces for the player next to move.
-  BitBoard all_mine = 0;
+  BitBoard all_mine;
 
   // All of the pieces for the player who just moved.
-  BitBoard all_other = 0;
+  BitBoard all_other;
 
   std::uint16_t half_move = 0;
   std::uint16_t full_move = 0;
@@ -106,27 +106,27 @@ struct BoardState {
 
   unsigned
   NumWhiteQueen() const noexcept
-  { return std::popcount(WhiteQueen()); }
+  { return WhiteQueen().count(); }
 
   unsigned
   NumWhiteRook() const noexcept
-  { return std::popcount(WhiteRook()); }
+  { return WhiteRook().count(); }
 
   unsigned
   NumWhiteBishop() const noexcept
-  { return std::popcount(WhiteBishop()); }
+  { return WhiteBishop().count(); }
 
   unsigned
   NumWhiteKnight() const noexcept
-  { return std::popcount(WhiteKnight()); }
+  { return WhiteKnight().count(); }
 
   unsigned
   NumWhitePawn() const noexcept
-  { return std::popcount(WhitePawn()); }
+  { return WhitePawn().count(); }
 
   unsigned
   NumWhite() const noexcept
-  { return std::popcount(AllMask(White())); }
+  { return AllMask(White()).count(); }
 
   const PieceSet&
   Black() const noexcept
@@ -158,27 +158,27 @@ struct BoardState {
 
   unsigned
   NumBlackQueen() const noexcept
-  { return std::popcount(BlackQueen()); }
+  { return BlackQueen().count(); }
 
   unsigned
   NumBlackRook() const noexcept
-  { return std::popcount(BlackRook()); }
+  { return BlackRook().count(); }
 
   unsigned
   NumBlackBishop() const noexcept
-  { return std::popcount(BlackBishop()); }
+  { return BlackBishop().count(); }
 
   unsigned
   NumBlackKnight() const noexcept
-  { return std::popcount(BlackKnight()); }
+  { return BlackKnight().count(); }
 
   unsigned
   NumBlackPawn() const noexcept
-  { return std::popcount(BlackPawn()); }
+  { return BlackPawn().count(); }
 
   unsigned
   NumBlack() const noexcept
-  { return std::popcount(AllMask(Black())); }
+  { return AllMask(Black()).count(); }
 
 };
 

@@ -119,13 +119,13 @@ SplitRows(std::string_view pieces) noexcept
 bool
 AreLogical(const PieceSet pieces) noexcept
 {
-  return std::popcount(pieces[Uint8(Piece::King)]) == 1
-     and std::popcount(pieces[Uint8(Piece::Queen)]) <= 9
-     and std::popcount(pieces[Uint8(Piece::Rook)]) <= 10
-     and std::popcount(pieces[Uint8(Piece::Bishop)]) <= 10
-     and std::popcount(pieces[Uint8(Piece::Knight)]) <= 10
-     and std::popcount(pieces[Uint8(Piece::Pawn)]) <= 10
-     and std::popcount(AllMask(pieces)) <= 16;
+  return pieces[Uint8(Piece::King)].count() == 1
+     and pieces[Uint8(Piece::Queen)].count() <= 9
+     and pieces[Uint8(Piece::Rook)].count() <= 10
+     and pieces[Uint8(Piece::Bishop)].count() <= 10
+     and pieces[Uint8(Piece::Knight)].count() <= 10
+     and pieces[Uint8(Piece::Pawn)].count() <= 10
+     and AllMask(pieces).count() <= 16;
 }
 
 std::expected<std::pair<PieceSet, PieceSet>, FenErr>
@@ -133,8 +133,6 @@ ParsePieces(std::string_view field) noexcept
 {
   PieceSet white;
   PieceSet black;
-  white.fill(0ull);
-  black.fill(0ull);
 
   auto rows = SplitRows(field);
   if (not rows)
@@ -176,9 +174,9 @@ ParsePieces(std::string_view field) noexcept
       }
 
       if (IsUpper(letter))
-        white[Uint8(piece)] |= 1ull << square;
+        white[Uint8(piece)].set_bit(square);
       else
-        black[Uint8(piece)] |= 1ull << square;
+        black[Uint8(piece)].set_bit(square);
 
       ++square;
     }

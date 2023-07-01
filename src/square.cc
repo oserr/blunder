@@ -24,17 +24,15 @@ std::set<Sq>
 ToSetOfSq(BitBoard bb)
 {
   std::set<Sq> squares;
-  for (; bb; bb &= bb - 1) {
-    unsigned index = std::countr_zero(bb);
-    squares.insert(ToSq(index));
-  }
+  while (bb)
+    squares.insert(ToSq(bb.first_bit_and_clear()));
   return squares;
 }
 
 BitBoard
 ToBitBoard(SqList squares) noexcept
 {
-  BitBoard bb = 0;
+  BitBoard bb;
   for (auto sq : squares)
     bb |= ToBitBoard(sq);
   return bb;

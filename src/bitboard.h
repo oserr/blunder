@@ -1,21 +1,299 @@
 #pragma once
 
 #include <array>
+#include <bit>
+#include <bitset>
 #include <cassert>
+#include <concepts>
 #include <cstdint>
+#include <ostream>
+#include <string>
+#include <utility>
 
 namespace blunder {
 
-using BitBoard = std::uint64_t;
+class BitBoard {
+public:
+  // Default ctor: initializes the BitBoard with all bits cleared.
+  BitBoard()
+    : bits(0ull) {}
+
+  // Initializes the BitBoard with some bits.
+  explicit
+  BitBoard(std::uint64_t bits)
+    : bits(bits) {}
+
+  //----------------------------
+  // Default copy control below.
+  //----------------------------
+
+  BitBoard(const BitBoard& other) noexcept = default;
+
+  BitBoard(BitBoard&& other) noexcept = default;
+
+  BitBoard&
+  operator=(const BitBoard& other) noexcept = default;
+
+  BitBoard&
+  operator=(BitBoard&& other) noexcept = default;
+
+  // Clears all the bits.
+  BitBoard&
+  clear() noexcept
+  {
+    bits = 0ull;
+    return *this;
+  }
+
+  // Sets the bits with other_bits.
+  BitBoard&
+  set_bits(std::uint64_t other_bits) noexcept
+  {
+    bits = other_bits;
+    return *this;
+  }
+
+  // Returns the number of bits set.
+  unsigned
+  count() const noexcept
+  { return std::popcount(bits); }
+
+  // Returns true if the BitBoard only has one bit set, false otherwise.
+  bool
+  has_single_bit() const noexcept
+  { return std::has_single_bit(bits); }
+
+  // Returns the underlying bits.
+  std::uint64_t
+  raw() const noexcept
+  { return bits; }
+
+  // Returns the index of the first bit set starting from LSB. If no bits are
+  // set, this will return 64.
+  unsigned
+  first_bit() const noexcept
+  { return std::countr_zero(bits); }
+
+  // Like first_bit, but also clears the bit.
+  unsigned
+  first_bit_and_clear() noexcept
+  {
+    auto index = first_bit();
+    bits &= bits - 1;
+    return index;
+  }
+
+  // Like first_bit_and_clear, but also returns a BitBoard with the bit set at
+  // the index of the first bit set.
+  std::pair<unsigned, BitBoard>
+  index_bb_and_clear() noexcept
+  {
+    auto index = first_bit_and_clear();
+    return {index, with_index(index)};
+  }
+
+  // Returns true if any bit is set, false otherwise.
+  operator bool() const noexcept
+  { return static_cast<bool>(bits); }
+
+  // Returns true if bit at index is set.
+  bool
+  is_set(unsigned index) const noexcept
+  { return static_cast<bool>(bits & (1ull << index)); }
+
+  // Mutates the BitBoard by shifting left.
+  BitBoard&
+  sl(unsigned shift) noexcept
+  {
+    bits <<= shift;
+    return *this;
+  }
+
+  // Returns a copy of the BitBoard shifted left.
+  BitBoard
+  shift_left(unsigned shift) const noexcept
+  { return BitBoard(bits << shift); }
+
+  // Same as sl, but operator overload.
+  BitBoard&
+  operator<<=(unsigned shift) noexcept
+  { return sl(shift); }
+
+  // Mutates the BitBoard by shifting right.
+  BitBoard&
+  sr(unsigned shift) noexcept
+  {
+    bits <<= shift;
+    return *this;
+  }
+
+  // Returns a copy of the BitBoard shifted right.
+  BitBoard
+  shift_right(unsigned shift) noexcept
+  { return BitBoard(bits >> shift); }
+
+  // Same as sr, but operator overload.
+  BitBoard&
+  operator>>=(unsigned shift) noexcept
+  { return sr(shift); }
+
+  // Operator overload for bit_or with assignment.
+  BitBoard&
+  operator|=(BitBoard bb) noexcept
+  {
+    bits |= bb.bits;
+    return *this;
+  }
+
+  // Operator overload for bit_and with assignment.
+  template<typename T>
+  requires std::integral<T>
+  BitBoard&
+  operator&=(T other_bits) noexcept
+  {
+    bits &= static_cast<std::uint64_t>(other_bits);
+    return *this;
+  }
+
+  // Operator overload for bit_and with assignment.
+  BitBoard&
+  operator&=(BitBoard bb) noexcept
+  {
+    bits &= bb.bits;
+    return *this;
+  }
+
+  // Returns the complement of bits set.
+  BitBoard
+  bit_not() noexcept
+  { return BitBoard(~bits); }
+
+  // Returns the insersection of bits with other.
+  BitBoard
+  bit_and(BitBoard other) noexcept
+  { return BitBoard(bits & other.bits); }
+
+  // Returns the union of bits with other.
+  BitBoard
+  bit_or(BitBoard other) noexcept
+  { return BitBoard(bits | other.bits); }
+
+  // Order operator.
+  auto
+  operator<=>(BitBoard other) noexcept
+  { return bits <=> other.bits; }
+
+  // String with 0s and 1s representing bit pattern.
+  std::string
+  str() const
+  { return std::bitset<64>(bits).to_string(); }
+
+  // Sets the bit at the given index.
+  BitBoard&
+  set_bit(unsigned index) noexcept
+  {
+    bits |= 1ull << index;
+    return *this;
+  }
+
+  // Returns true if bb is equal, i.e. they have the same set of bits set.
+  bool
+  eq(BitBoard bb) const noexcept
+  { return bits == bb.bits; }
+
+  // Creates a BitBoard with one bit set at the given index.
+  static BitBoard
+  with_index(unsigned index) noexcept
+  { return BitBoard().set_bit(index); }
+
+private:
+  std::uint64_t bits;
+};
+
+inline bool
+operator==(BitBoard left, BitBoard right) noexcept
+{ return left.eq(right); }
+
+inline BitBoard
+operator<<(BitBoard bb, unsigned shift) noexcept
+{ return bb.shift_left(shift); }
+
+inline BitBoard
+operator>>(BitBoard bb, unsigned shift) noexcept
+{ return bb.shift_right(shift); }
+
+inline BitBoard
+operator|(BitBoard left, BitBoard right) noexcept
+{ return left.bit_or(right); }
+
+template<typename T>
+requires std::integral<T>
+BitBoard
+operator|(BitBoard bb, T mask) noexcept
+{ return bb.bit_or(BitBoard(mask)); }
+
+template<typename T>
+requires std::integral<T>
+BitBoard
+operator|(T mask, BitBoard bb) noexcept
+{ return bb.bit_or(BitBoard(mask)); }
+
+inline BitBoard
+operator&(BitBoard left, BitBoard right) noexcept
+{ return left.bit_and(right); }
+
+template<typename T>
+requires std::integral<T>
+BitBoard
+operator&(BitBoard bb, T mask) noexcept
+{ return bb.bit_and(BitBoard(mask)); }
+
+template<typename T>
+requires std::integral<T>
+BitBoard
+operator&(T mask, BitBoard bb) noexcept
+{ return bb.bit_and(BitBoard(mask)); }
+
+inline BitBoard
+operator~(BitBoard bb) noexcept
+{ return bb.bit_not(); }
+
+inline std::ostream&
+operator<<(std::ostream& os, BitBoard bb)
+{ return os << bb.str(); }
+
+template<typename T>
+requires std::integral<T>
+BitBoard
+operator<<(BitBoard bb, T shift)
+{ return bb.shift_left(shift); }
+
+template<typename T>
+requires std::integral<T>
+BitBoard
+operator>>(BitBoard bb, T shift)
+{ return bb.shift_right(shift); }
+
+template<typename T>
+requires std::integral<T>
+BitBoard
+operator<<(T shift, BitBoard bb)
+{ return bb.shift_left(shift); }
+
+template<typename T>
+requires std::integral<T>
+BitBoard
+operator>>(T shift, BitBoard bb)
+{ return bb.shift_right(shift); }
 
 // Initial white piece placement.
-inline constexpr BitBoard kWhiteKing = 1 << 4;
-inline constexpr BitBoard kWhiteQueen = 1 << 3;
-inline constexpr BitBoard kWhiteRooks = (1 << 7 ) | 1;
-inline constexpr BitBoard kWhiteKnights = (1 << 6 ) | (1 << 1);
-inline constexpr BitBoard kWhiteBishops = (1 << 5 ) | (1 << 2);
-inline constexpr BitBoard kWhitePawns = 0xff00;
-inline constexpr BitBoard kWhitePieces = kWhiteKing |
+inline const BitBoard kWhiteKing(1ull << 4);
+inline const BitBoard kWhiteQueen(1ull << 3);
+inline const BitBoard kWhiteRooks((1ull << 7 ) | 1);
+inline const BitBoard kWhiteKnights((1ull << 6 ) | (1 << 1));
+inline const BitBoard kWhiteBishops((1ull << 5 ) | (1 << 2));
+inline const BitBoard kWhitePawns(0xff00);
+inline const BitBoard kWhitePieces = kWhiteKing |
                                 kWhiteQueen |
                                 kWhiteRooks |
                                 kWhiteKnights |
@@ -23,13 +301,13 @@ inline constexpr BitBoard kWhitePieces = kWhiteKing |
                                 kWhitePawns;
 
 // Initial black piece placement.
-inline constexpr BitBoard kBlackKing = kWhiteKing << 56;
-inline constexpr BitBoard kBlackQueen = kWhiteQueen << 56;
-inline constexpr BitBoard kBlackRooks = kWhiteRooks << 56;
-inline constexpr BitBoard kBlackKnights = kWhiteKnights << 56;
-inline constexpr BitBoard kBlackBishops = kWhiteBishops << 56;
-inline constexpr BitBoard kBlackPawns = kWhitePawns << 40;
-inline constexpr BitBoard kBlackPieces = kBlackKing |
+inline const BitBoard kBlackKing = kWhiteKing << 56;
+inline const BitBoard kBlackQueen = kWhiteQueen << 56;
+inline const BitBoard kBlackRooks = kWhiteRooks << 56;
+inline const BitBoard kBlackKnights = kWhiteKnights << 56;
+inline const BitBoard kBlackBishops = kWhiteBishops << 56;
+inline const BitBoard kBlackPawns = kWhitePawns << 40;
+inline const BitBoard kBlackPieces = kBlackKing |
                                 kBlackQueen |
                                 kBlackRooks |
                                 kBlackKnights |
@@ -37,70 +315,68 @@ inline constexpr BitBoard kBlackPieces = kBlackKing |
                                 kBlackPawns;
 
 // Files/colums.
-inline constexpr BitBoard kFileA = 0x0101010101010101;
-inline constexpr BitBoard kFileB = kFileA << 1;
-inline constexpr BitBoard kFileC = kFileB << 1;
-inline constexpr BitBoard kFileD = kFileC << 1;
-inline constexpr BitBoard kFileE = kFileD << 1;
-inline constexpr BitBoard kFileF = kFileE << 1;
-inline constexpr BitBoard kFileG = kFileF << 1;
-inline constexpr BitBoard kFileH = kFileG << 1;
+inline const BitBoard kFileA(0x0101010101010101);
+inline const BitBoard kFileB = kFileA << 1;
+inline const BitBoard kFileC = kFileB << 1;
+inline const BitBoard kFileD = kFileC << 1;
+inline const BitBoard kFileE = kFileD << 1;
+inline const BitBoard kFileF = kFileE << 1;
+inline const BitBoard kFileG = kFileF << 1;
+inline const BitBoard kFileH = kFileG << 1;
 
 // Ranks/rows.
-inline constexpr BitBoard kRank1 = 0xff;
-inline constexpr BitBoard kRank2 = kRank1 << 8;
-inline constexpr BitBoard kRank3 = kRank2 << 8;
-inline constexpr BitBoard kRank4 = kRank3 << 8;
-inline constexpr BitBoard kRank5 = kRank4 << 8;
-inline constexpr BitBoard kRank6 = kRank5 << 8;
-inline constexpr BitBoard kRank7 = kRank6 << 8;
-inline constexpr BitBoard kRank8 = kRank7 << 8;
+inline const BitBoard kRank1(0xff);
+inline const BitBoard kRank2 = kRank1 << 8;
+inline const BitBoard kRank3 = kRank2 << 8;
+inline const BitBoard kRank4 = kRank3 << 8;
+inline const BitBoard kRank5 = kRank4 << 8;
+inline const BitBoard kRank6 = kRank5 << 8;
+inline const BitBoard kRank7 = kRank6 << 8;
+inline const BitBoard kRank8 = kRank7 << 8;
 
 // All diagonals going up the board from A1 to A7.
-inline constexpr BitBoard kDiagA1H8 = 0x8040201008040201;
-inline constexpr BitBoard kDiagA2G8 = kDiagA1H8 << 8;
-inline constexpr BitBoard kDiagA3F8 = kDiagA2G8 << 8;
-inline constexpr BitBoard kDiagA4E8 = kDiagA3F8 << 8;
-inline constexpr BitBoard kDiagA5D8 = kDiagA4E8 << 8;
-inline constexpr BitBoard kDiagA6C8 = kDiagA5D8 << 8;
-inline constexpr BitBoard kDiagA7B8 = kDiagA6C8 << 8;
+inline const BitBoard kDiagA1H8(0x8040201008040201);
+inline const BitBoard kDiagA2G8 = kDiagA1H8 << 8;
+inline const BitBoard kDiagA3F8 = kDiagA2G8 << 8;
+inline const BitBoard kDiagA4E8 = kDiagA3F8 << 8;
+inline const BitBoard kDiagA5D8 = kDiagA4E8 << 8;
+inline const BitBoard kDiagA6C8 = kDiagA5D8 << 8;
+inline const BitBoard kDiagA7B8 = kDiagA6C8 << 8;
 
 // All diagonals going up the board from B1 to G1.
-inline constexpr BitBoard kDiagB1H7 = kDiagA1H8 >> 8;
-inline constexpr BitBoard kDiagC1H6 = kDiagB1H7 >> 8;
-inline constexpr BitBoard kDiagD1H5 = kDiagC1H6 >> 8;
-inline constexpr BitBoard kDiagE1H4 = kDiagD1H5 >> 8;
-inline constexpr BitBoard kDiagF1H3 = kDiagE1H4 >> 8;
-inline constexpr BitBoard kDiagG1H2 = kDiagF1H3 >> 8;
+inline const BitBoard kDiagB1H7 = kDiagA1H8 >> 8;
+inline const BitBoard kDiagC1H6 = kDiagB1H7 >> 8;
+inline const BitBoard kDiagD1H5 = kDiagC1H6 >> 8;
+inline const BitBoard kDiagE1H4 = kDiagD1H5 >> 8;
+inline const BitBoard kDiagF1H3 = kDiagE1H4 >> 8;
+inline const BitBoard kDiagG1H2 = kDiagF1H3 >> 8;
 
 // All diagonals going down the board from A8 to A2.
-inline constexpr BitBoard kDiagA8H1 = 0x0102040810204080;
-inline constexpr BitBoard kDiagA7G1 = kDiagA8H1 >> 8;
-inline constexpr BitBoard kDiagA6F1 = kDiagA7G1 >> 8;
-inline constexpr BitBoard kDiagA5E1 = kDiagA6F1 >> 8;
-inline constexpr BitBoard kDiagA4D1 = kDiagA5E1 >> 8;
-inline constexpr BitBoard kDiagA3C1 = kDiagA4D1 >> 8;
-inline constexpr BitBoard kDiagA2B1 = kDiagA3C1 >> 8;
+inline const BitBoard kDiagA8H1(0x0102040810204080);
+inline const BitBoard kDiagA7G1 = kDiagA8H1 >> 8;
+inline const BitBoard kDiagA6F1 = kDiagA7G1 >> 8;
+inline const BitBoard kDiagA5E1 = kDiagA6F1 >> 8;
+inline const BitBoard kDiagA4D1 = kDiagA5E1 >> 8;
+inline const BitBoard kDiagA3C1 = kDiagA4D1 >> 8;
+inline const BitBoard kDiagA2B1 = kDiagA3C1 >> 8;
 
 // All diagonals going down the board from B8 to G8.
-inline constexpr BitBoard kDiagB8H2 = kDiagA8H1 << 8;
-inline constexpr BitBoard kDiagC8H3 = kDiagB8H2 << 8;
-inline constexpr BitBoard kDiagD8H4 = kDiagC8H3 << 8;
-inline constexpr BitBoard kDiagE8H5 = kDiagD8H4 << 8;
-inline constexpr BitBoard kDiagF8H6 = kDiagE8H5 << 8;
-inline constexpr BitBoard kDiagG8H7 = kDiagF8H6 << 8;
+inline const BitBoard kDiagB8H2 = kDiagA8H1 << 8;
+inline const BitBoard kDiagC8H3 = kDiagB8H2 << 8;
+inline const BitBoard kDiagD8H4 = kDiagC8H3 << 8;
+inline const BitBoard kDiagE8H5 = kDiagD8H4 << 8;
+inline const BitBoard kDiagF8H6 = kDiagE8H5 << 8;
+inline const BitBoard kDiagG8H7 = kDiagF8H6 << 8;
 
 // Mask for the outer squares of the board. This is helpful for ignoring the
 // outer squares when computing sliding attacks.
-inline constexpr BitBoard kOuterSquares = kFileA | kFileH | kRank1 | kRank8;
+inline const BitBoard kOuterSquares = kFileA | kFileH | kRank1 | kRank8;
 
 // Colored squres.
-inline constexpr BitBoard kLightSquares = 0x55aa55aa55aa55aa;
-inline constexpr BitBoard kDarkSquares = ~kLightSquares;
+inline const BitBoard kLightSquares(0x55aa55aa55aa55aa);
+inline const BitBoard kDarkSquares = ~kLightSquares;
 
-inline constexpr BitBoard k64Bits = 64;
-
-inline constexpr std::array<BitBoard, k64Bits> kDiagMask= {
+inline const std::array<BitBoard, 64> kDiagMask= {
   // Rank 1
   kDiagA1H8,
   kDiagB1H7 | kDiagA2B1,
@@ -175,7 +451,7 @@ inline constexpr std::array<BitBoard, k64Bits> kDiagMask= {
   kDiagA1H8
 };
 
-inline constexpr std::array<BitBoard, k64Bits> kFileRankMask= {
+inline const std::array<BitBoard, 64> kFileRankMask= {
   // Rank 1
   kFileA | kRank1,
   kFileB | kRank1,
@@ -250,14 +526,14 @@ inline constexpr std::array<BitBoard, k64Bits> kFileRankMask= {
   kFileH | kRank8,
 };
 
-inline constexpr BitBoard kFileARank8FileH = kFileA | kRank8 | kFileH;
-inline constexpr BitBoard kRank1Rank8FileH = kRank1 | kRank8 | kFileH;
-inline constexpr BitBoard kRank1FileAFileH = kRank1 | kFileA | kFileH;
-inline constexpr BitBoard kFileARank1Rank8 = kFileA | kRank1 | kRank8;
+inline const BitBoard kFileARank8FileH = kFileA | kRank8 | kFileH;
+inline const BitBoard kRank1Rank8FileH = kRank1 | kRank8 | kFileH;
+inline const BitBoard kRank1FileAFileH = kRank1 | kFileA | kFileH;
+inline const BitBoard kFileARank1Rank8 = kFileA | kRank1 | kRank8;
 
 // These masks ignore the outer squares. For example, for a1, we don't care
 // about bits at a8 and h1.
-inline constexpr std::array<BitBoard, k64Bits> kRookMask= {
+inline const std::array<BitBoard, 64> kRookMask= {
   // Rank 1
   kFileRankMask[0] & ~(1ull | kFileH | kRank8),
   kFileRankMask[1] & ~((1ull << 1) | kFileARank8FileH),

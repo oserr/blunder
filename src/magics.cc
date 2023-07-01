@@ -23,7 +23,7 @@ GetMagicHash(
     std::uint64_t magic,
     std::uint8_t magic_bits) noexcept
 {
-  return (blocking * magic) >> (64 - magic_bits);
+  return (blocking.raw() * magic) >> (64 - magic_bits);
 }
 
 // Computes a subset of set bits in |mask| based on |num|. This is done by using
@@ -39,11 +39,10 @@ GetMagicHash(
 BitBoard
 PermuteMask(std::uint32_t num, std::uint32_t num_bits, BitBoard mask) noexcept
 {
-  BitBoard mask_combo = 0;
+  BitBoard mask_combo;
   for (std::uint32_t i = 0; i < num_bits; ++i) {
     if (num & (1 << i))
-      mask_combo |= 1ull << std::countr_zero(mask);
-    mask &= mask - 1;
+      mask_combo.set_bit(mask.first_bit_and_clear());
   }
   return mask_combo;
 }
@@ -57,7 +56,7 @@ FindMagic(
     std::uint32_t loops = 1000000000)
 {
   BitBoard mask = mask_fn(sq);
-  std::uint32_t num_bits = std::popcount(mask);
+  std::uint32_t num_bits = mask.count();
 
   if (num_bits < 5 or num_bits > 12)
     return std::unexpected(Err::MagicBitsOutOfRange);
@@ -77,12 +76,12 @@ FindMagic(
   for (auto k = 0u; k < loops; ++k) {
     const auto magic = magic_fn();
 
-    const auto num_high_bits = std::popcount((mask*magic) >> 56);
+    const auto num_high_bits = std::popcount((mask.raw()*magic) >> 56);
     if (num_high_bits < 6)
       continue;
 
     // Clear the attack table.
-    std::ranges::fill(attack_table, 0);
+    std::ranges::for_each(attack_table, &BitBoard::clear);
 
     bool found_collision = false;
     for (auto i = 0u; i < ncombos; ++i) {

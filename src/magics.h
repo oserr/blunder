@@ -13,7 +13,7 @@ namespace blunder {
 
 struct Magic {
   std::vector<BitBoard> attacks;
-  BitBoard mask = 0;
+  BitBoard mask;
   std::uint64_t magic = 0;
   std::uint8_t nbits = 0;
 };

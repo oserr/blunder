@@ -20,15 +20,15 @@ template<Color color, BoardSide side>
 constexpr bool
 NoneBetweenKingAndRook(BitBoard all_pieces) noexcept
 {
-  std::uint8_t bits = 0;
-  std::uint8_t mask = 0;
+  BitBoard bits;
+  BitBoard mask;
 
   if constexpr (side == BoardSide::King) {
-    bits = 0b00001001ull;
-    mask = 0b00001111ull;
+    bits.set_bits(0b00001001ull);
+    mask.set_bits(0b00001111ull);
   } else {
-    bits = 0b10001000ull;
-    mask = 0b11111000ull;
+    bits.set_bits(0b10001000ull);
+    mask.set_bits(0b11111000ull);
   }
 
   if constexpr (color == Color::Black)
@@ -51,10 +51,8 @@ GetNonAttacks(
     std::vector<Move>& moves)
 {
   auto p = Uint8(piece);
-  for (; to_squares; to_squares &= to_squares - 1) {
-    auto to_square = std::countr_zero(to_squares);
-    moves.emplace_back(p, from_square, to_square);
-  }
+  while (to_squares)
+    moves.emplace_back(p, from_square, to_squares.first_bit_and_clear());
 }
 
 // Returns all the simple attack moves for |piece| from square |from_square| to
@@ -69,9 +67,8 @@ GetSimpleAttacks(
     std::vector<Move>& moves)
 {
   auto p = Uint8(piece);
-  for (; to_squares; to_squares &= to_squares - 1) {
-    auto to_square = std::countr_zero(to_squares);
-    BitBoard attacked = 1ull << to_square;
+  while (to_squares) {
+    auto [to_square, attacked] = to_squares.index_bb_and_clear();
     auto to_piece = GetPieceUint8(other, attacked);
     assert(to_piece >= 0 and to_piece < 6);
     moves.emplace_back(p, from_square, to_piece, to_square);
@@ -93,10 +90,8 @@ GetSimpleMoves(
   auto all_pieces = state.all_mine | state.all_other;
   auto no_pieces = ~all_pieces;
 
-  for (; bb; bb &= bb - 1) {
-    auto from_square = std::countr_zero(bb);
-    auto bb_piece = 1ull << from_square;
-
+  while (bb) {
+    auto [from_square, bb_piece] = bb.index_bb_and_clear();
     auto bb_moves = moves_fn(bb_piece);
 
     // Compute moves to empty squares.
@@ -176,8 +171,8 @@ MovePawnsForward(
 {
   auto pawn_moves = move_fn(pawns, no_pieces);
 
-  for (; pawn_moves; pawn_moves &= pawn_moves - 1) {
-    auto to_square = std::countr_zero(pawn_moves);
+  while (pawn_moves) {
+    auto to_square = pawn_moves.first_bit_and_clear();
     auto from_square = from_fn(to_square);
 
     if (not is_promo_fn(to_square))
@@ -203,9 +198,8 @@ MovePawnsAttack(
 {
   auto pawn_moves = move_fn(pawns, state.all_other);
 
-  for (; pawn_moves; pawn_moves &= pawn_moves - 1) {
-    auto to_square = std::countr_zero(pawn_moves);
-    auto to_bb = 1ull << to_square;
+  while (pawn_moves) {
+    auto [to_square, to_bb] = pawn_moves.index_bb_and_clear();
     auto to_piece = GetPieceUint8(state.other, to_bb);
     auto from_square = from_fn(to_square);
 
@@ -324,7 +318,7 @@ MoveGen::QueenMoves(
 {
   auto all_pieces = state.all_mine | state.all_other;
   auto moves_fn = [&](BitBoard bb) {
-    auto from_square = std::countr_zero(bb);
+    auto from_square = bb.first_bit();
     return rmagics_.GetAttacks(from_square, all_pieces)
          | bmagics_.GetAttacks(from_square, all_pieces);
   };
@@ -338,7 +332,7 @@ MoveGen::RookMoves(
 {
   auto all_pieces = state.all_mine | state.all_other;
   auto moves_fn = [&](BitBoard bb) {
-    auto from_square = std::countr_zero(bb);
+    auto from_square = bb.first_bit();
     return rmagics_.GetAttacks(from_square, all_pieces);
   };
   GetSimpleMoves(Piece::Rook, state, moves_fn, moves);
@@ -351,7 +345,7 @@ MoveGen::BishopMoves(
 {
   auto all_pieces = state.all_mine | state.all_other;
   auto moves_fn = [&](BitBoard bb) {
-    auto from_square = std::countr_zero(bb);
+    auto from_square = bb.first_bit();
     return bmagics_.GetAttacks(from_square, all_pieces);
   };
   GetSimpleMoves(Piece::Bishop, state, moves_fn, moves);
