@@ -23,7 +23,7 @@ struct Move {
   // If the move does not represent an attack, then |to_piece| should be set to
   // None.
   std::uint8_t from_piece: 3 = 0;
-  std::uint8_t to_piece: 3 = Uint8(Piece::None);
+  std::uint8_t to_piece: 3 = uint(Type::None);
 
   // The source and destination squares.
   std::uint8_t from_square: 6 = 0;
@@ -38,14 +38,14 @@ struct Move {
   // If it is, promo_piece will be set to promoted piece.
   std::uint8_t en_passant: 1 = 0;
   std::uint8_t is_promo: 1 = 0;
-  std::uint8_t promo_piece: 3 = Uint8(Piece::None);
+  std::uint8_t promo_piece: 3 = uint(Type::None);
 
   // Initializes all fields.
-  constexpr Move() = default;
+  Move() = default;
 
   // Most common scenario for a move, i.e. we move a piece from one square to
   // another without attacking.
-  constexpr Move(
+  Move(
       std::uint8_t from_piece,
       std::uint8_t from_square,
       std::uint8_t to_square) noexcept
@@ -53,16 +53,22 @@ struct Move {
       from_square(from_square),
       to_square(to_square) {}
 
+  Move(
+      Piece from_piece,
+      std::uint8_t from_square,
+      std::uint8_t to_square) noexcept
+    : Move(from_piece.uint(), from_square, to_square) {}
+
   // Most common scenario for a move, i.e. we move a piece from one square to
   // another without attacking.
-  constexpr Move(
+  Move(
       Piece from_piece,
       Sq from_square,
       Sq to_square) noexcept
-    : Move(Uint8(from_piece), ToUint(from_square), ToUint(to_square)) {}
+    : Move(from_piece.uint(), ToUint(from_square), ToUint(to_square)) {}
 
   // Next most common scenario, we move a piece with capture.
-  constexpr Move(
+  Move(
       std::uint8_t from_piece,
       std::uint8_t from_square,
       std::uint8_t to_piece,
@@ -71,6 +77,20 @@ struct Move {
       to_piece(to_piece),
       from_square(from_square),
       to_square(to_square) {}
+
+  Move(
+      Piece from_piece,
+      std::uint8_t from_square,
+      std::uint8_t to_piece,
+      std::uint8_t to_square) noexcept
+    : Move(from_piece.uint(), from_square, to_piece, to_square) {}
+
+  Move(
+      Piece from_piece,
+      std::uint8_t from_square,
+      Piece to_piece,
+      std::uint8_t to_square) noexcept
+    : Move(from_piece.uint(), from_square, to_piece.uint(), to_square) {}
 
   // Copy ctor.
   constexpr Move(const Move& m) noexcept = default;
@@ -81,7 +101,7 @@ struct Move {
   static constexpr Move
   WhiteKingSideCastle() noexcept
   {
-    Move m(Uint8(Piece::King), 4, 6);
+    Move m(Piece::king(), 4, 6);
     m.castle = 1;
     m.kside = 1;
     return m;
@@ -90,7 +110,7 @@ struct Move {
   static constexpr Move
   WhiteQueenSideCastle() noexcept
   {
-    Move m(Uint8(Piece::King), 4, 2);
+    Move m(Piece::king(), 4, 2);
     m.castle = 1;
     return m;
   }
@@ -98,7 +118,7 @@ struct Move {
   static constexpr Move
   BlackKingSideCastle() noexcept
   {
-    Move m(Uint8(Piece::King), 60, 62);
+    Move m(Piece::king(), 60, 62);
     m.castle = 1;
     m.kside = 1;
     return m;
@@ -107,7 +127,7 @@ struct Move {
   static constexpr Move
   BlackQueenSideCastle() noexcept
   {
-    Move m(Uint8(Piece::King), 60, 58);
+    Move m(Piece::king(), 60, 58);
     m.castle = 1;
     return m;
   }
@@ -117,24 +137,24 @@ struct Move {
   {
     assert(to_square < 64);
 
-    Move m(Uint8(Piece::Pawn), to_square - 8, to_square);
+    Move m(Piece::pawn(), to_square - 8, to_square);
     m.is_promo = 1;
-    m.promo_piece = Uint8(promo);
+    m.promo_piece = promo.uint();
     return m;
   }
 
   static Move
   WhitePawnPromo(
       std::uint8_t from_square,
-      std::uint8_t to_piece,
+      Piece to_piece,
       std::uint8_t to_square,
       Piece promo) noexcept
   {
     assert(to_square < 64);
 
-    Move m(Uint8(Piece::Pawn), from_square, to_piece, to_square);
+    Move m(Piece::pawn(), from_square, to_piece, to_square);
     m.is_promo = 1;
-    m.promo_piece = Uint8(promo);
+    m.promo_piece = promo.uint();
     return m;
   }
 
@@ -146,9 +166,9 @@ struct Move {
   {
     assert(to_square < 64);
 
-    Move m(Uint8(Piece::Pawn), from_square, to_square);
+    Move m(Piece::pawn(), from_square, to_square);
     m.is_promo = 1;
-    m.promo_piece = Uint8(promo);
+    m.promo_piece = promo.uint();
     return m;
   }
 
@@ -161,11 +181,19 @@ struct Move {
   {
     assert(to_square < 64);
 
-    Move m(Uint8(Piece::Pawn), from_square, to_piece, to_square);
+    Move m(Piece::pawn(), from_square, to_piece, to_square);
     m.is_promo = 1;
-    m.promo_piece = Uint8(promo);
+    m.promo_piece = promo.uint();
     return m;
   }
+
+  static Move
+  PawnPromo(
+      std::uint8_t from_square,
+      Piece to_piece,
+      std::uint8_t to_square,
+      Piece promo) noexcept
+  { return PawnPromo(from_square, to_piece.uint(), to_square, promo); }
 
 };
 

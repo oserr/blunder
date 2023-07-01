@@ -26,7 +26,7 @@ DebugStr(Move mv)
   buff.reserve(128);
 
   buff += '{';
-  buff += AsciiLetter(ToPiece(mv.from_piece));
+  buff += Piece::from_int(mv.from_piece).letter();
   buff += ':';
   buff += ToStr(ToSq(mv.from_square));
   buff += "->";
@@ -44,21 +44,21 @@ DebugStr(Move mv)
     }
 
     buff += ", ";
-    buff += AsciiLetter(Piece::Rook);
+    buff += letter(Type::Rook);
     buff += ':';
     buff += ToStr(ToSq(from_sq));
     buff += "->";
     buff += ToStr(ToSq(to_sq));
   }
 
-  if (auto to_piece = ToPiece(mv.to_piece); to_piece != Piece::None) {
+  if (auto to_piece = Piece::from_int(mv.to_piece); to_piece != Type::None) {
     buff += ", !";
-    buff += AsciiLetter(to_piece);
+    buff += to_piece.letter();
   }
 
   if (mv.is_promo) {
     buff += ", ^";
-    buff += AsciiLetter(ToPiece(mv.promo_piece));
+    buff += Piece::from_int(mv.promo_piece).letter();
   }
 
   buff += '}';

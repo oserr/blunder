@@ -154,6 +154,7 @@ MagicAttacks::GetAttacks(std::uint8_t square, BitBoard blockers) const noexcept
   const auto& [attacks, mask, magic, nbits] = magics_[square];
   auto magic_hash = GetMagicHash(blockers & mask, magic, nbits);
   assert(magic_hash < attacks.size());
+
   return attacks[magic_hash];
 }
 

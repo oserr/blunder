@@ -50,9 +50,8 @@ GetNonAttacks(
     BitBoard to_squares,
     std::vector<Move>& moves)
 {
-  auto p = Uint8(piece);
   while (to_squares)
-    moves.emplace_back(p, from_square, to_squares.first_bit_and_clear());
+    moves.emplace_back(piece, from_square, to_squares.first_bit_and_clear());
 }
 
 // Returns all the simple attack moves for |piece| from square |from_square| to
@@ -66,12 +65,11 @@ GetSimpleAttacks(
     const PieceSet other,
     std::vector<Move>& moves)
 {
-  auto p = Uint8(piece);
   while (to_squares) {
     auto [to_square, attacked] = to_squares.index_bb_and_clear();
-    auto to_piece = GetPieceUint8(other, attacked);
-    assert(to_piece >= 0 and to_piece < 6);
-    moves.emplace_back(p, from_square, to_piece, to_square);
+    auto to_piece = other.find_type(attacked);
+    assert(to_piece.type() != Type::None);
+    moves.emplace_back(piece, from_square, to_piece, to_square);
   }
 }
 
@@ -86,7 +84,7 @@ GetSimpleMoves(
     const std::function<BitBoard(BitBoard)>& moves_fn,
     std::vector<Move>& moves)
 {
-  auto bb = state.mine[Uint8(piece)];
+  auto bb = state.mine.get(piece);
   auto all_pieces = state.all_mine | state.all_other;
   auto no_pieces = ~all_pieces;
 
@@ -176,13 +174,13 @@ MovePawnsForward(
     auto from_square = from_fn(to_square);
 
     if (not is_promo_fn(to_square))
-      moves.emplace_back(Uint8(Piece::Pawn), from_square, to_square);
+      moves.emplace_back(Piece::pawn(), from_square, to_square);
     else {
       // Pawn is moving to the last rank for promotion.
-      moves.push_back(Move::PawnPromo(from_square, to_square, Piece::Queen));
-      moves.push_back(Move::PawnPromo(from_square, to_square, Piece::Rook));
-      moves.push_back(Move::PawnPromo(from_square, to_square, Piece::Bishop));
-      moves.push_back(Move::PawnPromo(from_square, to_square, Piece::Knight));
+      moves.push_back(Move::PawnPromo(from_square, to_square, Piece::queen()));
+      moves.push_back(Move::PawnPromo(from_square, to_square, Piece::rook()));
+      moves.push_back(Move::PawnPromo(from_square, to_square, Piece::bishop()));
+      moves.push_back(Move::PawnPromo(from_square, to_square, Piece::knight()));
     }
   }
 }
@@ -200,20 +198,21 @@ MovePawnsAttack(
 
   while (pawn_moves) {
     auto [to_square, to_bb] = pawn_moves.index_bb_and_clear();
-    auto to_piece = GetPieceUint8(state.other, to_bb);
+    auto to_piece = state.other.find_type(to_bb);
+    assert(to_piece.type() != Type::None);
     auto from_square = from_fn(to_square);
 
     if (not is_promo_fn(to_square))
-      moves.emplace_back(Uint8(Piece::Pawn), from_square, to_piece, to_square);
+      moves.emplace_back(Piece::pawn(), from_square, to_piece, to_square);
     else {
       moves.push_back(Move::PawnPromo(
-            from_square, to_piece, to_square, Piece::Queen));
+            from_square, to_piece, to_square, Piece::queen()));
       moves.push_back(Move::PawnPromo(
-            from_square, to_piece, to_square, Piece::Rook));
+            from_square, to_piece, to_square, Piece::rook()));
       moves.push_back(Move::PawnPromo(
-            from_square, to_piece, to_square, Piece::Bishop));
+            from_square, to_piece, to_square, Piece::bishop()));
       moves.push_back(Move::PawnPromo(
-            from_square, to_piece, to_square, Piece::Knight));
+            from_square, to_piece, to_square, Piece::knight()));
     }
   }
 }
@@ -256,7 +255,7 @@ MoveGen::BishopMoves(const BoardState& state) const
 std::vector<Move>
 MoveGen::KnightMoves(const BoardState& state) const
 {
-  return GetSimpleMoves(Piece::Knight, state, MoveKnight);
+  return GetSimpleMoves(Piece::knight(), state, MoveKnight);
 }
 
 std::vector<Move>
@@ -287,7 +286,7 @@ MoveGen::KingMoves(
     const BoardState& state,
     std::vector<Move>& moves) const
 {
-  GetSimpleMoves(Piece::King, state, MoveKing, moves);
+  GetSimpleMoves(Piece::king(), state, MoveKing, moves);
 
   auto all_pieces = state.all_mine | state.all_other;
 
@@ -322,7 +321,7 @@ MoveGen::QueenMoves(
     return rmagics_.GetAttacks(from_square, all_pieces)
          | bmagics_.GetAttacks(from_square, all_pieces);
   };
-  GetSimpleMoves(Piece::Queen, state, moves_fn, moves);
+  GetSimpleMoves(Piece::queen(), state, moves_fn, moves);
 }
 
 void
@@ -335,7 +334,7 @@ MoveGen::RookMoves(
     auto from_square = bb.first_bit();
     return rmagics_.GetAttacks(from_square, all_pieces);
   };
-  GetSimpleMoves(Piece::Rook, state, moves_fn, moves);
+  GetSimpleMoves(Piece::rook(), state, moves_fn, moves);
 }
 
 void
@@ -348,7 +347,7 @@ MoveGen::BishopMoves(
     auto from_square = bb.first_bit();
     return bmagics_.GetAttacks(from_square, all_pieces);
   };
-  GetSimpleMoves(Piece::Bishop, state, moves_fn, moves);
+  GetSimpleMoves(Piece::bishop(), state, moves_fn, moves);
 }
 
 void
@@ -356,7 +355,7 @@ MoveGen::KnightMoves(
     const BoardState& state,
     std::vector<Move>& moves) const
 {
-  GetSimpleMoves(Piece::Knight, state, MoveKnight, moves);
+  GetSimpleMoves(Piece::knight(), state, MoveKnight, moves);
 }
 
 void
@@ -364,7 +363,7 @@ MoveGen::PawnMoves(
     const BoardState& state,
     std::vector<Move>& moves) const
 {
-  BitBoard pawns = state.mine[Uint8(Piece::Pawn)];
+  BitBoard pawns = state.mine.pawn();
 
   if (not pawns) return;
 

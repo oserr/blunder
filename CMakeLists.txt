@@ -46,6 +46,8 @@ add_library(blunder STATIC
   src/moves.h
   src/pieces.cc
   src/pieces.h
+  src/piece_set.cc
+  src/piece_set.h
   src/pre_computed_magics.h
   src/square.cc
   src/square.h)

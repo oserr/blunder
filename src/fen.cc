@@ -12,6 +12,7 @@
 #include <utility>
 
 #include "pieces.h"
+#include "piece_set.h"
 
 namespace blunder {
 namespace {
@@ -119,24 +120,24 @@ SplitRows(std::string_view pieces) noexcept
 bool
 AreLogical(const PieceSet pieces) noexcept
 {
-  return pieces[Uint8(Piece::King)].count() == 1
-     and pieces[Uint8(Piece::Queen)].count() <= 9
-     and pieces[Uint8(Piece::Rook)].count() <= 10
-     and pieces[Uint8(Piece::Bishop)].count() <= 10
-     and pieces[Uint8(Piece::Knight)].count() <= 10
-     and pieces[Uint8(Piece::Pawn)].count() <= 10
-     and AllMask(pieces).count() <= 16;
+  return pieces.king().count() == 1
+     and pieces.queen().count() <= 9
+     and pieces.rook().count() <= 10
+     and pieces.bishop().count() <= 10
+     and pieces.knight().count() <= 10
+     and pieces.pawn().count() <= 10
+     and pieces.full_set().count() <= 16;
 }
 
 std::expected<std::pair<PieceSet, PieceSet>, FenErr>
 ParsePieces(std::string_view field) noexcept
 {
-  PieceSet white;
-  PieceSet black;
-
   auto rows = SplitRows(field);
   if (not rows)
     return std::unexpected(rows.error());
+
+  PieceSet white;
+  PieceSet black;
 
   // Current square being processed.
   unsigned square = 0;
@@ -152,31 +153,31 @@ ParsePieces(std::string_view field) noexcept
 
       switch (ToLower(letter)) {
         case 'k':
-           piece = Piece::King;
+           piece = Type::King;
            break;
         case 'q':
-           piece = Piece::Queen;
+           piece = Type::Queen;
            break;
         case 'r':
-           piece = Piece::Rook;
+           piece = Type::Rook;
            break;
         case 'b':
-           piece = Piece::Bishop;
+           piece = Type::Bishop;
            break;
         case 'n':
-           piece = Piece::Knight;
+           piece = Type::Knight;
            break;
         case 'p':
-           piece = Piece::Pawn;
+           piece = Type::Pawn;
            break;
         default:
            return std::unexpected(FenErr::UnknownPiece);
       }
 
       if (IsUpper(letter))
-        white[Uint8(piece)].set_bit(square);
+        white.set_bit(piece, square);
       else
-        black[Uint8(piece)].set_bit(square);
+        black.set_bit(piece, square);
 
       ++square;
     }

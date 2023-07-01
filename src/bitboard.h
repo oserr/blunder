@@ -123,7 +123,7 @@ public:
   BitBoard&
   sr(unsigned shift) noexcept
   {
-    bits <<= shift;
+    bits >>= shift;
     return *this;
   }
 
@@ -257,7 +257,7 @@ template<typename T>
 requires std::integral<T>
 BitBoard
 operator|(T mask, BitBoard bb) noexcept
-{ return bb.bit_or(BitBoard(mask)); }
+{ return bb | mask; }
 
 inline BitBoard
 operator&(BitBoard left, BitBoard right) noexcept
@@ -273,7 +273,7 @@ template<typename T>
 requires std::integral<T>
 BitBoard
 operator&(T mask, BitBoard bb) noexcept
-{ return bb.bit_and(BitBoard(mask)); }
+{ return bb & mask; }
 
 inline BitBoard
 operator~(BitBoard bb) noexcept
@@ -295,17 +295,6 @@ BitBoard
 operator>>(BitBoard bb, T shift)
 { return bb.shift_right(shift); }
 
-template<typename T>
-requires std::integral<T>
-BitBoard
-operator<<(T shift, BitBoard bb)
-{ return bb.shift_left(shift); }
-
-template<typename T>
-requires std::integral<T>
-BitBoard
-operator>>(T shift, BitBoard bb)
-{ return bb.shift_right(shift); }
 
 // Initial white piece placement.
 inline const BitBoard kWhiteKing(1ull << 4);

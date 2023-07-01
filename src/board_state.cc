@@ -7,6 +7,7 @@
 
 #include "bitboard.h"
 #include "pieces.h"
+#include "piece_set.h"
 #include "square.h"
 
 namespace blunder {
@@ -20,21 +21,21 @@ FillAsciiBoard(
     Color color,
     std::array<char, 64>& board)  noexcept
 {
-  const Piece piece_type[] = {
-    Piece::King,
-    Piece::Queen,
-    Piece::Rook,
-    Piece::Bishop,
-    Piece::Knight,
-    Piece::Pawn
+  const Type piece_type[] = {
+    Type::King,
+    Type::Queen,
+    Type::Rook,
+    Type::Bishop,
+    Type::Knight,
+    Type::Pawn
   };
 
   for (auto type : piece_type) {
-    auto bb = pieces[Uint8(type)];
+    auto bb = pieces.get(type);
     auto squares = ToSetOfSq(bb);
     for (auto sq : squares) {
       auto index = ToUint(sq);
-      board[index] = AsciiLetter(type, color);
+      board[index] = letter(type, color);
     }
   }
 }
@@ -55,22 +56,10 @@ NewBoardState() noexcept
 {
   BoardState state;
 
-  state.mine[Uint8(Piece::King)] = kWhiteKing;
-  state.mine[Uint8(Piece::Queen)] = kWhiteQueen;
-  state.mine[Uint8(Piece::Rook)] = kWhiteRooks;
-  state.mine[Uint8(Piece::Bishop)] = kWhiteBishops;
-  state.mine[Uint8(Piece::Knight)] = kWhiteKnights;
-  state.mine[Uint8(Piece::Pawn)] = kWhitePawns;
-
-  state.other[Uint8(Piece::King)] = kBlackKing;
-  state.other[Uint8(Piece::Queen)] = kBlackQueen;
-  state.other[Uint8(Piece::Rook)] = kBlackRooks;
-  state.other[Uint8(Piece::Bishop)] = kBlackBishops;
-  state.other[Uint8(Piece::Knight)] = kBlackKnights;
-  state.other[Uint8(Piece::Pawn)] = kBlackPawns;
-
-  state.all_mine = kWhitePieces;
-  state.all_other = kBlackPieces;
+  state.mine = PieceSet::init_white();
+  state.all_mine = state.mine.full_set();
+  state.other = PieceSet::init_black();
+  state.all_other = state.other.full_set();
 
   state.half_move = 0;
   state.full_move = 1;

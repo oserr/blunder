@@ -37,22 +37,22 @@ protected:
 TEST_F(MoveGenTest, InitGamePawnMoves)
 {
   std::vector<Move> moves;
-  moves.emplace_back(Piece::Pawn, Sq::a2, Sq::a3);
-  moves.emplace_back(Piece::Pawn, Sq::a2, Sq::a4);
-  moves.emplace_back(Piece::Pawn, Sq::b2, Sq::b3);
-  moves.emplace_back(Piece::Pawn, Sq::b2, Sq::b4);
-  moves.emplace_back(Piece::Pawn, Sq::c2, Sq::c3);
-  moves.emplace_back(Piece::Pawn, Sq::c2, Sq::c4);
-  moves.emplace_back(Piece::Pawn, Sq::d2, Sq::d3);
-  moves.emplace_back(Piece::Pawn, Sq::d2, Sq::d4);
-  moves.emplace_back(Piece::Pawn, Sq::e2, Sq::e3);
-  moves.emplace_back(Piece::Pawn, Sq::e2, Sq::e4);
-  moves.emplace_back(Piece::Pawn, Sq::f2, Sq::f3);
-  moves.emplace_back(Piece::Pawn, Sq::f2, Sq::f4);
-  moves.emplace_back(Piece::Pawn, Sq::g2, Sq::g3);
-  moves.emplace_back(Piece::Pawn, Sq::g2, Sq::g4);
-  moves.emplace_back(Piece::Pawn, Sq::h2, Sq::h3);
-  moves.emplace_back(Piece::Pawn, Sq::h2, Sq::h4);
+  moves.emplace_back(Piece::pawn(), Sq::a2, Sq::a3);
+  moves.emplace_back(Piece::pawn(), Sq::a2, Sq::a4);
+  moves.emplace_back(Piece::pawn(), Sq::b2, Sq::b3);
+  moves.emplace_back(Piece::pawn(), Sq::b2, Sq::b4);
+  moves.emplace_back(Piece::pawn(), Sq::c2, Sq::c3);
+  moves.emplace_back(Piece::pawn(), Sq::c2, Sq::c4);
+  moves.emplace_back(Piece::pawn(), Sq::d2, Sq::d3);
+  moves.emplace_back(Piece::pawn(), Sq::d2, Sq::d4);
+  moves.emplace_back(Piece::pawn(), Sq::e2, Sq::e3);
+  moves.emplace_back(Piece::pawn(), Sq::e2, Sq::e4);
+  moves.emplace_back(Piece::pawn(), Sq::f2, Sq::f3);
+  moves.emplace_back(Piece::pawn(), Sq::f2, Sq::f4);
+  moves.emplace_back(Piece::pawn(), Sq::g2, Sq::g3);
+  moves.emplace_back(Piece::pawn(), Sq::g2, Sq::g4);
+  moves.emplace_back(Piece::pawn(), Sq::h2, Sq::h3);
+  moves.emplace_back(Piece::pawn(), Sq::h2, Sq::h4);
 
   auto state = NewBoardState();
   EXPECT_THAT(move_gen->PawnMoves(state), UnorderedElementsAreArray(moves));
@@ -67,10 +67,10 @@ TEST_F(MoveGenTest, InitGameKingMoves)
 TEST_F(MoveGenTest, InitGameKnightMoves)
 {
   std::vector<Move> moves;
-  moves.emplace_back(Piece::Knight, Sq::b1, Sq::a3);
-  moves.emplace_back(Piece::Knight, Sq::b1, Sq::c3);
-  moves.emplace_back(Piece::Knight, Sq::g1, Sq::f3);
-  moves.emplace_back(Piece::Knight, Sq::g1, Sq::h3);
+  moves.emplace_back(Piece::knight(), Sq::b1, Sq::a3);
+  moves.emplace_back(Piece::knight(), Sq::b1, Sq::c3);
+  moves.emplace_back(Piece::knight(), Sq::g1, Sq::f3);
+  moves.emplace_back(Piece::knight(), Sq::g1, Sq::h3);
 
   auto state = NewBoardState();
   EXPECT_THAT(move_gen->KnightMoves(state), UnorderedElementsAreArray(moves));
@@ -98,28 +98,28 @@ TEST_F(MoveGenTest, InitGameAllMoves)
 {
   std::vector<Move> moves;
   // Pawn moves
-  moves.emplace_back(Piece::Pawn, Sq::a2, Sq::a3);
-  moves.emplace_back(Piece::Pawn, Sq::a2, Sq::a4);
-  moves.emplace_back(Piece::Pawn, Sq::b2, Sq::b3);
-  moves.emplace_back(Piece::Pawn, Sq::b2, Sq::b4);
-  moves.emplace_back(Piece::Pawn, Sq::c2, Sq::c3);
-  moves.emplace_back(Piece::Pawn, Sq::c2, Sq::c4);
-  moves.emplace_back(Piece::Pawn, Sq::d2, Sq::d3);
-  moves.emplace_back(Piece::Pawn, Sq::d2, Sq::d4);
-  moves.emplace_back(Piece::Pawn, Sq::e2, Sq::e3);
-  moves.emplace_back(Piece::Pawn, Sq::e2, Sq::e4);
-  moves.emplace_back(Piece::Pawn, Sq::f2, Sq::f3);
-  moves.emplace_back(Piece::Pawn, Sq::f2, Sq::f4);
-  moves.emplace_back(Piece::Pawn, Sq::g2, Sq::g3);
-  moves.emplace_back(Piece::Pawn, Sq::g2, Sq::g4);
-  moves.emplace_back(Piece::Pawn, Sq::h2, Sq::h3);
-  moves.emplace_back(Piece::Pawn, Sq::h2, Sq::h4);
+  moves.emplace_back(Piece::pawn(), Sq::a2, Sq::a3);
+  moves.emplace_back(Piece::pawn(), Sq::a2, Sq::a4);
+  moves.emplace_back(Piece::pawn(), Sq::b2, Sq::b3);
+  moves.emplace_back(Piece::pawn(), Sq::b2, Sq::b4);
+  moves.emplace_back(Piece::pawn(), Sq::c2, Sq::c3);
+  moves.emplace_back(Piece::pawn(), Sq::c2, Sq::c4);
+  moves.emplace_back(Piece::pawn(), Sq::d2, Sq::d3);
+  moves.emplace_back(Piece::pawn(), Sq::d2, Sq::d4);
+  moves.emplace_back(Piece::pawn(), Sq::e2, Sq::e3);
+  moves.emplace_back(Piece::pawn(), Sq::e2, Sq::e4);
+  moves.emplace_back(Piece::pawn(), Sq::f2, Sq::f3);
+  moves.emplace_back(Piece::pawn(), Sq::f2, Sq::f4);
+  moves.emplace_back(Piece::pawn(), Sq::g2, Sq::g3);
+  moves.emplace_back(Piece::pawn(), Sq::g2, Sq::g4);
+  moves.emplace_back(Piece::pawn(), Sq::h2, Sq::h3);
+  moves.emplace_back(Piece::pawn(), Sq::h2, Sq::h4);
 
   // Knight moves
-  moves.emplace_back(Piece::Knight, Sq::b1, Sq::a3);
-  moves.emplace_back(Piece::Knight, Sq::b1, Sq::c3);
-  moves.emplace_back(Piece::Knight, Sq::g1, Sq::f3);
-  moves.emplace_back(Piece::Knight, Sq::g1, Sq::h3);
+  moves.emplace_back(Piece::knight(), Sq::b1, Sq::a3);
+  moves.emplace_back(Piece::knight(), Sq::b1, Sq::c3);
+  moves.emplace_back(Piece::knight(), Sq::g1, Sq::f3);
+  moves.emplace_back(Piece::knight(), Sq::g1, Sq::h3);
 
   auto state = NewBoardState();
   EXPECT_THAT(move_gen->AllMoves(state), UnorderedElementsAreArray(moves));

@@ -15,31 +15,31 @@ GetPieceUint8(const std::array<BitBoard, 6> pieces, BitBoard piece) noexcept
       return i;
   }
 
-  return static_cast<std::uint8_t>(Piece::None);
+  return static_cast<std::uint8_t>(Type::None);
 }
 
 std::uint8_t
-AsciiLetter(Piece piece, Color color) noexcept
+Piece::letter(Color color) noexcept
 {
   unsigned char letter = '?';
 
-  switch (piece) {
-    case Piece::King:
+  switch (ptype) {
+    case Type::King:
       letter = 'K';
       break;
-    case Piece::Queen:
+    case Type::Queen:
       letter = 'Q';
       break;
-    case Piece::Rook:
+    case Type::Rook:
       letter = 'R';
       break;
-    case Piece::Bishop:
+    case Type::Bishop:
       letter = 'B';
       break;
-    case Piece::Knight:
+    case Type::Knight:
       letter = 'N';
       break;
-    case Piece::Pawn:
+    case Type::Pawn:
       letter = 'P';
       break;
     default:

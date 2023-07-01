@@ -8,10 +8,9 @@
 #include "bitboard.h"
 #include "color.h"
 #include "pieces.h"
+#include "piece_set.h"
 
 namespace blunder {
-
-using PieceSet = std::array<BitBoard, 6>;
 
 // Computes the union of all the bitboards in |pieces|.
 BitBoard
@@ -82,27 +81,27 @@ struct BoardState {
 
   BitBoard
   WhiteKing() const noexcept
-  { return White()[Uint8(Piece::King)]; }
+  { return White().king(); }
 
   BitBoard
   WhiteQueen() const noexcept
-  { return White()[Uint8(Piece::Queen)]; }
+  { return White().queen(); }
 
   BitBoard
   WhiteRook() const noexcept
-  { return White()[Uint8(Piece::Rook)]; }
+  { return White().rook(); }
 
   BitBoard
   WhiteBishop() const noexcept
-  { return White()[Uint8(Piece::Bishop)]; }
+  { return White().bishop(); }
 
   BitBoard
   WhiteKnight() const noexcept
-  { return White()[Uint8(Piece::Knight)]; }
+  { return White().knight(); }
 
   BitBoard
   WhitePawn() const noexcept
-  { return White()[Uint8(Piece::Pawn)]; }
+  { return White().pawn(); }
 
   unsigned
   NumWhiteQueen() const noexcept
@@ -126,7 +125,7 @@ struct BoardState {
 
   unsigned
   NumWhite() const noexcept
-  { return AllMask(White()).count(); }
+  { return White().full_set().count(); }
 
   const PieceSet&
   Black() const noexcept
@@ -134,27 +133,27 @@ struct BoardState {
 
   BitBoard
   BlackKing() const noexcept
-  { return Black()[Uint8(Piece::King)]; }
+  { return Black().king(); }
 
   BitBoard
   BlackQueen() const noexcept
-  { return Black()[Uint8(Piece::Queen)]; }
+  { return Black().queen(); }
 
   BitBoard
   BlackRook() const noexcept
-  { return Black()[Uint8(Piece::Rook)]; }
+  { return Black().rook(); }
 
   BitBoard
   BlackBishop() const noexcept
-  { return Black()[Uint8(Piece::Bishop)]; }
+  { return Black().bishop(); }
 
   BitBoard
   BlackKnight() const noexcept
-  { return Black()[Uint8(Piece::Knight)]; }
+  { return Black().knight(); }
 
   BitBoard
   BlackPawn() const noexcept
-  { return Black()[Uint8(Piece::Pawn)]; }
+  { return Black().pawn(); }
 
   unsigned
   NumBlackQueen() const noexcept
@@ -178,8 +177,7 @@ struct BoardState {
 
   unsigned
   NumBlack() const noexcept
-  { return AllMask(Black()).count(); }
-
+  { return Black().full_set().count(); }
 };
 
 // Initializes a BoardState for a new game.
