@@ -217,6 +217,58 @@ MovePawnsAttack(
   }
 }
 
+// We create a BitBoard with one bit set where the pawn moves after capturing
+// en passant, and use that to check if there are any captures.
+void
+move_en_passant(
+    const BoardState& state,
+    std::vector<Move>& moves)
+{
+  if (not state.en_passant)
+    return;
+
+  // Fake square
+  auto pawns = state.mine.pawn();
+  unsigned to_sq = state.en_passant_file;
+  unsigned passant_sq = state.en_passant_file;
+
+  if (state.is_white_next()) {
+    to_sq += 40; // 6th row
+    passant_sq += 32; // 5th row
+
+    auto to_bb = BitBoard::from_index(to_sq);
+
+    auto attack = MoveWhitePawnsAttackLeft(pawns, to_bb);
+    if (attack) {
+      auto from_sq = FromLeftWhite(to_sq);
+      moves.push_back(Move::by_en_passant(from_sq, to_sq, passant_sq));
+    }
+
+    attack = MoveWhitePawnsAttackRight(pawns, to_bb);
+    if (attack) {
+      auto from_sq = FromRightWhite(to_sq);
+      moves.push_back(Move::by_en_passant(from_sq, to_sq, passant_sq));
+    }
+  } else {
+    to_sq += 16; // 3rd row
+    passant_sq += 24; // 4th row
+
+    auto to_bb = BitBoard::from_index(to_sq);
+
+    auto attack = MoveBlackPawnsAttackLeft(pawns, to_bb);
+    if (attack) {
+      auto from_sq = FromLeftBlack(to_sq);
+      moves.push_back(Move::by_en_passant(from_sq, to_sq, passant_sq));
+    }
+
+    attack = MoveBlackPawnsAttackRight(pawns, to_bb);
+    if (attack) {
+      auto from_sq = FromRightBlack(to_sq);
+      moves.push_back(Move::by_en_passant(from_sq, to_sq, passant_sq));
+    }
+  }
+}
+
 } // namespace
 
 std::vector<Move>
@@ -413,6 +465,7 @@ MoveGen::PawnMoves(
       pawns, state, attack_left_fn, from_left_fn, is_promo_fn, moves);
   MovePawnsAttack(
       pawns, state, attack_right_fn, from_right_fn, is_promo_fn, moves);
+  move_en_passant(state, moves);
 }
 
 } // namespace blunder

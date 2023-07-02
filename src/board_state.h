@@ -65,6 +65,12 @@ struct BoardState {
   // Indicates if black can castle on queenside.
   std::uint8_t bq_castle: 1 = 0;
 
+  bool in_check = false;
+
+  bool
+  is_white_next() const noexcept
+  { return next == Color::White; }
+
   // Sets |all_mine|, i.e. a BitBoard with all pieces from |mine|.
   void
   SetAllMine() noexcept

@@ -29,6 +29,9 @@ struct Move {
   std::uint8_t from_square: 6 = 0;
   std::uint8_t to_square: 6 = 0;
 
+  // The square of the captured piece on an en-passant move.
+  std::uint8_t passant_square: 6 = 0;
+
   // For king moves, indicates if the king is castling. kside=1 indicates
   // kingside, and kside=0 indicates queenside.
   std::uint8_t castle: 1 = 0;
@@ -194,6 +197,18 @@ struct Move {
       std::uint8_t to_square,
       Piece promo) noexcept
   { return PawnPromo(from_square, to_piece.uint(), to_square, promo); }
+
+  static Move
+  by_en_passant(
+      std::uint8_t from_sq,
+      std::uint8_t to_sq,
+      std::uint8_t passant_sq) noexcept
+  {
+    Move m(Piece::pawn(), from_sq, to_sq);
+    m.passant_square = passant_sq;
+    m.en_passant = true;
+    return m;
+  }
 
 };
 
