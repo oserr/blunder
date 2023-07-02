@@ -136,8 +136,6 @@ PermuteMask(std::uint32_t num, std::uint32_t num_bits, BitBoard mask) noexcept
   return mask_combo;
 }
 
-// TODO: handle edge squares because magics don't account for edge squares to
-// save space on precomputed attack tables.
 BitBoard
 MagicAttacks::GetAttacks(std::uint8_t square, BitBoard blockers) const noexcept
 {
