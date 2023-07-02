@@ -27,7 +27,7 @@ struct Castling {
   bool bqueen = false;
 };
 
-// Used internally to parse to parse a FEN string.
+// Used internally to parse a FEN string.
 struct NextField {
   // The next field in the FEN string.
   std::string_view field{};
