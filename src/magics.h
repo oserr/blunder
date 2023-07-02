@@ -11,6 +11,19 @@
 
 namespace blunder {
 
+// Computes a subset of set bits in |mask| based on |num|. This is done by using
+// the first |num_bits| in |num| to determine to set the bits in the subset of
+// |mask|. For example, if we have the following inputs
+//
+// - num = 0b00000100
+// - num_bits = 5
+// - mask = 0b0111000
+//
+// then PremuteMask returns 0b0100000, because only the 2nd (0-based index) bit
+// is set in |num|, and hence only the 2nd set bit in mask is set.
+BitBoard
+PermuteMask(std::uint32_t num, std::uint32_t num_bits, BitBoard mask) noexcept;
+
 struct Magic {
   std::vector<BitBoard> attacks;
   BitBoard mask;
