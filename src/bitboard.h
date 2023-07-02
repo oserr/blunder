@@ -74,12 +74,18 @@ public:
   first_bit() const noexcept
   { return std::countr_zero(bits); }
 
+  BitBoard& clear_first() noexcept
+  {
+    bits &= bits - 1;
+    return *this;
+  }
+
   // Like first_bit, but also clears the bit.
   unsigned
   first_bit_and_clear() noexcept
   {
     auto index = first_bit();
-    bits &= bits - 1;
+    clear_first();
     return index;
   }
 
@@ -230,6 +236,10 @@ public:
 private:
   std::uint64_t bits;
 };
+
+inline auto
+operator<=>(BitBoard left, BitBoard right) noexcept
+{ return left.raw() <=> right.raw(); }
 
 inline bool
 operator==(BitBoard left, BitBoard right) noexcept

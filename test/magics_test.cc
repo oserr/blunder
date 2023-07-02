@@ -10,6 +10,7 @@
 
 using namespace blunder;
 
+using ::testing::ContainerEq;
 using ::testing::SizeIs;
 
 constinit std::unique_ptr<MagicAttacks> bmagics = nullptr;
@@ -107,4 +108,43 @@ TEST_F(RookMagicsTest, FromF5)
         Sq::f3, Sq::f4, Sq::f6, Sq::f7,
         Sq::f8, Sq::e5, Sq::d5, Sq::g5,
         Sq::h5}));
+}
+
+TEST(PermuteMask, ForThreeConsecutiveBits) {
+  // Mask 111
+  // Combos: 000, 001, 011, 111, 110, 100, 101, 010
+  std::set<BitBoard> combos = {
+    BitBoard(), BitBoard(0b001),
+    BitBoard(0b011), BitBoard(0b111),
+    BitBoard(0b110), BitBoard(0b100),
+    BitBoard(0b101), BitBoard(0b010)};
+
+  BitBoard mask(0b111);
+  auto num_bits = mask.count();
+  auto ncombos = 1u << num_bits;
+
+  std::set<BitBoard> results;
+  for (unsigned i = 0; i < ncombos; ++i)
+    results.insert(PermuteMask(i, num_bits, mask));
+
+  EXPECT_THAT(results, ContainerEq(combos));
+}
+
+TEST(PermuteMask, ForThreeSeparateBits) {
+  // Combos for mask: 0101010
+  std::set<BitBoard> combos = {
+    BitBoard(), BitBoard(0b0000010),
+    BitBoard(0b0001010), BitBoard(0b0101010),
+    BitBoard(0b0101000), BitBoard(0b0100000),
+    BitBoard(0b0100010), BitBoard(0b0001000)};
+
+  BitBoard mask(0b0101010);
+  auto num_bits = mask.count();
+  auto ncombos = 1u << num_bits;
+
+  std::set<BitBoard> results;
+  for (unsigned i = 0; i < ncombos; ++i)
+    results.insert(PermuteMask(i, num_bits, mask));
+
+  EXPECT_THAT(results, ContainerEq(combos));
 }

@@ -9,6 +9,7 @@
 #include <functional>
 #include <iostream>
 #include <random>
+#include <set>
 #include <utility>
 
 #include "bitboard.h"
@@ -26,27 +27,6 @@ GetMagicHash(
   return (blocking.raw() * magic) >> (64 - magic_bits);
 }
 
-// Computes a subset of set bits in |mask| based on |num|. This is done by using
-// the first |num_bits| in |num| to determine to set the bits in the subset of
-// |mask|. For example, if we have the following inputs
-//
-// - num = 0b00000100
-// - num_bits = 5
-// - mask = 0b0111000
-//
-// then PremuteMask returns 0b0100000, because only the 2nd (0-based index) bit
-// is set in |num|, and hence only the 2nd set bit in mask is set.
-BitBoard
-PermuteMask(std::uint32_t num, std::uint32_t num_bits, BitBoard mask) noexcept
-{
-  BitBoard mask_combo;
-  for (std::uint32_t i = 0; i < num_bits; ++i) {
-    if (num & (1 << i))
-      mask_combo.set_bit(mask.first_bit_and_clear());
-  }
-  return mask_combo;
-}
-
 std::expected<std::pair<Magic, std::uint32_t>, Err>
 FindMagic(
     std::uint32_t sq,
@@ -62,7 +42,7 @@ FindMagic(
     return std::unexpected(Err::MagicBitsOutOfRange);
 
   const auto ncombos = 1u << num_bits;
-  constexpr unsigned kMaxCombos = 1 << 12;
+  constexpr unsigned kMaxCombos = 1u << 12;
   assert(ncombos <= kMaxCombos);
 
   BitBoard blocking[kMaxCombos];
@@ -80,9 +60,6 @@ FindMagic(
     if (num_high_bits < 6)
       continue;
 
-    // Clear the attack table.
-    std::ranges::for_each(attack_table, &BitBoard::clear);
-
     bool found_collision = false;
     for (auto i = 0u; i < ncombos; ++i) {
       auto magic_hash = GetMagicHash(blocking[i], magic, num_bits);
@@ -96,8 +73,11 @@ FindMagic(
     }
 
     // Try again if we found a collision.
-    if (found_collision)
+    if (found_collision) {
+      // Clear the attack table.
+      std::ranges::for_each(attack_table, &BitBoard::clear);
       continue;
+    }
 
     return std::make_pair(
         Magic(std::move(attack_table), mask, magic, num_bits), k);
@@ -143,6 +123,18 @@ CreateRandFn() noexcept
 }
 
 } // namespace
+
+BitBoard
+PermuteMask(std::uint32_t num, std::uint32_t num_bits, BitBoard mask) noexcept
+{
+  BitBoard mask_combo;
+  for (std::uint32_t i = 0; i < num_bits; ++i) {
+    if (num & (1 << i))
+      mask_combo.set_bit(mask.first_bit());
+    mask.clear_first();
+  }
+  return mask_combo;
+}
 
 // TODO: handle edge squares because magics don't account for edge squares to
 // save space on precomputed attack tables.
