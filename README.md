@@ -18,7 +18,7 @@ A chess engine written in modern C++.
   on archlinux. If you have a custom install of the library in a non-default
   location, e.g. `${HOME}/opt/libtorch`, then exporting
   `TORCH_INSTALL_PREFIX=${HOME}/opt/libtorch`, or setting the variable when
-  running cmake, will allow the build the work. For development, I'm using Torch
+  running cmake, will allow the build to work. For development, I'm using Torch
   version 2.1 with CUDA 12.1, which is currently the latest release.
 
 ## Compiling
