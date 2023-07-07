@@ -44,8 +44,8 @@ can_castle(BitBoard all_pieces) noexcept
 // Returns all the non-attack moves for |piece| from square |from_square| to all
 // squares in |to_squares|. The moves are returned in |moves|, an output
 // parameter.
-void
-GetNonAttacks(
+inline void
+get_non_attacks(
     Piece piece,
     std::uint8_t from_square,
     BitBoard to_squares,
@@ -95,7 +95,7 @@ GetSimpleMoves(
 
     // Compute moves to empty squares.
     auto to_squares = bb_moves & no_pieces;
-    GetNonAttacks(piece, from_square, to_squares, moves);
+    get_non_attacks(piece, from_square, to_squares, moves);
 
     // Compute attacks.
     to_squares = bb_moves & state.all_other;
