@@ -59,7 +59,7 @@ get_non_attacks(
 // squares in |to_squares|. We pass in the |other| pieces to be able to figure
 // out what the attacked pieces are.
 void
-GetSimpleAttacks(
+get_simple_attacks(
     Piece piece,
     std::uint8_t from_square,
     BitBoard to_squares,
@@ -79,7 +79,7 @@ GetSimpleAttacks(
 // |state| is the current board state, and |moves_fn| is a function to compute
 // moves for the given piece, including non-attacks and attacks.
 void
-GetSimpleMoves(
+get_simple_moves(
     Piece piece,
     const BoardState& state,
     const std::function<BitBoard(BitBoard)>& moves_fn,
@@ -99,19 +99,19 @@ GetSimpleMoves(
 
     // Compute attacks.
     to_squares = bb_moves & state.all_other;
-    GetSimpleAttacks(piece, from_square, to_squares, state.other, moves);
+    get_simple_attacks(piece, from_square, to_squares, state.other, moves);
   }
 }
 
 // Same as above, but list of moves is returned as output.
 std::vector<Move>
-GetSimpleMoves(
+get_simple_moves(
     Piece piece,
     const BoardState& state,
     const std::function<BitBoard(BitBoard)>& moves_fn)
 {
   std::vector<Move> moves;
-  GetSimpleMoves(piece, state, moves_fn, moves);
+  get_simple_moves(piece, state, moves_fn, moves);
   return moves;
 }
 
@@ -120,47 +120,47 @@ using FromFn = std::uint8_t(*)(std::uint8_t);
 using IsPromoFn = bool(*)(std::uint8_t);
 
 bool
-IsWhitePromo(std::uint8_t to_square) noexcept
+is_white_promo(std::uint8_t to_square) noexcept
 { return to_square >= 56; }
 
 bool
-IsBlackPromo(std::uint8_t to_square) noexcept
+is_black_promo(std::uint8_t to_square) noexcept
 { return to_square <= 7; }
 
 std::uint8_t
-FromSingleWhite(std::uint8_t to_square) noexcept
+from_single_white(std::uint8_t to_square) noexcept
 { return to_square - 8; }
 
 std::uint8_t
-FromDoubleWhite(std::uint8_t to_square) noexcept
+from_double_white(std::uint8_t to_square) noexcept
 { return to_square - 16; }
 
 std::uint8_t
-FromLeftWhite(std::uint8_t to_square) noexcept
+from_left_white(std::uint8_t to_square) noexcept
 { return to_square - 7; }
 
 std::uint8_t
-FromRightWhite(std::uint8_t to_square) noexcept
+from_right_white(std::uint8_t to_square) noexcept
 { return to_square - 9; }
 
 std::uint8_t
-FromSingleBlack(std::uint8_t to_square) noexcept
+from_single_black(std::uint8_t to_square) noexcept
 { return to_square + 8; }
 
 std::uint8_t
-FromDoubleBlack(std::uint8_t to_square) noexcept
+from_double_black(std::uint8_t to_square) noexcept
 { return to_square + 16; }
 
 std::uint8_t
-FromLeftBlack(std::uint8_t to_square) noexcept
+from_left_black(std::uint8_t to_square) noexcept
 { return to_square + 7; }
 
 std::uint8_t
-FromRightBlack(std::uint8_t to_square) noexcept
+from_right_black(std::uint8_t to_square) noexcept
 { return to_square + 9; }
 
 void
-MovePawnsForward(
+move_forward(
     BitBoard pawns,
     BitBoard no_pieces,
     PawnMovesFn move_fn,
@@ -187,7 +187,7 @@ MovePawnsForward(
 }
 
 void
-MovePawnsAttack(
+attack(
     BitBoard pawns,
     BoardState state,
     PawnMovesFn move_fn,
@@ -241,13 +241,13 @@ move_en_passant(
 
     auto attack = MoveWhitePawnsAttackLeft(pawns, to_bb);
     if (attack) {
-      auto from_sq = FromLeftWhite(to_sq);
+      auto from_sq = from_left_white(to_sq);
       moves.push_back(Move::by_en_passant(from_sq, to_sq, passant_sq));
     }
 
     attack = MoveWhitePawnsAttackRight(pawns, to_bb);
     if (attack) {
-      auto from_sq = FromRightWhite(to_sq);
+      auto from_sq = from_right_white(to_sq);
       moves.push_back(Move::by_en_passant(from_sq, to_sq, passant_sq));
     }
   } else {
@@ -258,13 +258,13 @@ move_en_passant(
 
     auto attack = MoveBlackPawnsAttackLeft(pawns, to_bb);
     if (attack) {
-      auto from_sq = FromLeftBlack(to_sq);
+      auto from_sq = from_left_black(to_sq);
       moves.push_back(Move::by_en_passant(from_sq, to_sq, passant_sq));
     }
 
     attack = MoveBlackPawnsAttackRight(pawns, to_bb);
     if (attack) {
-      auto from_sq = FromRightBlack(to_sq);
+      auto from_sq = from_right_black(to_sq);
       moves.push_back(Move::by_en_passant(from_sq, to_sq, passant_sq));
     }
   }
@@ -308,7 +308,7 @@ MoveGen::BishopMoves(const BoardState& state) const
 std::vector<Move>
 MoveGen::KnightMoves(const BoardState& state) const
 {
-  return GetSimpleMoves(Piece::knight(), state, MoveKnight);
+  return get_simple_moves(Piece::knight(), state, MoveKnight);
 }
 
 std::vector<Move>
@@ -339,7 +339,7 @@ MoveGen::KingMoves(
     const BoardState& state,
     std::vector<Move>& moves) const
 {
-  GetSimpleMoves(Piece::king(), state, MoveKing, moves);
+  get_simple_moves(Piece::king(), state, MoveKing, moves);
 
   auto all_pieces = state.all_mine | state.all_other;
 
@@ -374,7 +374,7 @@ MoveGen::QueenMoves(
     return rmagics_.get_attacks(from_square, all_pieces)
          | bmagics_.get_attacks(from_square, all_pieces);
   };
-  GetSimpleMoves(Piece::queen(), state, moves_fn, moves);
+  get_simple_moves(Piece::queen(), state, moves_fn, moves);
 }
 
 void
@@ -387,7 +387,7 @@ MoveGen::RookMoves(
     auto from_square = bb.first_bit();
     return rmagics_.get_attacks(from_square, all_pieces);
   };
-  GetSimpleMoves(Piece::rook(), state, moves_fn, moves);
+  get_simple_moves(Piece::rook(), state, moves_fn, moves);
 }
 
 void
@@ -400,7 +400,7 @@ MoveGen::BishopMoves(
     auto from_square = bb.first_bit();
     return bmagics_.get_attacks(from_square, all_pieces);
   };
-  GetSimpleMoves(Piece::bishop(), state, moves_fn, moves);
+  get_simple_moves(Piece::bishop(), state, moves_fn, moves);
 }
 
 void
@@ -408,7 +408,7 @@ MoveGen::KnightMoves(
     const BoardState& state,
     std::vector<Move>& moves) const
 {
-  GetSimpleMoves(Piece::knight(), state, MoveKnight, moves);
+  get_simple_moves(Piece::knight(), state, MoveKnight, moves);
 }
 
 void
@@ -436,36 +436,32 @@ MoveGen::PawnMoves(
     double_fn = MoveWhitePawnsDouble;
     attack_left_fn = MoveWhitePawnsAttackLeft;
     attack_right_fn = MoveWhitePawnsAttackRight;
-    from_single_fn = FromSingleWhite;
-    from_double_fn = FromDoubleWhite;
-    from_left_fn = FromLeftWhite;
-    from_right_fn = FromRightWhite;
-    is_promo_fn = IsWhitePromo;
+    from_single_fn = from_single_white;
+    from_double_fn = from_double_white;
+    from_left_fn = from_left_white;
+    from_right_fn = from_right_white;
+    is_promo_fn = is_white_promo;
     break;
   default:
     single_fn = MoveBlackPawnsSingle;
     double_fn = MoveBlackPawnsDouble;
     attack_left_fn = MoveBlackPawnsAttackLeft;
     attack_right_fn = MoveBlackPawnsAttackRight;
-    from_single_fn = FromSingleBlack;
-    from_double_fn = FromDoubleBlack;
-    from_left_fn = FromLeftBlack;
-    from_right_fn = FromRightBlack;
-    is_promo_fn = IsBlackPromo;
+    from_single_fn = from_single_black;
+    from_double_fn = from_double_black;
+    from_left_fn = from_left_black;
+    from_right_fn = from_right_black;
+    is_promo_fn = is_black_promo;
     break;
   }
 
   auto no_pieces = ~(state.all_mine | state.all_other);
 
   // TODO: handle en passant moves
-  MovePawnsForward(
-      pawns, no_pieces, single_fn, from_single_fn, is_promo_fn, moves);
-  MovePawnsForward(
-      pawns, no_pieces, double_fn, from_double_fn, is_promo_fn, moves);
-  MovePawnsAttack(
-      pawns, state, attack_left_fn, from_left_fn, is_promo_fn, moves);
-  MovePawnsAttack(
-      pawns, state, attack_right_fn, from_right_fn, is_promo_fn, moves);
+  move_forward(pawns, no_pieces, single_fn, from_single_fn, is_promo_fn, moves);
+  move_forward(pawns, no_pieces, double_fn, from_double_fn, is_promo_fn, moves);
+  attack(pawns, state, attack_left_fn, from_left_fn, is_promo_fn, moves);
+  attack(pawns, state, attack_right_fn, from_right_fn, is_promo_fn, moves);
   move_en_passant(state, moves);
 }
 
