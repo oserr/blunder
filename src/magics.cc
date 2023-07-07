@@ -19,7 +19,7 @@ namespace blunder {
 namespace {
 
 inline constexpr std::uint32_t
-GetMagicHash(
+get_magic_hash(
     BitBoard blocking,
     std::uint64_t magic,
     std::uint8_t magic_bits) noexcept
@@ -28,7 +28,7 @@ GetMagicHash(
 }
 
 std::expected<std::pair<Magic, std::uint32_t>, Err>
-FindMagic(
+find_magic(
     std::uint32_t sq,
     std::function<BitBoard(std::uint32_t)> mask_fn,
     std::function<BitBoard(std::uint32_t, BitBoard)> attacks_fn,
@@ -62,7 +62,7 @@ FindMagic(
 
     bool found_collision = false;
     for (auto i = 0u; i < ncombos; ++i) {
-      auto magic_hash = GetMagicHash(blocking[i], magic, num_bits);
+      auto magic_hash = get_magic_hash(blocking[i], magic, num_bits);
 
       if (not attack_table[magic_hash])
         attack_table[magic_hash] = attacks[i];
@@ -88,7 +88,7 @@ FindMagic(
 }
 
 std::expected<std::vector<Magic>, Err>
-FindAllMagics(
+find_all_magics(
     std::function<BitBoard(std::uint32_t)> mask_fn,
     std::function<BitBoard(std::uint32_t, BitBoard)> attacks_fn,
     const std::function<std::uint64_t()>& magic_fn,
@@ -98,7 +98,7 @@ FindAllMagics(
   magics.reserve(64);
 
   for (auto s = 0u; s < 64u; ++s) {
-    auto magic_info = FindMagic(s, mask_fn, attacks_fn, magic_fn, loops);
+    auto magic_info = find_magic(s, mask_fn, attacks_fn, magic_fn, loops);
 
     if (not magic_info) {
       std::cerr << "Unable to find magic for square=" << s << std::endl;
@@ -142,7 +142,7 @@ MagicAttacks::GetAttacks(std::uint8_t square, BitBoard blockers) const noexcept
   assert(square < 64);
   assert(magics_.size() == 64);
   const auto& [attacks, mask, magic, nbits] = magics_[square];
-  auto magic_hash = GetMagicHash(blockers & mask, magic, nbits);
+  auto magic_hash = get_magic_hash(blockers & mask, magic, nbits);
   assert(magic_hash < attacks.size());
 
   return attacks[magic_hash];
@@ -152,7 +152,7 @@ std::expected<MagicAttacks, Err>
 ComputeBishopMagics()
 {
   auto magic_fn = CreateRandFn();
-  auto magics = FindAllMagics(GetBishopMask, GetBishopAttacks, magic_fn);
+  auto magics = find_all_magics(GetBishopMask, GetBishopAttacks, magic_fn);
   if (not magics)
     return std::unexpected(magics.error());
   return MagicAttacks(std::move(*magics));
@@ -162,7 +162,7 @@ std::expected<MagicAttacks, Err>
 ComputeRookMagics()
 {
   auto magic_fn = CreateRandFn();
-  auto magics = FindAllMagics(GetRookMask, GetRookAttacks, magic_fn);
+  auto magics = find_all_magics(GetRookMask, GetRookAttacks, magic_fn);
   if (not magics)
     return std::unexpected(magics.error());
   return MagicAttacks(std::move(*magics));
@@ -173,7 +173,8 @@ InitFromBishopMagics(std::span<const std::uint64_t> magics)
 {
   assert(magics.size() == 64);
   auto magic_fn = [sq=0, magics=magics] mutable { return magics[sq++]; };
-  auto all_magics = FindAllMagics(GetBishopMask, GetBishopAttacks, magic_fn, 1);
+  auto all_magics = find_all_magics(
+      GetBishopMask, GetBishopAttacks, magic_fn, 1);
   if (not all_magics)
     return std::unexpected(all_magics.error());
   return MagicAttacks(std::move(*all_magics));
@@ -183,7 +184,7 @@ std::expected<MagicAttacks, Err>
 InitFromRookMagics(std::span<const std::uint64_t> magics)
 {
   auto magic_fn = [sq=0, magics=magics] mutable { return magics[sq++]; };
-  auto all_magics = FindAllMagics(GetRookMask, GetRookAttacks, magic_fn, 1);
+  auto all_magics = find_all_magics(GetRookMask, GetRookAttacks, magic_fn, 1);
   if (not all_magics)
     return std::unexpected(all_magics.error());
   return MagicAttacks(std::move(*all_magics));
