@@ -16,6 +16,7 @@
 namespace blunder {
 namespace {
 
+// TODO: make this a function of BoardState.
 template<Color color, BoardSide side>
 constexpr bool
 can_castle(BitBoard all_pieces) noexcept
