@@ -48,7 +48,7 @@ FindMagic(
   BitBoard blocking[kMaxCombos];
   BitBoard attacks[kMaxCombos];
   for (auto i = 0u; i < ncombos; ++i) {
-    blocking[i] = PermuteMask(i, num_bits, mask);
+    blocking[i] = permute_mask(i, num_bits, mask);
     attacks[i] = attacks_fn(sq, blocking[i]);
   }
 
@@ -125,7 +125,7 @@ CreateRandFn() noexcept
 } // namespace
 
 BitBoard
-PermuteMask(std::uint32_t num, std::uint32_t num_bits, BitBoard mask) noexcept
+permute_mask(std::uint32_t num, std::uint32_t num_bits, BitBoard mask) noexcept
 {
   BitBoard mask_combo;
   for (std::uint32_t i = 0; i < num_bits; ++i) {

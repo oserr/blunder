@@ -22,7 +22,7 @@ namespace blunder {
 // then PremuteMask returns 0b0100000, because only the 2nd (0-based index) bit
 // is set in |num|, and hence only the 2nd set bit in mask is set.
 BitBoard
-PermuteMask(std::uint32_t num, std::uint32_t num_bits, BitBoard mask) noexcept;
+permute_mask(std::uint32_t num, std::uint32_t num_bits, BitBoard mask) noexcept;
 
 struct Magic {
   std::vector<BitBoard> attacks;

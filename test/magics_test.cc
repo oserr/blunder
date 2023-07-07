@@ -125,7 +125,7 @@ TEST(PermuteMask, ForThreeConsecutiveBits) {
 
   std::set<BitBoard> results;
   for (unsigned i = 0; i < ncombos; ++i)
-    results.insert(PermuteMask(i, num_bits, mask));
+    results.insert(permute_mask(i, num_bits, mask));
 
   EXPECT_THAT(results, ContainerEq(combos));
 }
@@ -144,7 +144,7 @@ TEST(PermuteMask, ForThreeSeparateBits) {
 
   std::set<BitBoard> results;
   for (unsigned i = 0; i < ncombos; ++i)
-    results.insert(PermuteMask(i, num_bits, mask));
+    results.insert(permute_mask(i, num_bits, mask));
 
   EXPECT_THAT(results, ContainerEq(combos));
 }
