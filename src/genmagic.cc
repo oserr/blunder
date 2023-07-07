@@ -13,7 +13,7 @@
 using namespace blunder;
 
 void
-PrintHelp(std::string_view prog, std::ostream& os)
+print_help(std::string_view prog, std::ostream& os)
 {
   os << "Usage: " << prog << " [options] ...\n"
      << "     -h|--help         Print this help message.\n"
@@ -26,7 +26,7 @@ PrintHelp(std::string_view prog, std::ostream& os)
 }
 
 void
-PrintMagics(std::span<const Magic> magics, std::string_view msg)
+print_magics(std::span<const Magic> magics, std::string_view msg)
 {
   std::cout << msg << '\n';
   for (const auto& magic : magics)
@@ -35,16 +35,16 @@ PrintMagics(std::span<const Magic> magics, std::string_view msg)
 
 //template<size_t N>
 void
-PrintMagics(
+print_magics(
     std::span<const Magic> bmagics,
     std::span<const Magic> rmagics)
 {
-  PrintMagics(bmagics, "The magic numbers for bishops are...");
-  PrintMagics(rmagics, "The magic numbers for rooks are...");
+  print_magics(bmagics, "The magic numbers for bishops are...");
+  print_magics(rmagics, "The magic numbers for rooks are...");
 }
 
 std::pair<MagicAttacks, MagicAttacks>
-GenerateMagics()
+gen_magics()
 {
   // Handle bishops.
   auto magic_bishops = compute_bmagics();
@@ -64,7 +64,7 @@ GenerateMagics()
 }
 
 std::pair<MagicAttacks, MagicAttacks>
-UsePrecomputedMagics()
+init_magics()
 {
   // Handle bishops.
   auto magic_bishops = from_bmagics(kBishopMagics);
@@ -84,7 +84,7 @@ UsePrecomputedMagics()
 }
 
 void
-WriteMagics(
+write_magics(
     const std::string& fname,
     std::span<const Magic> bmagics,
     std::span<const Magic> rmagics)
@@ -132,7 +132,7 @@ main(int argc, char** argv)
     if (ret == -1) break;
     switch (ret) {
       case 'h':
-        PrintHelp(argv[0], std::cout);
+        print_help(argv[0], std::cout);
         return EXIT_SUCCESS;
       case 'f':
         fname = optarg;
@@ -145,30 +145,30 @@ main(int argc, char** argv)
         break;
       default:
         std::cerr << "Received unknown command line option.\n";
-        PrintHelp(argv[0], std::cerr);
+        print_help(argv[0], std::cerr);
         return EXIT_FAILURE;
     }
   }
 
   if (generated and precomputed) {
     std::cerr << "Either --generate or --precomputed should be selected.\n";
-    PrintHelp(argv[0], std::cerr);
+    print_help(argv[0], std::cerr);
     return EXIT_FAILURE;
   } else if (not generated and not precomputed) {
     std::cerr << "One of --generate or --precomputed should be selected.\n";
-    PrintHelp(argv[0], std::cerr);
+    print_help(argv[0], std::cerr);
     return EXIT_FAILURE;
   }
 
   auto [magic_bishops, magic_rooks] = generated
-    ? GenerateMagics()
-    : UsePrecomputedMagics();
+    ? gen_magics()
+    : init_magics();
 
   auto bmagics = magic_bishops.get_magics();
   auto rmagics = magic_rooks.get_magics();
 
-  PrintMagics(bmagics, rmagics);
-  WriteMagics(fname, bmagics, rmagics);
+  print_magics(bmagics, rmagics);
+  write_magics(fname, bmagics, rmagics);
 
   return EXIT_SUCCESS;
 }
