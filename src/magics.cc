@@ -137,7 +137,7 @@ permute_mask(std::uint32_t num, std::uint32_t num_bits, BitBoard mask) noexcept
 }
 
 BitBoard
-MagicAttacks::GetAttacks(std::uint8_t square, BitBoard blockers) const noexcept
+MagicAttacks::get_attacks(std::uint8_t square, BitBoard blockers) const noexcept
 {
   assert(square < 64);
   assert(magics_.size() == 64);
@@ -149,7 +149,7 @@ MagicAttacks::GetAttacks(std::uint8_t square, BitBoard blockers) const noexcept
 }
 
 std::expected<MagicAttacks, Err>
-ComputeBishopMagics()
+compute_bmagics()
 {
   auto magic_fn = CreateRandFn();
   auto magics = find_all_magics(GetBishopMask, GetBishopAttacks, magic_fn);
@@ -159,7 +159,7 @@ ComputeBishopMagics()
 }
 
 std::expected<MagicAttacks, Err>
-ComputeRookMagics()
+compute_rmagics()
 {
   auto magic_fn = CreateRandFn();
   auto magics = find_all_magics(GetRookMask, GetRookAttacks, magic_fn);
@@ -169,7 +169,7 @@ ComputeRookMagics()
 }
 
 std::expected<MagicAttacks, Err>
-InitFromBishopMagics(std::span<const std::uint64_t> magics)
+from_bmagics(std::span<const std::uint64_t> magics)
 {
   assert(magics.size() == 64);
   auto magic_fn = [sq=0, magics=magics] mutable { return magics[sq++]; };
@@ -181,7 +181,7 @@ InitFromBishopMagics(std::span<const std::uint64_t> magics)
 }
 
 std::expected<MagicAttacks, Err>
-InitFromRookMagics(std::span<const std::uint64_t> magics)
+from_rmagics(std::span<const std::uint64_t> magics)
 {
   auto magic_fn = [sq=0, magics=magics] mutable { return magics[sq++]; };
   auto all_magics = find_all_magics(GetRookMask, GetRookAttacks, magic_fn, 1);

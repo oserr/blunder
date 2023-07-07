@@ -24,8 +24,8 @@ protected:
   SetUp() override
   {
     if (not move_gen) {
-      auto bmagics = InitFromBishopMagics(kBishopMagics);
-      auto rmagics = InitFromRookMagics(kRookMagics);
+      auto bmagics = from_bmagics(kBishopMagics);
+      auto rmagics = from_rmagics(kRookMagics);
       ASSERT_TRUE(bmagics) << "Unable to init bishop magics for MoveGen.";
       ASSERT_TRUE(rmagics) << "Unable to init rook magics for MoveGen.";
       move_gen = std::make_unique<MoveGen>(

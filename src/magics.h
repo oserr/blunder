@@ -41,10 +41,10 @@ public:
   MagicAttacks(MagicAttacks&& magic_attacks) noexcept = default;
 
   BitBoard
-  GetAttacks(std::uint8_t square, BitBoard blockers) const noexcept;
+  get_attacks(std::uint8_t square, BitBoard blockers) const noexcept;
 
   std::span<const Magic>
-  GetMagics() const noexcept
+  get_magics() const noexcept
   { return std::span(magics_); }
 
 private:
@@ -53,15 +53,15 @@ private:
 };
 
 std::expected<MagicAttacks, Err>
-ComputeBishopMagics();
+compute_bmagics();
 
 std::expected<MagicAttacks, Err>
-ComputeRookMagics();
+compute_rmagics();
 
 std::expected<MagicAttacks, Err>
-InitFromBishopMagics(std::span<const std::uint64_t> magics);
+from_bmagics(std::span<const std::uint64_t> magics);
 
 std::expected<MagicAttacks, Err>
-InitFromRookMagics(std::span<const std::uint64_t> magics);
+from_rmagics(std::span<const std::uint64_t> magics);
 
 } // namespace blunder

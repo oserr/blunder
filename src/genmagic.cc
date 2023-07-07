@@ -47,14 +47,14 @@ std::pair<MagicAttacks, MagicAttacks>
 GenerateMagics()
 {
   // Handle bishops.
-  auto magic_bishops = ComputeBishopMagics();
+  auto magic_bishops = compute_bmagics();
   if (not magic_bishops) {
     std::cerr << "Unable to compute magic attacks for bishops." << std::endl;
     std::exit(EXIT_FAILURE);
   }
 
   // Handle rooks.
-  auto magic_rooks = ComputeRookMagics();
+  auto magic_rooks = compute_rmagics();
   if (not magic_rooks) {
     std::cerr << "Unable to compute magic attacks for rooks." << std::endl;
     std::exit(EXIT_FAILURE);
@@ -67,14 +67,14 @@ std::pair<MagicAttacks, MagicAttacks>
 UsePrecomputedMagics()
 {
   // Handle bishops.
-  auto magic_bishops = InitFromBishopMagics(kBishopMagics);
+  auto magic_bishops = from_bmagics(kBishopMagics);
   if (not magic_bishops) {
     std::cerr << "Unable to use precomputed magics for bishops." << std::endl;
     std::exit(EXIT_FAILURE);
   }
 
   // Handle rooks.
-  auto magic_rooks = InitFromRookMagics(kRookMagics);
+  auto magic_rooks = from_rmagics(kRookMagics);
   if (not magic_rooks) {
     std::cerr << "Unable to use precomputed magics for rooks." << std::endl;
     std::exit(EXIT_FAILURE);
@@ -164,8 +164,8 @@ main(int argc, char** argv)
     ? GenerateMagics()
     : UsePrecomputedMagics();
 
-  auto bmagics = magic_bishops.GetMagics();
-  auto rmagics = magic_rooks.GetMagics();
+  auto bmagics = magic_bishops.get_magics();
+  auto rmagics = magic_rooks.get_magics();
 
   PrintMagics(bmagics, rmagics);
   WriteMagics(fname, bmagics, rmagics);
