@@ -18,7 +18,7 @@ namespace {
 
 template<Color color, BoardSide side>
 constexpr bool
-NoneBetweenKingAndRook(BitBoard all_pieces) noexcept
+can_castle(BitBoard all_pieces) noexcept
 {
   BitBoard bits;
   BitBoard mask;
@@ -345,18 +345,18 @@ MoveGen::KingMoves(
   switch (state.next) {
   case Color::White:
     if (state.wk_castle and
-        NoneBetweenKingAndRook<Color::White, BoardSide::King>(all_pieces))
+        can_castle<Color::White, BoardSide::King>(all_pieces))
       moves.push_back(Move::WhiteKingSideCastle());
     if (state.wq_castle and
-        NoneBetweenKingAndRook<Color::White, BoardSide::Queen>(all_pieces))
+        can_castle<Color::White, BoardSide::Queen>(all_pieces))
       moves.push_back(Move::WhiteQueenSideCastle());
     break;
   case Color::Black:
     if (state.bk_castle and
-        NoneBetweenKingAndRook<Color::Black, BoardSide::King>(all_pieces))
+        can_castle<Color::Black, BoardSide::King>(all_pieces))
       moves.push_back(Move::BlackKingSideCastle());
     if (state.bq_castle and
-        NoneBetweenKingAndRook<Color::Black, BoardSide::Queen>(all_pieces))
+        can_castle<Color::Black, BoardSide::Queen>(all_pieces))
       moves.push_back(Move::BlackQueenSideCastle());
     break;
   }
