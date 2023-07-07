@@ -55,13 +55,13 @@ TEST_F(MoveGenTest, InitGamePawnMoves)
   moves.emplace_back(Piece::pawn(), Sq::h2, Sq::h4);
 
   auto state = NewBoardState();
-  EXPECT_THAT(move_gen->PawnMoves(state), UnorderedElementsAreArray(moves));
+  EXPECT_THAT(move_gen->for_pawn(state), UnorderedElementsAreArray(moves));
 }
 
 TEST_F(MoveGenTest, InitGameKingMoves)
 {
   auto state = NewBoardState();
-  EXPECT_THAT(move_gen->KingMoves(state), IsEmpty());
+  EXPECT_THAT(move_gen->for_king(state), IsEmpty());
 }
 
 TEST_F(MoveGenTest, InitGameKnightMoves)
@@ -73,25 +73,25 @@ TEST_F(MoveGenTest, InitGameKnightMoves)
   moves.emplace_back(Piece::knight(), Sq::g1, Sq::h3);
 
   auto state = NewBoardState();
-  EXPECT_THAT(move_gen->KnightMoves(state), UnorderedElementsAreArray(moves));
+  EXPECT_THAT(move_gen->for_knight(state), UnorderedElementsAreArray(moves));
 }
 
 TEST_F(MoveGenTest, InitGameQueenMoves)
 {
   auto state = NewBoardState();
-  EXPECT_THAT(move_gen->QueenMoves(state), IsEmpty());
+  EXPECT_THAT(move_gen->for_queen(state), IsEmpty());
 }
 
 TEST_F(MoveGenTest, InitGameRookMoves)
 {
   auto state = NewBoardState();
-  EXPECT_THAT(move_gen->RookMoves(state), IsEmpty());
+  EXPECT_THAT(move_gen->for_rook(state), IsEmpty());
 }
 
 TEST_F(MoveGenTest, InitGameBishopMoves)
 {
   auto state = NewBoardState();
-  EXPECT_THAT(move_gen->BishopMoves(state), IsEmpty());
+  EXPECT_THAT(move_gen->for_bishop(state), IsEmpty());
 }
 
 TEST_F(MoveGenTest, InitGameAllMoves)
@@ -122,5 +122,5 @@ TEST_F(MoveGenTest, InitGameAllMoves)
   moves.emplace_back(Piece::knight(), Sq::g1, Sq::h3);
 
   auto state = NewBoardState();
-  EXPECT_THAT(move_gen->AllMoves(state), UnorderedElementsAreArray(moves));
+  EXPECT_THAT(move_gen->for_all(state), UnorderedElementsAreArray(moves));
 }

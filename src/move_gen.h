@@ -22,60 +22,60 @@ public:
   // These may include moves that put the king in check. It is up to client to
   // determine which moves put the king in check.
   std::vector<Move>
-  KingMoves(const BoardState& state) const override;
+  for_king(const BoardState& state) const override;
 
   // Generates all possible moves for queens on the board.
   std::vector<Move>
-  QueenMoves(const BoardState& state) const override;
+  for_queen(const BoardState& state) const override;
 
   // Generates all possible moves for rooks on the board, except for castling
   // moves.
   std::vector<Move>
-  RookMoves(const BoardState& state) const override;
+  for_rook(const BoardState& state) const override;
 
   // Generates all possible moves for bishops on the board.
   std::vector<Move>
-  BishopMoves(const BoardState& state) const override;
+  for_bishop(const BoardState& state) const override;
 
   // Generates all possible moves for knights on the board.
   std::vector<Move>
-  KnightMoves(const BoardState& state) const override;
+  for_knight(const BoardState& state) const override;
 
   // Generates all possible moves for pawns on the board.
   std::vector<Move>
-  PawnMoves(const BoardState& state) const override;
+  for_pawn(const BoardState& state) const override;
 
   // Generates all possible moves for all pieces on the board.
   std::vector<Move>
-  AllMoves(const BoardState& state) const override;
+  for_all(const BoardState& state) const override;
 
 private:
   // Generates all possible moves for a king, including castling with the rook.
   // These may include moves that put the king in check. It is up to client of
   // MoveGen to determine which moves put the king in check.
   void
-  KingMoves(const BoardState& state, std::vector<Move>& moves) const;
+  for_king(const BoardState& state, std::vector<Move>& moves) const;
 
   // Generates all possible moves for queens on the board.
   void
-  QueenMoves(const BoardState& state, std::vector<Move>& moves) const;
+  for_queen(const BoardState& state, std::vector<Move>& moves) const;
 
   // Generates all possible moves for rooks on the board, except for castling
   // moves.
   void
-  RookMoves(const BoardState& state, std::vector<Move>& moves) const;
+  for_rook(const BoardState& state, std::vector<Move>& moves) const;
 
   // Generates all possible moves for bishops on the board.
   void
-  BishopMoves(const BoardState& state, std::vector<Move>& moves) const;
+  for_bishop(const BoardState& state, std::vector<Move>& moves) const;
 
   // Generates all possible moves for knights on the board.
   void
-  KnightMoves(const BoardState& state, std::vector<Move>& moves) const;
+  for_knight(const BoardState& state, std::vector<Move>& moves) const;
 
   // Generates all possible moves for pawns on the board.
   void
-  PawnMoves(const BoardState& state, std::vector<Move>& moves) const;
+  for_pawn(const BoardState& state, std::vector<Move>& moves) const;
 
   // Magic bitboards for bishops.
   MagicAttacks bmagics_;

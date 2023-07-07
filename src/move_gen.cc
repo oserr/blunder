@@ -273,69 +273,69 @@ move_en_passant(
 } // namespace
 
 std::vector<Move>
-MoveGen::KingMoves(const BoardState& state) const
+MoveGen::for_king(const BoardState& state) const
 {
   std::vector<Move> moves;
-  KingMoves(state, moves);
+  for_king(state, moves);
   return moves;
 }
 
 // Generates all possible moves for queens on the board.
 std::vector<Move>
-MoveGen::QueenMoves(const BoardState& state) const
+MoveGen::for_queen(const BoardState& state) const
 {
   std::vector<Move> moves;
-  QueenMoves(state, moves);
+  for_queen(state, moves);
   return moves;
 }
 
 std::vector<Move>
-MoveGen::RookMoves(const BoardState& state) const
+MoveGen::for_rook(const BoardState& state) const
 {
   std::vector<Move> moves;
-  RookMoves(state, moves);
+  for_rook(state, moves);
   return moves;
 }
 
 std::vector<Move>
-MoveGen::BishopMoves(const BoardState& state) const
+MoveGen::for_bishop(const BoardState& state) const
 {
   std::vector<Move> moves;
-  BishopMoves(state, moves);
+  for_bishop(state, moves);
   return moves;
 }
 
 std::vector<Move>
-MoveGen::KnightMoves(const BoardState& state) const
+MoveGen::for_knight(const BoardState& state) const
 {
   return get_simple_moves(Piece::knight(), state, MoveKnight);
 }
 
 std::vector<Move>
-MoveGen::PawnMoves(const BoardState& state) const
+MoveGen::for_pawn(const BoardState& state) const
 {
   std::vector<Move> moves;
-  PawnMoves(state, moves);
+  for_pawn(state, moves);
   return moves;
 }
 
 std::vector<Move>
-MoveGen::AllMoves(const BoardState& state) const
+MoveGen::for_all(const BoardState& state) const
 {
   // TODO: determine if there are any performance gains from computing the moves
   // in parallel.
   std::vector<Move> moves;
-  KingMoves(state, moves);
-  QueenMoves(state, moves);
-  RookMoves(state, moves);
-  BishopMoves(state, moves);
-  KnightMoves(state, moves);
-  PawnMoves(state, moves);
+  for_king(state, moves);
+  for_queen(state, moves);
+  for_rook(state, moves);
+  for_bishop(state, moves);
+  for_knight(state, moves);
+  for_pawn(state, moves);
   return moves;
 }
 
 void
-MoveGen::KingMoves(
+MoveGen::for_king(
     const BoardState& state,
     std::vector<Move>& moves) const
 {
@@ -364,7 +364,7 @@ MoveGen::KingMoves(
 }
 
 void
-MoveGen::QueenMoves(
+MoveGen::for_queen(
     const BoardState& state,
     std::vector<Move>& moves) const
 {
@@ -378,7 +378,7 @@ MoveGen::QueenMoves(
 }
 
 void
-MoveGen::RookMoves(
+MoveGen::for_rook(
     const BoardState& state,
     std::vector<Move>& moves) const
 {
@@ -391,7 +391,7 @@ MoveGen::RookMoves(
 }
 
 void
-MoveGen::BishopMoves(
+MoveGen::for_bishop(
     const BoardState& state,
     std::vector<Move>& moves) const
 {
@@ -404,7 +404,7 @@ MoveGen::BishopMoves(
 }
 
 void
-MoveGen::KnightMoves(
+MoveGen::for_knight(
     const BoardState& state,
     std::vector<Move>& moves) const
 {
@@ -412,7 +412,7 @@ MoveGen::KnightMoves(
 }
 
 void
-MoveGen::PawnMoves(
+MoveGen::for_pawn(
     const BoardState& state,
     std::vector<Move>& moves) const
 {

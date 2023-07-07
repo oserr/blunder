@@ -12,25 +12,25 @@ namespace blunder {
 class MoveGenerator {
 public:
   virtual std::vector<Move>
-  KingMoves(const BoardState& state) const = 0;
+  for_king(const BoardState& state) const = 0;
 
   virtual std::vector<Move>
-  QueenMoves(const BoardState& state) const = 0;
+  for_queen(const BoardState& state) const = 0;
 
   virtual std::vector<Move>
-  RookMoves(const BoardState& state) const = 0;
+  for_rook(const BoardState& state) const = 0;
 
   virtual std::vector<Move>
-  BishopMoves(const BoardState& state) const = 0;
+  for_bishop(const BoardState& state) const = 0;
 
   virtual std::vector<Move>
-  KnightMoves(const BoardState& state) const = 0;
+  for_knight(const BoardState& state) const = 0;
 
   virtual std::vector<Move>
-  PawnMoves(const BoardState& state) const = 0;
+  for_pawn(const BoardState& state) const = 0;
 
   virtual std::vector<Move>
-  AllMoves(const BoardState& state) const = 0;
+  for_all(const BoardState& state) const = 0;
 };
 
 } // namespace blunder
