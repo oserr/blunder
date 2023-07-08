@@ -29,6 +29,20 @@ namespace blunder {
 // like the following:
 // - 1N, 1NE, 1E,..., 2N, 2NE, 2E, ..., 7N, 7NE, 7E,... and so on.
 
+// TODO: implement logic to encode the input feature for the network, which is 6
+// planes for each of the pieces for each player, i.e. 12 total planes, and 2
+// planes for repetition count in current position for each player. These are
+// repeated for 8 time steps up to the current position. There are an additional
+// 7 layers for
+//
+// - 1 for piece color
+// - 1 for total move count
+// - 2 for king and queenside castling for the current player
+// - 2 for castling for the other player
+// - no progress count (50 move rule)
+//
+// In total, the input feature consists of 119 (8, 8) feature planes.
+
 // Define a new Module.
 struct Net : torch::nn::Module {
   Net()
