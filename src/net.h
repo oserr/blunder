@@ -67,7 +67,7 @@ struct Net : torch::nn::Module {
   torch::nn::Linear fc3{nullptr};
 };
 
-// Placer holder to have code to get things
+// TODO: implement a training loop.
 std::shared_ptr<Net>
 train_net();
 
