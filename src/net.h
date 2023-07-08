@@ -43,7 +43,33 @@ namespace blunder {
 //
 // In total, the input feature consists of 119 (8, 8) feature planes.
 
-// Define a new Module.
+// TODO: implement AlphaZero neural architecture:
+// 1) An initial convolution
+//   - A convolution of 256 filters of kernel size 3x3 with stride 1.
+//   - batch normalization
+//   - a rectifier nonlinearity
+// 2) 19 residual blocks, each consisting of the following
+//   - A convolution of 256 filters of kernel size 3x3 with stride 1.
+//   - batch normalization
+//   - a rectifier nonlinearity
+//   - A convolution of 256 filters of kernel size 3x3 with stride 1.
+//   - batch normalization
+//   - a skip connection that adds the input to the block
+//   - a rectifier nonlinearity
+// 3) the output is then passed to two heads
+//    A) Policy head
+//      - A convolution of 256 filters of kernel size 3x3 with stride 1.
+//      - batch normalization
+//      - a rectifier nonlinearity
+//      - convolution of 73 filters
+//    B) Value head
+//      - A convolution of 1 filter of kernel size 1x1 with stride 1.
+//      - batch normalization
+//      - a rectifier nonlinearity
+//      - a fully connected linear layer to a hidden layer of size 256
+//      - a rectified non linearity
+//      - a fully connected layer to a scalar
+//      - a tanh nonlinearity outputting a scalar in the range [-1, 1].
 struct Net : torch::nn::Module {
   Net()
     : fc1(register_module("fc1", torch::nn::Linear(784, 64))),
