@@ -80,7 +80,7 @@ PolicyNet::forward(Tensor x)
 ValueNet::ValueNet()
     : conv(Conv2d(Conv2dOptions(256, 1, 1).stride(1))),
       bnorm(BatchNorm2d(BatchNorm2dOptions(1))),
-      fc1(Linear(16, 256)),
+      fc1(Linear(64, 256)),
       fc2(Linear(256, 1))
 {
   register_module("ValueNet-conv", conv);
@@ -125,10 +125,10 @@ AlphaZeroNet::forward(Tensor x)
   for (auto& res_net : res_nets)
     out = res_net.forward(out);
 
-  auto policy = policy_net.forward(out);
+  auto pol = policy_net.forward(out);
   auto val = value_net.forward(out);
 
-  return {policy, val};
+  return {pol, val};
 }
 
 std::shared_ptr<AlphaZeroNet>
