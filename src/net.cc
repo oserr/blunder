@@ -1,5 +1,6 @@
 #include "net.h"
 
+#include <format>
 #include <iostream>
 
 namespace blunder {
@@ -95,11 +96,46 @@ ValueNet::forward(Tensor x)
   return tanh(fc2(relu(fc1(flatten(out)))));
 }
 
-std::shared_ptr<Net>
+//--------------
+// AlphaZero net
+//--------------
+
+AlphaZeroNet::AlphaZeroNet()
+  : conv(Conv2d(Conv2dOptions(119, 256, 3).stride(1).padding(1))),
+    bnorm(make_bnorm()),
+    policy_net(),
+    value_net()
+{
+  register_module("input-conv", conv);
+  register_module("input-bnorm", bnorm);
+
+  // Initialize the residual blocks.
+  res_nets.reserve(19);
+  for (int i = 0; i < 19; ++i)
+    res_nets.emplace_back(std::format("ResNetBlock-{}", i));
+}
+
+std::pair<Tensor, Tensor>
+AlphaZeroNet::forward(Tensor x)
+{
+  auto out = conv(x);
+  out = bnorm(out);
+  out = relu(out);
+
+  for (auto& res_net : res_nets)
+    out = res_net.forward(out);
+
+  auto policy = policy_net.forward(out);
+  auto val = value_net.forward(out);
+
+  return {policy, val};
+}
+
+std::shared_ptr<AlphaZeroNet>
 train_net()
 {
   // Create a new Net.
-  auto net = std::make_shared<Net>();
+  auto net = std::make_shared<AlphaZeroNet>();
 
   // Create a multi-threaded data loader for the MNIST dataset.
   auto data_loader = torch::data::make_data_loader(
@@ -118,21 +154,28 @@ train_net()
       optimizer.zero_grad();
 
       // Execute the model on the input data.
-      torch::Tensor prediction = net->forward(batch.data);
+      auto [policy_pred, value_pred] = net->forward(batch.data);
+
+      // TODO: compute loss for policy correctly
+      auto loss = torch::nll_loss(policy_pred, batch.target);
+
+      // TODO: compute loss for value
 
       // Compute a loss value to judge the prediction of our model.
-      torch::Tensor loss = torch::nll_loss(prediction, batch.target);
+      //torch::Tensor loss = torch::nll_loss(prediction, batch.target);
 
       // Compute gradients of the loss w.r.t. the parameters of our model.
-      loss.backward();
+      //loss.backward();
 
       // Update the parameters based on the calculated gradients.
       optimizer.step();
 
       // Output the loss and checkpoint every 100 batches.
       if (++batch_index % 100 == 0) {
-        std::cout << "Epoch: " << epoch << " | Batch: " << batch_index
-                  << " | Loss: " << loss.item<float>() << std::endl;
+        std::cout << "Epoch: " << epoch
+                  << " | Batch: " << batch_index
+                  << " | Loss: " << loss.item<float>()
+                  << std::endl;
 
         // Serialize your model periodically as a checkpoint.
         torch::save(net, "net.pt");

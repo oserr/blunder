@@ -1,6 +1,8 @@
 #pragma once
 
 #include <string_view>
+#include <utility>
+#include <vector>
 
 #include <torch/torch.h>
 
@@ -72,6 +74,10 @@ namespace blunder {
 //      - a fully connected layer to a scalar
 //      - a tanh nonlinearity outputting a scalar in the range [-1, 1].
 
+//---------------
+// Residual Block
+//---------------
+
 // ResBlockNet implements the residual block in the AlphaZero network, which has
 // 19 of these blocks connected together.
 struct ResBlockNet : torch::nn::Module {
@@ -87,6 +93,10 @@ struct ResBlockNet : torch::nn::Module {
   torch::nn::BatchNorm2d bnorm2 = nullptr;
 };
 
+//----------------
+// Policy head net
+//----------------
+
 struct PolicyNet : torch::nn::Module {
   PolicyNet();
 
@@ -97,6 +107,10 @@ struct PolicyNet : torch::nn::Module {
   torch::nn::BatchNorm2d bnorm = nullptr;
   torch::nn::Conv2d conv2 = nullptr;
 };
+
+//----------------
+// Value head net
+//----------------
 
 struct ValueNet : torch::nn::Module {
   ValueNet();
@@ -110,41 +124,25 @@ struct ValueNet : torch::nn::Module {
   torch::nn::Linear fc2 = nullptr;
 };
 
-struct Net : torch::nn::Module {
-  Net()
-    : fc1(register_module("fc1", torch::nn::Linear(784, 64))),
-      fc2(register_module("fc2", torch::nn::Linear(64, 32))),
-      fc3(register_module("fc3", torch::nn::Linear(32, 10))),
-      conv(register_module("conv", torch::nn::Conv2d(
-              torch::nn::Conv2dOptions(119, 256, 3)
-                .stride(1)
-                .padding(1)))),
-      relu(torch::nn::ReLU()),
-      bnorm(register_module("bnorm",
-            torch::nn::BatchNorm2d(torch::nn::BatchNorm2dOptions(256))))
-  {}
+//--------------
+// AlphaZero net
+//--------------
 
-  // Implement the Net's algorithm.
-  torch::Tensor
-  forward(torch::Tensor x)
-  {
-    x = torch::relu(fc1->forward(x.reshape({x.size(0), 784})));
-    x = torch::dropout(x, /*p=*/0.5, /*train=*/is_training());
-    x = torch::relu(fc2->forward(x));
-    x = torch::log_softmax(fc3->forward(x), /*dim=*/1);
-    return x;
-  }
+struct AlphaZeroNet : torch::nn::Module {
+  AlphaZeroNet();
 
-  torch::nn::Linear fc1 = nullptr;
-  torch::nn::Linear fc2 = nullptr;
-  torch::nn::Linear fc3 = nullptr;
+  std::pair<torch::Tensor, torch::Tensor>
+  forward(torch::Tensor x);
+
   torch::nn::Conv2d conv = nullptr;
-  torch::nn::ReLU relu = nullptr;
   torch::nn::BatchNorm2d bnorm = nullptr;
+  PolicyNet policy_net;
+  ValueNet value_net;
+  std::vector<ResBlockNet> res_nets;
 };
 
 // TODO: implement a training loop.
-std::shared_ptr<Net>
+std::shared_ptr<AlphaZeroNet>
 train_net();
 
 } // namespace blunder
