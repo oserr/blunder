@@ -7,11 +7,14 @@ namespace blunder {
 namespace {
 
 using ::torch::Tensor;
+using ::torch::flatten;
 using ::torch::nn::BatchNorm2d;
 using ::torch::nn::BatchNorm2dOptions;
 using ::torch::nn::Conv2d;
 using ::torch::nn::Conv2dOptions;
+using ::torch::nn::Linear;
 using ::torch::relu;
+using ::torch::tanh;
 
 inline Conv2d
 make_conv_nn()
@@ -68,6 +71,29 @@ PolicyNet::PolicyNet()
 Tensor
 PolicyNet::forward(Tensor x)
 { return conv2(relu(bnorm(conv1(x)))); }
+
+//----------------
+// Value head net
+//----------------
+
+ValueNet::ValueNet()
+    : conv(Conv2d(Conv2dOptions(256, 1, 1).stride(1))),
+      bnorm(BatchNorm2d(BatchNorm2dOptions(1))),
+      fc1(Linear(16, 256)),
+      fc2(Linear(256, 1))
+{
+  register_module("ValueNet-conv", conv);
+  register_module("ValueNet-bnorm", bnorm);
+  register_module("ValueNet-fc1", fc1);
+  register_module("ValueNet-fc2", fc2);
+}
+
+Tensor
+ValueNet::forward(Tensor x)
+{
+  auto out = relu(bnorm(conv(x)));
+  return tanh(fc2(relu(fc1(flatten(out)))));
+}
 
 std::shared_ptr<Net>
 train_net()

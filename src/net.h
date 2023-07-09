@@ -98,6 +98,18 @@ struct PolicyNet : torch::nn::Module {
   torch::nn::Conv2d conv2 = nullptr;
 };
 
+struct ValueNet : torch::nn::Module {
+  ValueNet();
+
+  torch::Tensor
+  forward(torch::Tensor x);
+
+  torch::nn::Conv2d conv = nullptr;
+  torch::nn::BatchNorm2d bnorm = nullptr;
+  torch::nn::Linear fc1 = nullptr;
+  torch::nn::Linear fc2 = nullptr;
+};
+
 struct Net : torch::nn::Module {
   Net()
     : fc1(register_module("fc1", torch::nn::Linear(784, 64))),
