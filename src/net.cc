@@ -1,6 +1,51 @@
 #include "net.h"
 
+#include <iostream>
+
 namespace blunder {
+
+namespace {
+
+using ::torch::Tensor;
+using ::torch::nn::BatchNorm2d;
+using ::torch::nn::BatchNorm2dOptions;
+using ::torch::nn::Conv2d;
+using ::torch::nn::Conv2dOptions;
+using ::torch::relu;
+
+inline Conv2d
+make_conv_nn()
+{
+  auto opts = Conv2dOptions(256, 256, 3).stride(1).padding(1);
+  return Conv2d(opts);
+}
+
+inline BatchNorm2d
+make_bnorm()
+{ return BatchNorm2d(BatchNorm2dOptions(256)); }
+
+} // namespace
+
+ResBlockNet::ResBlockNet(std::string_view name)
+    : conv1(make_conv_nn()),
+      conv2(make_conv_nn()),
+      bnorm1(make_bnorm()),
+      bnorm2(make_bnorm())
+{
+  register_module(std::format("{}-conv1", name), conv1);
+  register_module(std::format("{}-conv2", name), conv2);
+  register_module(std::format("{}-bnorm1", name), bnorm1);
+  register_module(std::format("{}-bnorm2", name), bnorm2);
+}
+
+Tensor
+ResBlockNet::forward(Tensor x)
+{
+  auto out = relu(bnorm1(conv1(x)));
+  out = bnorm2(conv2(out));
+  out += x;
+  return relu(out);
+}
 
 std::shared_ptr<Net>
 train_net()

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <iostream>
+#include <string_view>
 
 #include <torch/torch.h>
 
@@ -43,6 +43,7 @@ namespace blunder {
 //
 // In total, the input feature consists of 119 (8, 8) feature planes.
 
+
 // TODO: implement AlphaZero neural architecture:
 // 1) An initial convolution
 //   - A convolution of 256 filters of kernel size 3x3 with stride 1.
@@ -70,11 +71,34 @@ namespace blunder {
 //      - a rectified non linearity
 //      - a fully connected layer to a scalar
 //      - a tanh nonlinearity outputting a scalar in the range [-1, 1].
+
+// ResBlockNet implements the residual block in the AlphaZero network, which has
+// 19 of these blocks connected together.
+struct ResBlockNet : torch::nn::Module {
+  explicit
+  ResBlockNet(std::string_view name);
+
+  torch::Tensor
+  forward(torch::Tensor x);
+
+  torch::nn::Conv2d conv1 = nullptr;
+  torch::nn::Conv2d conv2 = nullptr;
+  torch::nn::BatchNorm2d bnorm1 = nullptr;
+  torch::nn::BatchNorm2d bnorm2 = nullptr;
+};
+
 struct Net : torch::nn::Module {
   Net()
     : fc1(register_module("fc1", torch::nn::Linear(784, 64))),
       fc2(register_module("fc2", torch::nn::Linear(64, 32))),
-      fc3(register_module("fc3", torch::nn::Linear(32, 10)))
+      fc3(register_module("fc3", torch::nn::Linear(32, 10))),
+      conv(register_module("conv", torch::nn::Conv2d(
+              torch::nn::Conv2dOptions(119, 256, 3)
+                .stride(1)
+                .padding(1)))),
+      relu(torch::nn::ReLU()),
+      bnorm(register_module("bnorm",
+            torch::nn::BatchNorm2d(torch::nn::BatchNorm2dOptions(256))))
   {}
 
   // Implement the Net's algorithm.
@@ -88,9 +112,12 @@ struct Net : torch::nn::Module {
     return x;
   }
 
-  torch::nn::Linear fc1{nullptr};
-  torch::nn::Linear fc2{nullptr};
-  torch::nn::Linear fc3{nullptr};
+  torch::nn::Linear fc1 = nullptr;
+  torch::nn::Linear fc2 = nullptr;
+  torch::nn::Linear fc3 = nullptr;
+  torch::nn::Conv2d conv = nullptr;
+  torch::nn::ReLU relu = nullptr;
+  torch::nn::BatchNorm2d bnorm = nullptr;
 };
 
 // TODO: implement a training loop.
