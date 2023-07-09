@@ -26,6 +26,10 @@ make_bnorm()
 
 } // namespace
 
+//---------------
+// Residual Block
+//---------------
+
 ResBlockNet::ResBlockNet(std::string_view name)
     : conv1(make_conv_nn()),
       conv2(make_conv_nn()),
@@ -46,6 +50,24 @@ ResBlockNet::forward(Tensor x)
   out += x;
   return relu(out);
 }
+
+//----------------
+// Policy head net
+//----------------
+
+PolicyNet::PolicyNet()
+    : conv1(make_conv_nn()),
+      bnorm(make_bnorm()),
+      conv2(Conv2d(Conv2dOptions(256, 73, 3).stride(1).padding(1)))
+{
+  register_module("PolicyNet-conv1", conv1);
+  register_module("PolicyNet-bnorm", bnorm);
+  register_module("PolicyNet-conv2", conv2);
+}
+
+Tensor
+PolicyNet::forward(Tensor x)
+{ return conv2(relu(bnorm(conv1(x)))); }
 
 std::shared_ptr<Net>
 train_net()

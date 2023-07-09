@@ -87,6 +87,17 @@ struct ResBlockNet : torch::nn::Module {
   torch::nn::BatchNorm2d bnorm2 = nullptr;
 };
 
+struct PolicyNet : torch::nn::Module {
+  PolicyNet();
+
+  torch::Tensor
+  forward(torch::Tensor x);
+
+  torch::nn::Conv2d conv1 = nullptr;
+  torch::nn::BatchNorm2d bnorm = nullptr;
+  torch::nn::Conv2d conv2 = nullptr;
+};
+
 struct Net : torch::nn::Module {
   Net()
     : fc1(register_module("fc1", torch::nn::Linear(784, 64))),
