@@ -81,7 +81,10 @@ set_target_properties(genmagic PROPERTIES CXX_STANDARD 23)
 target_compile_features(genmagic PRIVATE)
 target_link_libraries(genmagic blunder)
 
-include(GoogleTest)
+add_executable(train_net src/train_net.cc)
+set_target_properties(train_net PROPERTIES CXX_STANDARD 23)
+target_compile_features(train_net PRIVATE)
+target_link_libraries(train_net blunder)
 
 # Simple function to create a test target.
 function(create_test target)
