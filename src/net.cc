@@ -8,12 +8,16 @@ namespace blunder {
 namespace {
 
 using ::torch::Tensor;
+using ::torch::data::datasets::Dataset;
+using ::torch::data::Example;
 using ::torch::flatten;
 using ::torch::nn::BatchNorm2d;
 using ::torch::nn::BatchNorm2dOptions;
 using ::torch::nn::Conv2d;
 using ::torch::nn::Conv2dOptions;
 using ::torch::nn::Linear;
+using ::torch::nn::MSELoss;
+using ::torch::nn::CrossEntropyLoss;
 using ::torch::relu;
 using ::torch::tanh;
 
@@ -27,6 +31,32 @@ make_conv_nn()
 inline BatchNorm2d
 make_bnorm()
 { return BatchNorm2d(BatchNorm2dOptions(256)); }
+
+using TensorPair = std::pair<Tensor, Tensor>;
+
+// TODO: When we begin to generate training data through self play, we'll save
+// the game history, and this custom loader will need to read the data and
+// convert it to tensors.
+//
+// Placer holder code for a custom dataset to use with a dataloader.
+// Each example will consists of the input to the network, i.e. an 8x8x119 stack
+// of planes representing the current chess position, and the target will
+// consist of a pair of tensors, one to represent the value and the other to
+// represent the move policy.
+class ChessDataset :
+  public Dataset<ChessDataset, Example<Tensor, TensorPair>>
+{
+public:
+  //static constexpr bool is_stateful = false;
+
+  ExampleType
+  get(size_t) override
+  { return ExampleType(); }
+
+  torch::optional<size_t>
+  size() const override
+  { return 0; };
+};
 
 } // namespace
 
@@ -139,8 +169,9 @@ train_net()
 
   // Create a multi-threaded data loader for the MNIST dataset.
   auto data_loader = torch::data::make_data_loader(
-      torch::data::datasets::MNIST("./data").map(
-          torch::data::transforms::Stack<>()),
+      //torch::data::datasets::MNIST("./data").map(
+      //    torch::data::transforms::Stack<>()),
+      ChessDataset(),
       /*batch_size=*/64);
 
   // Instantiate an SGD optimization algorithm to update our Net's parameters.
@@ -150,35 +181,43 @@ train_net()
     size_t batch_index = 0;
     // Iterate the data loader to yield batches from the dataset.
     for (auto& batch : *data_loader) {
-      // Reset gradients.
-      optimizer.zero_grad();
+      // TODO: define a function to stack Elements when we create the data
+      // loader, so we can operate on the whole batch rather than individual
+      // examples. For now do this to get it to compile.
+      for (auto& example : batch) {
+        // Reset gradients.
+        optimizer.zero_grad();
 
-      // Execute the model on the input data.
-      auto [policy_pred, value_pred] = net->forward(batch.data);
+        // Execute the model on the input data.
+        auto [policy_pred, value_pred] = net->forward(example.data);
 
-      // TODO: compute loss for policy correctly
-      auto loss = torch::nll_loss(policy_pred, batch.target);
+        // Get the target values from self play.
+        auto& [policy_target, value_target] = example.target;
 
-      // TODO: compute loss for value
+        // TODO: compute loss for value
+        MSELoss mse_loss;
+        auto value_loss = mse_loss(value_pred, value_target);
 
-      // Compute a loss value to judge the prediction of our model.
-      //torch::Tensor loss = torch::nll_loss(prediction, batch.target);
+        CrossEntropyLoss ce_loss;
+        auto policy_loss = ce_loss(policy_pred, policy_target);
 
-      // Compute gradients of the loss w.r.t. the parameters of our model.
-      //loss.backward();
+        // TODO: add L2 regularization.
+        auto loss = value_loss + policy_loss;
+        loss.backward();
 
-      // Update the parameters based on the calculated gradients.
-      optimizer.step();
+        // Update the parameters based on the calculated gradients.
+        optimizer.step();
 
-      // Output the loss and checkpoint every 100 batches.
-      if (++batch_index % 100 == 0) {
-        std::cout << "Epoch: " << epoch
-                  << " | Batch: " << batch_index
-                  << " | Loss: " << loss.item<float>()
-                  << std::endl;
+        // Output the loss and checkpoint every 100 batches.
+        if (++batch_index % 100 == 0) {
+          std::cout << "Epoch: " << epoch
+                    << " | Batch: " << batch_index
+                    << " | Loss: " << loss.item<float>()
+                    << std::endl;
 
-        // Serialize your model periodically as a checkpoint.
-        torch::save(net, "net.pt");
+          // Serialize your model periodically as a checkpoint.
+          torch::save(net, "net.pt");
+        }
       }
     }
   }
