@@ -11,7 +11,7 @@
 using namespace blunder;
 
 void
-PrintHelp(std::string_view prog, std::ostream& os)
+print_help(std::string_view prog, std::ostream& os)
 {
   os << "Usage: " << prog << " [options] ...\n"
      << "     -h|--help      Print this help message.\n"
@@ -50,10 +50,10 @@ main(int argc, char** argv)
     switch (ret) {
       case '?':
         std::cerr << "Received unknown command line option.\n";
-        PrintHelp(argv[0], std::cerr);
+        print_help(argv[0], std::cerr);
         return EXIT_FAILURE;
       case 'h':
-        PrintHelp(argv[0], std::cout);
+        print_help(argv[0], std::cout);
         return EXIT_SUCCESS;
       case 'd':
         print_dmask = true;
@@ -93,11 +93,11 @@ main(int argc, char** argv)
 
   if (square == -1) {
     std::cerr << "Need to specify a square.\n";
-    PrintHelp(argv[0], std::cerr);
+    print_help(argv[0], std::cerr);
     return EXIT_FAILURE;
   } else if (std::ranges::none_of(flags, std::identity())) {
     std::cerr << "Need to specify a mask for the square.\n";
-    PrintHelp(argv[0], std::cerr);
+    print_help(argv[0], std::cerr);
     return EXIT_FAILURE;
   }
 
