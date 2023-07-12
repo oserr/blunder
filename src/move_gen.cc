@@ -178,10 +178,10 @@ move_forward(
       moves.emplace_back(Piece::pawn(), from_square, to_square);
     else {
       // Pawn is moving to the last rank for promotion.
-      moves.push_back(Move::PawnPromo(from_square, to_square, Piece::queen()));
-      moves.push_back(Move::PawnPromo(from_square, to_square, Piece::rook()));
-      moves.push_back(Move::PawnPromo(from_square, to_square, Piece::bishop()));
-      moves.push_back(Move::PawnPromo(from_square, to_square, Piece::knight()));
+      moves.push_back(Move::promo(from_square, to_square, Piece::queen()));
+      moves.push_back(Move::promo(from_square, to_square, Piece::rook()));
+      moves.push_back(Move::promo(from_square, to_square, Piece::bishop()));
+      moves.push_back(Move::promo(from_square, to_square, Piece::knight()));
     }
   }
 }
@@ -206,13 +206,13 @@ attack(
     if (not is_promo_fn(to_square))
       moves.emplace_back(Piece::pawn(), from_square, to_piece, to_square);
     else {
-      moves.push_back(Move::PawnPromo(
+      moves.push_back(Move::promo(
             from_square, to_piece, to_square, Piece::queen()));
-      moves.push_back(Move::PawnPromo(
+      moves.push_back(Move::promo(
             from_square, to_piece, to_square, Piece::rook()));
-      moves.push_back(Move::PawnPromo(
+      moves.push_back(Move::promo(
             from_square, to_piece, to_square, Piece::bishop()));
-      moves.push_back(Move::PawnPromo(
+      moves.push_back(Move::promo(
             from_square, to_piece, to_square, Piece::knight()));
     }
   }
@@ -347,18 +347,18 @@ MoveGen::for_king(
   case Color::White:
     if (state.wk_castle and
         can_castle<Color::White, BoardSide::King>(all_pieces))
-      moves.push_back(Move::WhiteKingSideCastle());
+      moves.push_back(Move::wk_castle());
     if (state.wq_castle and
         can_castle<Color::White, BoardSide::Queen>(all_pieces))
-      moves.push_back(Move::WhiteQueenSideCastle());
+      moves.push_back(Move::wq_castle());
     break;
   case Color::Black:
     if (state.bk_castle and
         can_castle<Color::Black, BoardSide::King>(all_pieces))
-      moves.push_back(Move::BlackKingSideCastle());
+      moves.push_back(Move::bk_castle());
     if (state.bq_castle and
         can_castle<Color::Black, BoardSide::Queen>(all_pieces))
-      moves.push_back(Move::BlackQueenSideCastle());
+      moves.push_back(Move::wq_castle());
     break;
   }
 }

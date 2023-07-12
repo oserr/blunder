@@ -6,36 +6,36 @@
 namespace blunder {
 
 bool
-operator==(Move left, Move right) noexcept
+Move::eq(Move mv) const noexcept
 {
-  return left.from_piece == right.from_piece
-     and left.to_piece == right.to_piece
-     and left.from_square == right.from_square
-     and left.to_square == right.to_square
-     and left.castle == right.castle
-     and left.kside == right.kside
-     and left.en_passant == right.en_passant
-     and left.is_promo == right.is_promo
-     and left.promo_piece == right.promo_piece;
+  return from_piece == mv.from_piece
+     and to_piece == mv.to_piece
+     and from_square == mv.from_square
+     and to_square == mv.to_square
+     and castle == mv.castle
+     and kside == mv.kside
+     and en_passant == mv.en_passant
+     and is_promo == mv.is_promo
+     and promo_piece == mv.promo_piece;
 }
 
 std::string
-DebugStr(Move mv)
+Move::str() const
 {
   std::string buff;
   buff.reserve(128);
 
   buff += '{';
-  buff += Piece::from_int(mv.from_piece).letter();
+  buff += Piece::from_int(from_piece).letter();
   buff += ':';
-  buff += ToStr(ToSq(mv.from_square));
+  buff += ToStr(ToSq(from_square));
   buff += "->";
-  buff += ToStr(ToSq(mv.to_square));
+  buff += ToStr(ToSq(to_square));
 
-  if (mv.castle) {
-    std::uint8_t from_sq = mv.from_square;
-    std::uint8_t to_sq = mv.to_square;
-    if (mv.kside) {
+  if (castle) {
+    std::uint8_t from_sq = from_square;
+    std::uint8_t to_sq = to_square;
+    if (kside) {
       from_sq += 3;
       --to_sq;
     } else {
@@ -51,14 +51,14 @@ DebugStr(Move mv)
     buff += ToStr(ToSq(to_sq));
   }
 
-  if (auto to_piece = Piece::from_int(mv.to_piece); to_piece != Type::None) {
+  if (auto piece = Piece::from_int(to_piece); piece != Type::None) {
     buff += ", !";
-    buff += to_piece.letter();
+    buff += piece.letter();
   }
 
-  if (mv.is_promo) {
+  if (is_promo) {
     buff += ", ^";
-    buff += Piece::from_int(mv.promo_piece).letter();
+    buff += Piece::from_int(promo_piece).letter();
   }
 
   buff += '}';

@@ -46,8 +46,12 @@ struct Move {
   // Initializes all fields.
   Move() = default;
 
+  // ------------------------------------------------------------------------
   // Most common scenario for a move, i.e. we move a piece from one square to
-  // another without attacking.
+  // another without attacking, and hence this initializes the move with the
+  // source square, piece type for moving piece, and destination square.
+  // ------------------------------------------------------------------------
+  
   Move(
       std::uint8_t from_piece,
       std::uint8_t from_square,
@@ -62,15 +66,16 @@ struct Move {
       std::uint8_t to_square) noexcept
     : Move(from_piece.uint(), from_square, to_square) {}
 
-  // Most common scenario for a move, i.e. we move a piece from one square to
-  // another without attacking.
   Move(
       Piece from_piece,
       Sq from_square,
       Sq to_square) noexcept
     : Move(from_piece.uint(), ToUint(from_square), ToUint(to_square)) {}
 
-  // Next most common scenario, we move a piece with capture.
+  // ------------------------------------------------------------------------
+  // Next most common scenario, we move a piece with capture, with overloads.
+  // ------------------------------------------------------------------------
+
   Move(
       std::uint8_t from_piece,
       std::uint8_t from_square,
@@ -95,14 +100,17 @@ struct Move {
       std::uint8_t to_square) noexcept
     : Move(from_piece.uint(), from_square, to_piece.uint(), to_square) {}
 
-  // Copy ctor.
+  // Copy control.
   constexpr Move(const Move& m) noexcept = default;
-
-  // Default assignment operator.
   Move& operator=(const Move& m) noexcept = default;
 
+  // --------------------------------------------------------------------------
+  // Convenience functions to initialize special types of moves, like castling,
+  // pawn promos, etc.
+  // --------------------------------------------------------------------------
+
   static constexpr Move
-  WhiteKingSideCastle() noexcept
+  wk_castle() noexcept
   {
     Move m(Piece::king(), 4, 6);
     m.castle = 1;
@@ -111,7 +119,7 @@ struct Move {
   }
 
   static constexpr Move
-  WhiteQueenSideCastle() noexcept
+  wq_castle() noexcept
   {
     Move m(Piece::king(), 4, 2);
     m.castle = 1;
@@ -119,7 +127,7 @@ struct Move {
   }
 
   static constexpr Move
-  BlackKingSideCastle() noexcept
+  bk_castle() noexcept
   {
     Move m(Piece::king(), 60, 62);
     m.castle = 1;
@@ -128,7 +136,7 @@ struct Move {
   }
 
   static constexpr Move
-  BlackQueenSideCastle() noexcept
+  bq_castle() noexcept
   {
     Move m(Piece::king(), 60, 58);
     m.castle = 1;
@@ -136,67 +144,43 @@ struct Move {
   }
 
   static Move
-  WhitePawnPromo(std::uint8_t to_square, Piece promo) noexcept
-  {
-    assert(to_square < 64);
-
-    Move m(Piece::pawn(), to_square - 8, to_square);
-    m.is_promo = 1;
-    m.promo_piece = promo.uint();
-    return m;
-  }
-
-  static Move
-  WhitePawnPromo(
-      std::uint8_t from_square,
-      Piece to_piece,
-      std::uint8_t to_square,
+  promo(
+      std::uint8_t from_sq,
+      std::uint8_t to_sq,
       Piece promo) noexcept
   {
-    assert(to_square < 64);
+    assert(from_sq < 64);
+    assert(to_sq < 64);
 
-    Move m(Piece::pawn(), from_square, to_piece, to_square);
+    Move m(Piece::pawn(), from_sq, to_sq);
     m.is_promo = 1;
     m.promo_piece = promo.uint();
     return m;
   }
 
   static Move
-  PawnPromo(
-      std::uint8_t from_square,
-      std::uint8_t to_square,
-      Piece promo) noexcept
-  {
-    assert(to_square < 64);
-
-    Move m(Piece::pawn(), from_square, to_square);
-    m.is_promo = 1;
-    m.promo_piece = promo.uint();
-    return m;
-  }
-
-  static Move
-  PawnPromo(
-      std::uint8_t from_square,
+  promo(
+      std::uint8_t from_sq,
       std::uint8_t to_piece,
-      std::uint8_t to_square,
+      std::uint8_t to_sq,
       Piece promo) noexcept
   {
-    assert(to_square < 64);
+    assert(from_sq < 64);
+    assert(to_sq < 64);
 
-    Move m(Piece::pawn(), from_square, to_piece, to_square);
+    Move m(Piece::pawn(), from_sq, to_piece, to_sq);
     m.is_promo = 1;
     m.promo_piece = promo.uint();
     return m;
   }
 
   static Move
-  PawnPromo(
-      std::uint8_t from_square,
+  promo(
+      std::uint8_t from_sq,
       Piece to_piece,
-      std::uint8_t to_square,
+      std::uint8_t to_sq,
       Piece promo) noexcept
-  { return PawnPromo(from_square, to_piece.uint(), to_square, promo); }
+  { return Move::promo(from_sq, to_piece.uint(), to_sq, promo); }
 
   static Move
   by_en_passant(
@@ -204,31 +188,35 @@ struct Move {
       std::uint8_t to_sq,
       std::uint8_t passant_sq) noexcept
   {
+    assert(from_sq < 64);
+    assert(to_sq < 64);
+
     Move m(Piece::pawn(), from_sq, to_sq);
     m.passant_square = passant_sq;
     m.en_passant = true;
     return m;
   }
 
+  // Cretes a printable debug string for Move in the form
+  //
+  //   {P:from_square -> to_square, ...}
+  //
+  // where P is a color agnostic piece type, and ... may contain the rook move
+  // in a castling move, a captured piece !P, and a promoted pawn piece ^P.
+  std::string
+  str() const;
+
+  // Returns true if both moves are equal.
+  bool
+  eq(Move mv) const noexcept;
 };
 
-bool
-operator==(Move left, Move right) noexcept;
-
-// Cretes a printable debug string for Move in the form
-//
-//   {P:from_square -> to_square, ...}
-//
-// where P is a color agnostic piece type, and ... may contain the rook move in
-// a castling move, a captured piece !P, and a promoted pawn piece ^P.
-std::string
-DebugStr(Move mv);
+inline bool
+operator==(Move left, Move right) noexcept
+{ return left.eq(right); }
 
 inline std::ostream&
 operator<<(std::ostream& os, Move mv)
-{
-  os << DebugStr(mv);
-  return os;
-}
+{ return os << mv.str(); }
 
 } // namespace blunder
