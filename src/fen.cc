@@ -38,27 +38,27 @@ struct NextField {
 // Simple wrappers around std utilities with correct input type.
 
 inline bool
-IsSpace(unsigned char c) noexcept
+is_space(unsigned char c) noexcept
 { return std::isspace(c); }
 
 inline bool
-IsUpper(unsigned char c) noexcept
+is_upper(unsigned char c) noexcept
 { return std::isupper(c); }
 
 inline char
-ToLower(unsigned char c) noexcept
+to_lower(unsigned char c) noexcept
 { return std::tolower(c); }
 
 // Returns a NextField where field is a string without any spaces, and chunk is
 // the remaning part of the string. If there are no more fields, returns an err
 // or for missing a field.
 std::expected<NextField, FenErr>
-GetNextField(std::string_view chunk) noexcept
+get_next_field(std::string_view chunk) noexcept
 {
-  while (not chunk.empty() and IsSpace(chunk[0]))
+  while (not chunk.empty() and is_space(chunk[0]))
     chunk.remove_prefix(1);
 
-  auto iter = rng::find_if(chunk, [](unsigned char c) { return IsSpace(c); });
+  auto iter = rng::find_if(chunk, [](unsigned char c) { return is_space(c); });
 
   if (iter == chunk.end() and chunk.empty())
     return std::unexpected(FenErr::MissingField);
@@ -75,7 +75,7 @@ GetNextField(std::string_view chunk) noexcept
 // 6, ..., which is how they appear in a FEN string. Returns an error if we are
 // unable to split 8 rows and consume all the bytes.
 std::expected<std::array<std::string_view, 8>, FenErr>
-SplitRows(std::string_view pieces) noexcept
+split_rows(std::string_view pieces) noexcept
 {
   std::array<std::string_view, 8> rows;
   unsigned num_rows = 0;
@@ -118,7 +118,7 @@ SplitRows(std::string_view pieces) noexcept
 // - no more than 10 knights
 // - no more than 9 queens
 bool
-AreLogical(const PieceSet pieces) noexcept
+is_logical(const PieceSet pieces) noexcept
 {
   return pieces.king().count() == 1
      and pieces.queen().count() <= 9
@@ -130,9 +130,9 @@ AreLogical(const PieceSet pieces) noexcept
 }
 
 std::expected<std::pair<PieceSet, PieceSet>, FenErr>
-ParsePieces(std::string_view field) noexcept
+parse_pieces(std::string_view field) noexcept
 {
-  auto rows = SplitRows(field);
+  auto rows = split_rows(field);
   if (not rows)
     return std::unexpected(rows.error());
 
@@ -151,7 +151,7 @@ ParsePieces(std::string_view field) noexcept
 
       Piece piece;
 
-      switch (ToLower(letter)) {
+      switch (to_lower(letter)) {
         case 'k':
            piece = Type::King;
            break;
@@ -174,7 +174,7 @@ ParsePieces(std::string_view field) noexcept
            return std::unexpected(FenErr::UnknownPiece);
       }
 
-      if (IsUpper(letter))
+      if (is_upper(letter))
         white.set_bit(piece, square);
       else
         black.set_bit(piece, square);
@@ -186,17 +186,17 @@ ParsePieces(std::string_view field) noexcept
   if (square != 64)
     return std::unexpected(FenErr::Not64Squares);
 
-  if (not AreLogical(white))
+  if (not is_logical(white))
     return std::unexpected(FenErr::WhiteNotLogical);
 
-  if (not AreLogical(black))
+  if (not is_logical(black))
     return std::unexpected(FenErr::BlackNotLogical);
 
   return std::make_pair(white, black);
 }
 
 std::expected<Color, FenErr>
-ParseColor(std::string_view field) noexcept
+parse_color(std::string_view field) noexcept
 {
   if (field.size() != 1)
     return std::unexpected(FenErr::InvalidColor);
@@ -212,7 +212,7 @@ ParseColor(std::string_view field) noexcept
 }
 
 std::expected<Castling, FenErr>
-ParseCastling(std::string_view field) noexcept
+parse_castling(std::string_view field) noexcept
 {
   if (field.size() < 1 or field.size() > 4)
     return std::unexpected(FenErr::InvalidCastling);
@@ -245,7 +245,7 @@ ParseCastling(std::string_view field) noexcept
 }
 
 std::expected<std::optional<unsigned>, FenErr>
-ParseEnPassant(std::string_view field) noexcept
+parse_enpassant(std::string_view field) noexcept
 {
   switch (field.size()) {
     case 1:
@@ -253,7 +253,7 @@ ParseEnPassant(std::string_view field) noexcept
         return std::nullopt;
       break;
     case 2: {
-      auto letter = ToLower(field[0]);
+      auto letter = to_lower(field[0]);
       if (letter < 'a' or letter > 'h')
         break;
 
@@ -272,7 +272,7 @@ ParseEnPassant(std::string_view field) noexcept
 }
 
 std::expected<unsigned, FenErr>
-ParseNumber(std::string_view field) noexcept
+parse_num(std::string_view field) noexcept
 {
   if (field.empty())
     return std::unexpected(FenErr::InvalidNum);
@@ -296,7 +296,7 @@ enum class FieldType {
 };
 
 std::unexpected<FenErr>
-MissingField(FieldType field_type) noexcept
+missing_field(FieldType field_type) noexcept
 {
   switch (field_type) {
     case FieldType::Pieces:
@@ -320,7 +320,7 @@ MissingField(FieldType field_type) noexcept
 } // namespace
 
 std::expected<BoardState, FenErr>
-ReadFen(std::string_view fen) noexcept
+read_fen(std::string_view fen) noexcept
 {
   FieldType fields[] = {
     FieldType::Pieces,
@@ -340,37 +340,37 @@ ReadFen(std::string_view fen) noexcept
   unsigned full_move = 0;
 
   for (auto field_type : fields) {
-    auto next_field = GetNextField(fen);
+    auto next_field = get_next_field(fen);
 
     if (not next_field)
-      return MissingField(field_type);
+      return missing_field(field_type);
 
     auto [field, chunk] = *next_field;
 
     switch (field_type) {
       case FieldType::Pieces: {
-        auto pieces = ParsePieces(field);
+        auto pieces = parse_pieces(field);
         if (not pieces)
           return std::unexpected(pieces.error());
         std::tie(white, black) = *pieces;
         break;
       }
       case FieldType::Color: {
-        auto color_val = ParseColor(field);
+        auto color_val = parse_color(field);
         if (not color_val)
           return std::unexpected(color_val.error());
         color = *color_val;
         break;
       }
       case FieldType::Castling: {
-        auto castling_val = ParseCastling(field);
+        auto castling_val = parse_castling(field);
         if (not castling_val)
           return std::unexpected(castling_val.error());
         castling = *castling_val;
         break;
       }
       case FieldType::EnPassant: {
-        auto en_passant_val = ParseEnPassant(field);
+        auto en_passant_val = parse_enpassant(field);
         if (not en_passant_val)
           return std::unexpected(en_passant_val.error());
         if (en_passant_val->has_value())
@@ -378,7 +378,7 @@ ReadFen(std::string_view fen) noexcept
         break;
       }
       case FieldType::HalfMove: {
-        auto num = ParseNumber(field);
+        auto num = parse_num(field);
         if (not num)
           return std::unexpected(FenErr::InvalidHalfMove);
         if (*num > 100)
@@ -387,7 +387,7 @@ ReadFen(std::string_view fen) noexcept
         break;
       }
       case FieldType::FullMove: {
-        auto num = ParseNumber(field);
+        auto num = parse_num(field);
         if (not num)
           return std::unexpected(FenErr::InvalidFullMove);
         full_move = *num;
@@ -429,7 +429,7 @@ ReadFen(std::string_view fen) noexcept
 }
 
 std::string_view
-StrView(FenErr err) noexcept
+str_view(FenErr err) noexcept
 {
   switch (err) {
     case FenErr::NoPieces:

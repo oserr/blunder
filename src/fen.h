@@ -37,16 +37,13 @@ enum class FenErr {
 // Returns the BoardState representing the chess position in the |fen| string,
 // or an error code if unable to parse the position.
 std::expected<BoardState, FenErr>
-ReadFen(std::string_view fen) noexcept;
+read_fen(std::string_view fen) noexcept;
 
 std::string_view
-StrView(FenErr err) noexcept;
+str_view(FenErr err) noexcept;
 
 inline std::ostream&
 operator<<(std::ostream& os, FenErr err)
-{
-  os << StrView(err);
-  return os;
-}
+{ return os << str_view(err); }
 
 } // namespace blunder
