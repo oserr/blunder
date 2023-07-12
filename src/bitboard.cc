@@ -35,7 +35,7 @@ BitBoard::fancy_str() const
 }
 
 BitBoard
-GetRookAttacks(std::uint32_t sq, BitBoard blocking) noexcept
+get_rattacks(std::uint32_t sq, BitBoard blocking) noexcept
 {
   assert(sq < 64);
 
@@ -75,7 +75,7 @@ GetRookAttacks(std::uint32_t sq, BitBoard blocking) noexcept
 }
 
 BitBoard
-GetBishopAttacks(std::uint32_t sq, BitBoard blocking) noexcept
+get_battacks(std::uint32_t sq, BitBoard blocking) noexcept
 {
   assert(sq < 64);
 

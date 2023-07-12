@@ -117,11 +117,11 @@ main(int argc, char** argv)
 
   if (print_bmask) {
     std::cout << "Bishop mask for magic numbers...\n";
-    std::cout << GetBishopMask(square).fancy_str() << std::endl;
+    std::cout << get_bmask(square).fancy_str() << std::endl;
   }
   if (print_rmask) {
     std::cout << "Rook mask for magic numbers...\n";
-    std::cout << GetRookMask(square).fancy_str() << std::endl;
+    std::cout << get_rmask(square).fancy_str() << std::endl;
   }
 
   return EXIT_SUCCESS;

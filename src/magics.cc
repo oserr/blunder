@@ -115,7 +115,7 @@ find_all_magics(
 }
 
 std::function<std::uint64_t()>
-CreateRandFn() noexcept
+create_rand_fn() noexcept
 {
   std::random_device rand_dev;
   std::mt19937_64 rand_gen{rand_dev()};
@@ -151,8 +151,8 @@ MagicAttacks::get_attacks(std::uint8_t square, BitBoard blockers) const noexcept
 std::expected<MagicAttacks, Err>
 compute_bmagics()
 {
-  auto magic_fn = CreateRandFn();
-  auto magics = find_all_magics(GetBishopMask, GetBishopAttacks, magic_fn);
+  auto magic_fn = create_rand_fn();
+  auto magics = find_all_magics(get_bmask, get_battacks, magic_fn);
   if (not magics)
     return std::unexpected(magics.error());
   return MagicAttacks(std::move(*magics));
@@ -161,8 +161,8 @@ compute_bmagics()
 std::expected<MagicAttacks, Err>
 compute_rmagics()
 {
-  auto magic_fn = CreateRandFn();
-  auto magics = find_all_magics(GetRookMask, GetRookAttacks, magic_fn);
+  auto magic_fn = create_rand_fn();
+  auto magics = find_all_magics(get_rmask, get_rattacks, magic_fn);
   if (not magics)
     return std::unexpected(magics.error());
   return MagicAttacks(std::move(*magics));
@@ -173,8 +173,7 @@ from_bmagics(std::span<const std::uint64_t> magics)
 {
   assert(magics.size() == 64);
   auto magic_fn = [sq=0, magics=magics] mutable { return magics[sq++]; };
-  auto all_magics = find_all_magics(
-      GetBishopMask, GetBishopAttacks, magic_fn, 1);
+  auto all_magics = find_all_magics(get_bmask, get_battacks, magic_fn, 1);
   if (not all_magics)
     return std::unexpected(all_magics.error());
   return MagicAttacks(std::move(*all_magics));
@@ -184,7 +183,7 @@ std::expected<MagicAttacks, Err>
 from_rmagics(std::span<const std::uint64_t> magics)
 {
   auto magic_fn = [sq=0, magics=magics] mutable { return magics[sq++]; };
-  auto all_magics = find_all_magics(GetRookMask, GetRookAttacks, magic_fn, 1);
+  auto all_magics = find_all_magics(get_rmask, get_rattacks, magic_fn, 1);
   if (not all_magics)
     return std::unexpected(all_magics.error());
   return MagicAttacks(std::move(*all_magics));

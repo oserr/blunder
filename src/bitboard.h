@@ -629,23 +629,23 @@ inline const std::array<BitBoard, 64> kRookMask= {
 };
 
 inline BitBoard
-GetRookMask(std::uint32_t sq) noexcept
+get_rmask(std::uint32_t sq) noexcept
 {
   assert(sq < 64);
   return kRookMask[sq];
 }
 
 inline BitBoard
-GetBishopMask(std::uint32_t sq) noexcept
+get_bmask(std::uint32_t sq) noexcept
 {
   assert(sq < 64);
   return kDiagMask[sq] & ~kOuterSquares & ~(1ull << sq);
 }
 
 BitBoard
-GetRookAttacks(std::uint32_t sq, BitBoard blocking) noexcept;
+get_rattacks(std::uint32_t sq, BitBoard blocking) noexcept;
 
 BitBoard
-GetBishopAttacks(std::uint32_t sq, BitBoard blocking) noexcept;
+get_battacks(std::uint32_t sq, BitBoard blocking) noexcept;
 
 } // blunder
