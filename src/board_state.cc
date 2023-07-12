@@ -32,9 +32,9 @@ FillAsciiBoard(
 
   for (auto type : piece_type) {
     auto bb = pieces.get(type);
-    auto squares = ToSetOfSq(bb);
+    auto squares = to_set_of_sq(bb);
     for (auto sq : squares) {
-      auto index = ToUint(sq);
+      auto index = to_int(sq);
       board[index] = letter(type, color);
     }
   }

@@ -36,8 +36,8 @@ TEST_F(BishopMagicsTest, Contains64Magics)
 
 TEST_F(BishopMagicsTest, FromE4)
 {
-  auto square = ToUint(Sq::e4);
-  auto blockers = ToBitBoard({Sq::d3, Sq::d5, Sq::f5, Sq::f3});
+  auto square = to_int(Sq::e4);
+  auto blockers = to_bitboard({Sq::d3, Sq::d5, Sq::f5, Sq::f3});
   EXPECT_THAT(
       bmagics->get_attacks(square, blockers),
       EqualToSq(SqList{Sq::d3, Sq::f3, Sq::d5, Sq::f5}));
@@ -45,8 +45,8 @@ TEST_F(BishopMagicsTest, FromE4)
 
 TEST_F(BishopMagicsTest, FromB1)
 {
-  auto square = ToUint(Sq::b1);
-  auto blockers = ToBitBoard({Sq::e4, Sq::f5});
+  auto square = to_int(Sq::b1);
+  auto blockers = to_bitboard({Sq::e4, Sq::f5});
   EXPECT_THAT(
       bmagics->get_attacks(square, blockers),
       EqualToSq(SqList{Sq::c2, Sq::d3, Sq::e4}));
@@ -54,8 +54,8 @@ TEST_F(BishopMagicsTest, FromB1)
 
 TEST_F(BishopMagicsTest, FromC4)
 {
-  auto square = ToUint(Sq::c4);
-  auto blockers = ToBitBoard({Sq::b3, Sq::e6, Sq::f7, Sq::g8});
+  auto square = to_int(Sq::c4);
+  auto blockers = to_bitboard({Sq::b3, Sq::e6, Sq::f7, Sq::g8});
   EXPECT_THAT(
       bmagics->get_attacks(square, blockers),
       EqualToSq(SqList{Sq::b3, Sq::d3, Sq::e2, Sq::b5, Sq::d5, Sq::e6}));
@@ -81,8 +81,8 @@ TEST_F(RookMagicsTest, Contains64Magics)
 
 TEST_F(RookMagicsTest, FromE4)
 {
-  auto square = ToUint(Sq::e4);
-  auto blockers = ToBitBoard({Sq::e3, Sq::d4, Sq::f4, Sq::e5});
+  auto square = to_int(Sq::e4);
+  auto blockers = to_bitboard({Sq::e3, Sq::d4, Sq::f4, Sq::e5});
   EXPECT_THAT(
       rmagics->get_attacks(square, blockers),
       EqualToSq(SqList{Sq::e3, Sq::d4, Sq::f4, Sq::e5}));
@@ -90,8 +90,8 @@ TEST_F(RookMagicsTest, FromE4)
 
 TEST_F(RookMagicsTest, FromA1)
 {
-  auto square = ToUint(Sq::a1);
-  auto blockers = ToBitBoard({Sq::a4, Sq::e3, Sq::f4, Sq::e1});
+  auto square = to_int(Sq::a1);
+  auto blockers = to_bitboard({Sq::a4, Sq::e3, Sq::f4, Sq::e1});
   EXPECT_THAT(
       rmagics->get_attacks(square, blockers),
       EqualToSq(SqList{
@@ -100,8 +100,8 @@ TEST_F(RookMagicsTest, FromA1)
 
 TEST_F(RookMagicsTest, FromF5)
 {
-  auto square = ToUint(Sq::f5);
-  auto blockers = ToBitBoard({Sq::f2, Sq::f3, Sq::d5});
+  auto square = to_int(Sq::f5);
+  auto blockers = to_bitboard({Sq::f2, Sq::f3, Sq::d5});
   EXPECT_THAT(
       rmagics->get_attacks(square, blockers),
       EqualToSq(SqList{

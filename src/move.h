@@ -70,7 +70,7 @@ struct Move {
       Piece from_piece,
       Sq from_square,
       Sq to_square) noexcept
-    : Move(from_piece.uint(), ToUint(from_square), ToUint(to_square)) {}
+    : Move(from_piece.uint(), to_int(from_square), to_int(to_square)) {}
 
   // ------------------------------------------------------------------------
   // Next most common scenario, we move a piece with capture, with overloads.

@@ -28,9 +28,9 @@ Move::str() const
   buff += '{';
   buff += Piece::from_int(from_piece).letter();
   buff += ':';
-  buff += ToStr(ToSq(from_square));
+  buff += to_sq_str(from_square);
   buff += "->";
-  buff += ToStr(ToSq(to_square));
+  buff += to_sq_str(to_square);
 
   if (castle) {
     std::uint8_t from_sq = from_square;
@@ -46,9 +46,9 @@ Move::str() const
     buff += ", ";
     buff += letter(Type::Rook);
     buff += ':';
-    buff += ToStr(ToSq(from_sq));
+    buff += to_sq_str(from_sq);
     buff += "->";
-    buff += ToStr(ToSq(to_sq));
+    buff += to_sq_str(to_sq);
   }
 
   if (auto piece = Piece::from_int(to_piece); piece != Type::None) {

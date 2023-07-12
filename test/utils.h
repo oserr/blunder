@@ -6,13 +6,13 @@
 namespace blunder {
 
 MATCHER_P(EqualToSq, squares, "has the following squares set: "
-    + ToListStr(squares))
+    + to_list_str(squares))
 {
-  auto bb = ToBitBoard(squares);
+  auto bb = to_bitboard(squares);
   if (bb == arg) return true;
 
-  auto sq_set = ToSetOfSq(arg);
-  *result_listener << ToListStr(sq_set);
+  auto sq_set = to_set_of_sq(arg);
+  *result_listener << to_list_str(sq_set);
 
   return false;
 }

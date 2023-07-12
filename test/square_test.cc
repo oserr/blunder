@@ -30,45 +30,45 @@ constexpr std::array<std::string_view, 64> kSquareStr = {
   "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8"
 };
 
-TEST(ToUint, ConvertsSquareToUnsigned)
+TEST(ToInt, ConvertsSquareToUnsigned)
 {
   for (unsigned i = 0; i < kSquares.size(); ++i) {
-    EXPECT_EQ(ToUint(kSquares[i]), i);
+    EXPECT_EQ(to_int(kSquares[i]), i);
   }
 }
 
 TEST(ToSq, ConvertsUnsignedToSquare)
 {
   for (unsigned i = 0; i < kSquares.size(); ++i) {
-    EXPECT_EQ(ToSq(i), kSquares[i]);
+    EXPECT_EQ(to_sq(i), kSquares[i]);
   }
 }
 
 TEST(ToBitBoard, ConvertsSquareToBitboard)
 {
   for (unsigned i = 0; i < kSquares.size(); ++i) {
-    EXPECT_EQ(ToBitBoard(kSquares[i]), BitBoard::from_index(i));
+    EXPECT_EQ(to_bitboard(kSquares[i]), BitBoard::from_index(i));
   }
 }
 
-TEST(ToStr, ConvertsSquareToString)
+TEST(Str, ConvertsSquareToString)
 {
   for (unsigned i = 0; i < kSquares.size(); ++i) {
-    EXPECT_EQ(ToStr(kSquares[i]), kSquareStr[i]);
+    EXPECT_EQ(str(kSquares[i]), kSquareStr[i]);
   }
 }
 
 TEST(ToSqStr, ConvertsUnsignedToSquareString)
 {
   for (unsigned i = 0; i < kSquares.size(); ++i) {
-    EXPECT_EQ(ToSqStr(i), kSquareStr[i]);
+    EXPECT_EQ(to_sq_str(i), kSquareStr[i]);
   }
 }
 
 TEST(ToSetOfSq, ConvertsBitBoardToSquares)
 {
   auto squares = std::set<Sq>{Sq::c1, Sq::f1, Sq::h1};
-  EXPECT_EQ(ToSetOfSq(BitBoard(0b10100100)), squares);
+  EXPECT_EQ(to_set_of_sq(BitBoard(0b10100100)), squares);
 }
 
 TEST(ToBitBoard, ConvertsSquaresToBitBoard)
@@ -79,5 +79,5 @@ TEST(ToBitBoard, ConvertsSquaresToBitBoard)
       .set_bit(8)
       .set_bit(23)
       .set_bit(63);
-  EXPECT_EQ(ToBitBoard({Sq::a1, Sq::a2, Sq::h3, Sq::h8}), bb);
+  EXPECT_EQ(to_bitboard({Sq::a1, Sq::a2, Sq::h3, Sq::h8}), bb);
 }

@@ -6,7 +6,7 @@
 namespace blunder {
 
 std::string
-ToSqStr(unsigned val)
+to_sq_str(unsigned val)
 {
   assert(val < 64);
   auto row = val / 8;
@@ -21,25 +21,25 @@ ToSqStr(unsigned val)
 }
 
 std::set<Sq>
-ToSetOfSq(BitBoard bb)
+to_set_of_sq(BitBoard bb)
 {
   std::set<Sq> squares;
   while (bb)
-    squares.insert(ToSq(bb.first_bit_and_clear()));
+    squares.insert(to_sq(bb.first_bit_and_clear()));
   return squares;
 }
 
 BitBoard
-ToBitBoard(SqList squares) noexcept
+to_bitboard(SqList squares) noexcept
 {
   BitBoard bb;
   for (auto sq : squares)
-    bb |= ToBitBoard(sq);
+    bb |= to_bitboard(sq);
   return bb;
 }
 
 std::string
-ToListStr(const std::set<Sq>& squares)
+to_list_str(const std::set<Sq>& squares)
 {
   std::string out;
   out.reserve(squares.size() * 6);
@@ -50,10 +50,10 @@ ToListStr(const std::set<Sq>& squares)
   auto last = squares.end();
 
   if (first != last)
-    out += ToStr(*first++);
+    out += str(*first++);
 
   while (first != last)
-    out += ", " + ToStr(*first++);
+    out += ", " + str(*first++);
 
   out += ']';
 
@@ -61,10 +61,10 @@ ToListStr(const std::set<Sq>& squares)
 }
 
 std::string
-ToListStr(SqList squares)
+to_list_str(SqList squares)
 {
   std::set<Sq> sqs{squares.begin(), squares.end()};
-  return ToListStr(sqs);
+  return to_list_str(sqs);
 }
 
 } // namespace blunder

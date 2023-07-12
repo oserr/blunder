@@ -23,11 +23,11 @@ enum class Sq {
 using SqList = std::initializer_list<Sq>;
 
 inline unsigned
-ToUint(Sq sq) noexcept
+to_int(Sq sq) noexcept
 { return static_cast<unsigned>(sq); }
 
 inline Sq
-ToSq(unsigned val) noexcept
+to_sq(unsigned val) noexcept
 {
   assert(val < 64);
   return static_cast<Sq>(val);
@@ -35,26 +35,26 @@ ToSq(unsigned val) noexcept
 
 // Converts a Sq to a BitBoard.
 inline BitBoard
-ToBitBoard(Sq sq) noexcept
-{ return BitBoard::from_index(ToUint(sq)); }
+to_bitboard(Sq sq) noexcept
+{ return BitBoard::from_index(to_int(sq)); }
 
 std::string
-ToSqStr(unsigned val);
+to_sq_str(unsigned val);
 
 inline std::string
-ToStr(Sq sq)
-{ return ToSqStr(ToUint(sq)); }
+str(Sq sq)
+{ return to_sq_str(to_int(sq)); }
 
 std::set<Sq>
-ToSetOfSq(BitBoard bb);
+to_set_of_sq(BitBoard bb);
 
 BitBoard
-ToBitBoard(SqList squares) noexcept;
+to_bitboard(SqList squares) noexcept;
 
 std::string
-ToListStr(const std::set<Sq>& squares);
+to_list_str(const std::set<Sq>& squares);
 
 std::string
-ToListStr(SqList squares);
+to_list_str(SqList squares);
 
 } // namespace blunder
