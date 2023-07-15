@@ -116,7 +116,7 @@ TEST(ReadFen, InitNewGame)
   auto state = read_fen(
       "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
   ASSERT_TRUE(state);
-  EXPECT_EQ(*state, NewBoardState());
+  EXPECT_EQ(*state, BoardState::new_board());
 }
 
 TEST(ReadFen, PawnsAndKing)
@@ -129,17 +129,17 @@ TEST(ReadFen, PawnsAndKing)
   EXPECT_THAT(white.king(), EqualToSq(SqList{Sq::h3}));
   EXPECT_THAT(white.pawn(),
       EqualToSq(SqList{Sq::a3, Sq::b4, Sq::d5, Sq::e4, Sq::f3, Sq::h4}));
-  EXPECT_FALSE(state->wk_castle);
-  EXPECT_FALSE(state->wq_castle);
+  EXPECT_FALSE(state->has_wk_castling());
+  EXPECT_FALSE(state->has_wq_castling());
 
   auto black = state->black();
   EXPECT_EQ(black.full_set().count(), black.pawn().count() + 1);
   EXPECT_THAT(black.king(), EqualToSq(SqList{Sq::f7}));
   EXPECT_THAT(black.pawn(),
       EqualToSq(SqList{Sq::a4, Sq::b5, Sq::d6, Sq::e5, Sq::f4, Sq::h5}));
-  EXPECT_FALSE(state->bk_castle);
-  EXPECT_FALSE(state->bq_castle);
+  EXPECT_FALSE(state->has_bk_castling());
+  EXPECT_FALSE(state->has_bq_castling());
 
-  EXPECT_EQ(state->half_move, 99);
-  EXPECT_EQ(state->full_move, 50);
+  EXPECT_EQ(state->hm_count(), 99);
+  EXPECT_EQ(state->fm_count(), 50);
 }

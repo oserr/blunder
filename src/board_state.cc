@@ -42,24 +42,13 @@ fill_ascii_board(
 
 } // namespace
 
-BitBoard
-AllMask(const PieceSet& pieces) noexcept
-{
-  BitBoard mask;
-  for (auto piece : pieces)
-    mask |= piece;
-  return mask;
-}
-
 BoardState
-NewBoardState() noexcept
+BoardState::new_board() noexcept
 {
   BoardState state;
 
-  state.mine = PieceSet::init_white();
-  state.all_mine = state.mine.full_set();
-  state.other = PieceSet::init_black();
-  state.all_other = state.other.full_set();
+  state.bb_mine = PieceSet::init_white();
+  state.bb_other = PieceSet::init_black();
 
   state.half_move = 0;
   state.full_move = 1;
@@ -80,10 +69,8 @@ NewBoardState() noexcept
 bool
 BoardState::eq(const BoardState& bs) const noexcept
 {
-  return mine == bs.mine
-     and other == bs.other
-     and all_mine == bs.all_mine
-     and all_other == bs.all_other
+  return bb_mine == bs.bb_mine
+     and bb_other == bs.bb_other
      and half_move == bs.half_move
      and full_move == bs.full_move
      and en_passant == bs.en_passant

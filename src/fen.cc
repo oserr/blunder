@@ -109,26 +109,6 @@ split_rows(std::string_view pieces) noexcept
   return rows;
 }
 
-// Checks the following:
-// - only 1 king
-// - no more than 16 total pieces
-// - no more than 8 pawns
-// - no more than 10 rooks
-// - no more than 10 bishops
-// - no more than 10 knights
-// - no more than 9 queens
-bool
-is_logical(const PieceSet pieces) noexcept
-{
-  return pieces.king().count() == 1
-     and pieces.queen().count() <= 9
-     and pieces.rook().count() <= 10
-     and pieces.bishop().count() <= 10
-     and pieces.knight().count() <= 10
-     and pieces.pawn().count() <= 10
-     and pieces.full_set().count() <= 16;
-}
-
 std::expected<std::pair<PieceSet, PieceSet>, FenErr>
 parse_pieces(std::string_view field) noexcept
 {
@@ -186,10 +166,10 @@ parse_pieces(std::string_view field) noexcept
   if (square != 64)
     return std::unexpected(FenErr::Not64Squares);
 
-  if (not is_logical(white))
+  if (not white.is_valid())
     return std::unexpected(FenErr::WhiteNotLogical);
 
-  if (not is_logical(black))
+  if (not black.is_valid())
     return std::unexpected(FenErr::BlackNotLogical);
 
   return std::make_pair(white, black);
@@ -373,7 +353,7 @@ read_fen(std::string_view fen) noexcept
         auto en_passant_val = parse_enpassant(field);
         if (not en_passant_val)
           return std::unexpected(en_passant_val.error());
-        if (en_passant_val->has_value())
+        if (*en_passant_val)
           en_passant = **en_passant_val;
         break;
       }
@@ -399,33 +379,24 @@ read_fen(std::string_view fen) noexcept
     fen = chunk;
   }
 
-  BoardState state;
+  BoardStateBuilder builder;
+  if (en_passant)
+    builder.set_enpassant_file(*en_passant % 8);
 
-  if (color == Color::White) {
-    state.mine = white;
-    state.other = black;
-  } else {
-    state.mine = black;
-    state.other = white;
-  }
+  auto state = builder
+         .set_pieces(color, white, black)
+         .set_wk_castling(castling.wking)
+         .set_wq_castling(castling.wqueen)
+         .set_bk_castling(castling.bking)
+         .set_bq_castling(castling.bqueen)
+         .set_half_move(half_move)
+         .set_full_move(full_move)
+         .build();
 
-  state.next = color;
-  state.wk_castle = castling.wking;
-  state.wq_castle = castling.wqueen;
-  state.bk_castle = castling.bking;
-  state.bq_castle = castling.bqueen;
-  state.half_move = half_move;
-  state.full_move = full_move;
+  if (not state)
+    return std::unexpected(FenErr::Internal);
 
-  if (en_passant) {
-    state.en_passant = 1;
-    state.en_passant_file = *en_passant % 8;
-  }
-
-  state.SetAllMine();
-  state.SetAllOther();
-
-  return state;
+  return *state;
 }
 
 std::string_view

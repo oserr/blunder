@@ -3,10 +3,10 @@
 #include <cassert>
 #include <cstdint>
 #include <functional>
+#include <iostream>
 #include <vector>
 
 #include "bitboard.h"
-#include "board_side.h"
 #include "board_state.h"
 #include "color.h"
 #include "move.h"
@@ -15,31 +15,6 @@
 
 namespace blunder {
 namespace {
-
-// TODO: make this a function of BoardState.
-template<Color color, BoardSide side>
-constexpr bool
-can_castle(BitBoard all_pieces) noexcept
-{
-  BitBoard bits;
-  BitBoard mask;
-
-  if constexpr (side == BoardSide::King) {
-    bits.set_bits(0b00001001ull);
-    mask.set_bits(0b00001111ull);
-  } else {
-    bits.set_bits(0b10001000ull);
-    mask.set_bits(0b11111000ull);
-  }
-
-  if constexpr (color == Color::Black)
-    all_pieces >>= 56;
-
-  all_pieces &= 0xffull;
-  all_pieces &= mask;
-
-  return bits == all_pieces;
-}
 
 // Returns all the non-attack moves for |piece| from square |from_square| to all
 // squares in |to_squares|. The moves are returned in |moves|, an output
@@ -63,7 +38,7 @@ get_simple_attacks(
     Piece piece,
     std::uint8_t from_square,
     BitBoard to_squares,
-    const PieceSet other,
+    const PieceSet& other,
     std::vector<Move>& moves)
 {
   while (to_squares) {
@@ -85,9 +60,8 @@ get_simple_moves(
     const std::function<BitBoard(BitBoard)>& moves_fn,
     std::vector<Move>& moves)
 {
-  auto bb = state.mine.get(piece);
-  auto all_pieces = state.all_mine | state.all_other;
-  auto no_pieces = ~all_pieces;
+  auto bb = state.mine().get(piece);
+  auto no_pieces = state.none();
 
   while (bb) {
     auto [from_square, bb_piece] = bb.index_bb_and_clear();
@@ -98,8 +72,8 @@ get_simple_moves(
     get_non_attacks(piece, from_square, to_squares, moves);
 
     // Compute attacks.
-    to_squares = bb_moves & state.all_other;
-    get_simple_attacks(piece, from_square, to_squares, state.other, moves);
+    to_squares = bb_moves & state.all_other();
+    get_simple_attacks(piece, from_square, to_squares, state.other(), moves);
   }
 }
 
@@ -215,11 +189,11 @@ attack(
     IsPromoFn is_promo_fn,
     std::vector<Move>& moves)
 {
-  auto pawn_moves = move_fn(pawns, state.all_other);
+  auto pawn_moves = move_fn(pawns, state.all_other());
 
   while (pawn_moves) {
     auto [to_square, to_bb] = pawn_moves.index_bb_and_clear();
-    auto to_piece = state.other.find_type(to_bb);
+    auto to_piece = state.other().find_type(to_bb);
     assert(to_piece.type() != Type::None);
     auto from_square = from_fn(to_square);
 
@@ -245,13 +219,13 @@ move_en_passant(
     const BoardState& state,
     std::vector<Move>& moves)
 {
-  if (not state.en_passant)
+  if (not state.has_enpassant())
     return;
 
   // Fake square
-  auto pawns = state.mine.pawn();
-  unsigned to_sq = state.en_passant_file;
-  unsigned passant_sq = state.en_passant_file;
+  auto pawns = state.mine().pawn();
+  unsigned to_sq = state.enpassant_file();
+  unsigned passant_sq = to_sq;
 
   if (state.is_white_next()) {
     to_sq += 40; // 6th row
@@ -361,25 +335,16 @@ MoveGen::for_king(
 {
   get_simple_moves(Piece::king(), state, move_king, moves);
 
-  auto all_pieces = state.all_mine | state.all_other;
-
-  switch (state.next) {
-  case Color::White:
-    if (state.wk_castle and
-        can_castle<Color::White, BoardSide::King>(all_pieces))
+  if (state.is_white_next()) {
+    if (state.wk_can_castle())
       moves.push_back(Move::wk_castle());
-    if (state.wq_castle and
-        can_castle<Color::White, BoardSide::Queen>(all_pieces))
+    if (state.wq_can_castle())
       moves.push_back(Move::wq_castle());
-    break;
-  case Color::Black:
-    if (state.bk_castle and
-        can_castle<Color::Black, BoardSide::King>(all_pieces))
+  } else {
+    if (state.bk_can_castle())
       moves.push_back(Move::bk_castle());
-    if (state.bq_castle and
-        can_castle<Color::Black, BoardSide::Queen>(all_pieces))
+    if (state.bq_can_castle())
       moves.push_back(Move::wq_castle());
-    break;
   }
 }
 
@@ -388,7 +353,7 @@ MoveGen::for_queen(
     const BoardState& state,
     std::vector<Move>& moves) const
 {
-  auto all_pieces = state.all_mine | state.all_other;
+  auto all_pieces = state.all_bits();
   auto moves_fn = [&](BitBoard bb) {
     auto from_square = bb.first_bit();
     return rmagics_.get_attacks(from_square, all_pieces)
@@ -402,7 +367,7 @@ MoveGen::for_rook(
     const BoardState& state,
     std::vector<Move>& moves) const
 {
-  auto all_pieces = state.all_mine | state.all_other;
+  auto all_pieces = state.all_bits();
   auto moves_fn = [&](BitBoard bb) {
     auto from_square = bb.first_bit();
     return rmagics_.get_attacks(from_square, all_pieces);
@@ -415,7 +380,7 @@ MoveGen::for_bishop(
     const BoardState& state,
     std::vector<Move>& moves) const
 {
-  auto all_pieces = state.all_mine | state.all_other;
+  auto all_pieces = state.all_bits();
   auto moves_fn = [&](BitBoard bb) {
     auto from_square = bb.first_bit();
     return bmagics_.get_attacks(from_square, all_pieces);
@@ -436,7 +401,7 @@ MoveGen::for_pawn(
     const BoardState& state,
     std::vector<Move>& moves) const
 {
-  BitBoard pawns = state.mine.pawn();
+  BitBoard pawns = state.mine().pawn();
 
   if (not pawns) return;
 
@@ -450,8 +415,7 @@ MoveGen::for_pawn(
   FromFn from_right_fn;
   IsPromoFn is_promo_fn;
 
-  switch (state.next) {
-  case Color::White:
+  if (state.is_white_next()) {
     single_fn = move_wp_single;
     double_fn = move_wp_double;
     attack_left_fn = move_wp_left;
@@ -461,8 +425,7 @@ MoveGen::for_pawn(
     from_left_fn = from_left_white;
     from_right_fn = from_right_white;
     is_promo_fn = is_white_promo;
-    break;
-  default:
+  } else {
     single_fn = move_bp_single;
     double_fn = move_bp_double;
     attack_left_fn = move_bp_left;
@@ -472,10 +435,9 @@ MoveGen::for_pawn(
     from_left_fn = from_left_black;
     from_right_fn = from_right_black;
     is_promo_fn = is_black_promo;
-    break;
   }
 
-  auto no_pieces = ~(state.all_mine | state.all_other);
+  auto no_pieces = ~state.all_bits();
 
   // TODO: handle en passant moves
   move_forward(pawns, no_pieces, single_fn, from_single_fn, is_promo_fn, moves);

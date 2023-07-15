@@ -57,11 +57,11 @@ public:
   //----------
   // Setters
   //----------
-  
+
   PieceSet&
   set_bit(Type type, unsigned index) noexcept
-  { 
-    get_mut(type).set_bit(index); 
+  {
+    get_mut(type).set_bit(index);
     all_bits.set_bit(index);
     return *this;
   }
@@ -108,6 +108,12 @@ public:
   // new game.
   static PieceSet
   init_black() noexcept;
+
+  // Returns true if the piece set is valid, false otherwise. For exampe, the
+  // set should have exactly one king, no more than 8 pawns, no more than 16
+  // total pieces, etc.
+  bool
+  is_valid() const noexcept;
 
 private:
 

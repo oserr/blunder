@@ -47,4 +47,16 @@ PieceSet::init_black() noexcept
   return pieces;
 }
 
+bool
+PieceSet::is_valid() const noexcept
+{
+  return king().count() == 1
+     and queen().count() <= 9
+     and rook().count() <= 10
+     and bishop().count() <= 10
+     and knight().count() <= 10
+     and pawn().count() <= 10
+     and full_set().count() <= 16;
+}
+
 } // namespace blunder
