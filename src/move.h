@@ -23,7 +23,7 @@ struct Move {
   // If the move does not represent an attack, then |to_piece| should be set to
   // None.
   std::uint8_t from_piece: 3 = 0;
-  std::uint8_t to_piece: 3 = uint(Type::None);
+  std::uint8_t to_piece: 3 = to_int(Type::None);
 
   // The source and destination squares.
   std::uint8_t from_square: 6 = 0;
@@ -41,7 +41,7 @@ struct Move {
   // If it is, promo_piece will be set to promoted piece.
   std::uint8_t en_passant: 1 = 0;
   std::uint8_t is_promo: 1 = 0;
-  std::uint8_t promo_piece: 3 = uint(Type::None);
+  std::uint8_t promo_piece: 3 = to_int(Type::None);
 
   // Initializes all fields.
   Move() = default;
