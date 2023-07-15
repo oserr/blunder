@@ -115,50 +115,69 @@ get_simple_moves(
   return moves;
 }
 
+//----------------------------------------
+// Helper functions to compute pawn moves.
+//----------------------------------------
+
 using PawnMovesFn = BitBoard(*)(BitBoard, BitBoard);
 using FromFn = std::uint8_t(*)(std::uint8_t);
 using IsPromoFn = bool(*)(std::uint8_t);
 
+// Used to check if the move represents a promotion for white.
 bool
 is_white_promo(std::uint8_t to_square) noexcept
 { return to_square >= 56; }
 
+// Used to check if the move represents a promotion for black.
 bool
 is_black_promo(std::uint8_t to_square) noexcept
 { return to_square <= 7; }
 
+// Computes the from square for a one-square white pawn move given the
+// destination square.
 std::uint8_t
 from_single_white(std::uint8_t to_square) noexcept
 { return to_square - 8; }
 
+// Computes the from square for a double-square white pawn move given the
+// destination square.
 std::uint8_t
 from_double_white(std::uint8_t to_square) noexcept
 { return to_square - 16; }
 
+// Computes the from square for a white pawn attack diagonal left.
 std::uint8_t
 from_left_white(std::uint8_t to_square) noexcept
 { return to_square - 7; }
 
+// Computes the from square for a white pawn attack diagonal right.
 std::uint8_t
 from_right_white(std::uint8_t to_square) noexcept
 { return to_square - 9; }
 
+// Computes the from square for a one-square black pawn move given the
+// destination square.
 std::uint8_t
 from_single_black(std::uint8_t to_square) noexcept
 { return to_square + 8; }
 
+// Computes the from square for a double-square black pawn move given the
+// destination square.
 std::uint8_t
 from_double_black(std::uint8_t to_square) noexcept
 { return to_square + 16; }
 
+// Computes the from square for a black pawn attack diagonal left.
 std::uint8_t
 from_left_black(std::uint8_t to_square) noexcept
 { return to_square + 7; }
 
+// Computes the from square for a black pawn attack diagonal right.
 std::uint8_t
 from_right_black(std::uint8_t to_square) noexcept
 { return to_square + 9; }
 
+// Function to generate forward pawn moves.
 void
 move_forward(
     BitBoard pawns,
@@ -186,6 +205,7 @@ move_forward(
   }
 }
 
+// Function to generate pawn attacks.
 void
 attack(
     BitBoard pawns,
