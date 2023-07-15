@@ -16,7 +16,7 @@ namespace {
 namespace rng = std::ranges;
 
 void
-FillAsciiBoard(
+fill_ascii_board(
     const PieceSet& pieces,
     Color color,
     std::array<char, 64>& board)  noexcept
@@ -78,29 +78,29 @@ NewBoardState() noexcept
 }
 
 bool
-operator==(const BoardState& left, const BoardState& right) noexcept
+BoardState::eq(const BoardState& bs) const noexcept
 {
-  return left.mine == right.mine
-     and left.other == right.other
-     and left.all_mine == right.all_mine
-     and left.all_other == right.all_other
-     and left.half_move == right.half_move
-     and left.full_move == right.full_move
-     and left.en_passant == right.en_passant
-     and left.en_passant_file == right.en_passant_file
-     and left.wk_castle == right.wk_castle
-     and left.wq_castle == right.wq_castle
-     and left.bk_castle == right.bk_castle
-     and left.bq_castle == right.bq_castle;
+  return mine == bs.mine
+     and other == bs.other
+     and all_mine == bs.all_mine
+     and all_other == bs.all_other
+     and half_move == bs.half_move
+     and full_move == bs.full_move
+     and en_passant == bs.en_passant
+     and en_passant_file == bs.en_passant_file
+     and wk_castle == bs.wk_castle
+     and wq_castle == bs.wq_castle
+     and bk_castle == bs.bk_castle
+     and bq_castle == bs.bq_castle;
 }
 
 std::string
-DebugStr(const BoardState& state)
+BoardState::str() const
 {
   std::array<char, 64> board;
   board.fill('-');
-  FillAsciiBoard(state.White(), Color::White, board);
-  FillAsciiBoard(state.Black(), Color::Black, board);
+  fill_ascii_board(white(), Color::White, board);
+  fill_ascii_board(black(), Color::Black, board);
 
   auto rev_board = std::bit_cast<std::array<std::uint64_t, 8>>(board);
   rng::reverse(rev_board);
@@ -120,27 +120,27 @@ DebugStr(const BoardState& state)
   }
 
   buff += "Color:";
-  buff += state.next == Color::White ? 'w' : 'b';
+  buff += next == Color::White ? 'w' : 'b';
   buff += '\n';
 
   buff += "Castling:";
-  if (state.wk_castle)
+  if (wk_castle)
     buff += 'K';
-  if (state.wq_castle)
+  if (wq_castle)
     buff += 'Q';
-  if (state.bk_castle)
+  if (bk_castle)
     buff += 'k';
-  if (state.bq_castle)
+  if (bq_castle)
     buff += 'q';
 
   buff += '\n';
 
-  std::format_to(std::back_inserter(buff), "HalfMove: {}\n", state.half_move);
-  std::format_to(std::back_inserter(buff), "FullMove: {}\n", state.full_move);
+  std::format_to(std::back_inserter(buff), "HalfMove: {}\n", half_move);
+  std::format_to(std::back_inserter(buff), "FullMove: {}\n", full_move);
 
-  if (state.en_passant)
+  if (en_passant)
     std::format_to(
-        std::back_inserter(buff), "EnPassant: {}\n", state.en_passant_file);
+        std::back_inserter(buff), "EnPassant: {}\n", en_passant_file);
 
   return buff;
 }

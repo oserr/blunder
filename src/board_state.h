@@ -82,125 +82,30 @@ struct BoardState {
   { all_other = AllMask(other); }
 
   const PieceSet&
-  White() const noexcept
+  white() const noexcept
   { return next == Color::White ? mine : other; }
 
-  BitBoard
-  WhiteKing() const noexcept
-  { return White().king(); }
-
-  BitBoard
-  WhiteQueen() const noexcept
-  { return White().queen(); }
-
-  BitBoard
-  WhiteRook() const noexcept
-  { return White().rook(); }
-
-  BitBoard
-  WhiteBishop() const noexcept
-  { return White().bishop(); }
-
-  BitBoard
-  WhiteKnight() const noexcept
-  { return White().knight(); }
-
-  BitBoard
-  WhitePawn() const noexcept
-  { return White().pawn(); }
-
-  unsigned
-  NumWhiteQueen() const noexcept
-  { return WhiteQueen().count(); }
-
-  unsigned
-  NumWhiteRook() const noexcept
-  { return WhiteRook().count(); }
-
-  unsigned
-  NumWhiteBishop() const noexcept
-  { return WhiteBishop().count(); }
-
-  unsigned
-  NumWhiteKnight() const noexcept
-  { return WhiteKnight().count(); }
-
-  unsigned
-  NumWhitePawn() const noexcept
-  { return WhitePawn().count(); }
-
-  unsigned
-  NumWhite() const noexcept
-  { return White().full_set().count(); }
-
   const PieceSet&
-  Black() const noexcept
+  black() const noexcept
   { return next == Color::White ? other : mine; }
 
-  BitBoard
-  BlackKing() const noexcept
-  { return Black().king(); }
+  std::string
+  str() const;
 
-  BitBoard
-  BlackQueen() const noexcept
-  { return Black().queen(); }
-
-  BitBoard
-  BlackRook() const noexcept
-  { return Black().rook(); }
-
-  BitBoard
-  BlackBishop() const noexcept
-  { return Black().bishop(); }
-
-  BitBoard
-  BlackKnight() const noexcept
-  { return Black().knight(); }
-
-  BitBoard
-  BlackPawn() const noexcept
-  { return Black().pawn(); }
-
-  unsigned
-  NumBlackQueen() const noexcept
-  { return BlackQueen().count(); }
-
-  unsigned
-  NumBlackRook() const noexcept
-  { return BlackRook().count(); }
-
-  unsigned
-  NumBlackBishop() const noexcept
-  { return BlackBishop().count(); }
-
-  unsigned
-  NumBlackKnight() const noexcept
-  { return BlackKnight().count(); }
-
-  unsigned
-  NumBlackPawn() const noexcept
-  { return BlackPawn().count(); }
-
-  unsigned
-  NumBlack() const noexcept
-  { return Black().full_set().count(); }
+  bool
+  eq(const BoardState& other) const noexcept;
 };
 
 // Initializes a BoardState for a new game.
 BoardState
 NewBoardState() noexcept;
 
-bool
-operator==(const BoardState& left, const BoardState& right) noexcept;
-
-std::string
-DebugStr(const BoardState& state);
+inline bool
+operator==(const BoardState& left, const BoardState& right) noexcept
+{ return left.eq(right); }
 
 inline std::ostream&
 operator<<(std::ostream& os, const BoardState& state)
-{
-  os << DebugStr(state);
-  return os;
-}
+{ return os << state.str(); }
 
 } // namespace blunder

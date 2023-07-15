@@ -124,16 +124,18 @@ TEST(ReadFen, PawnsAndKing)
   auto state = read_fen("8/5k2/3p4/1p1Pp2p/pP2Pp1P/P4P1K/8/8 b - - 99 50");
   ASSERT_TRUE(state);
 
-  EXPECT_EQ(state->NumWhite(), state->NumWhitePawn() + 1);
-  EXPECT_THAT(state->WhiteKing(), EqualToSq(SqList{Sq::h3}));
-  EXPECT_THAT(state->WhitePawn(),
+  auto white = state->white();
+  EXPECT_EQ(white.full_set().count(), white.pawn().count() + 1);
+  EXPECT_THAT(white.king(), EqualToSq(SqList{Sq::h3}));
+  EXPECT_THAT(white.pawn(),
       EqualToSq(SqList{Sq::a3, Sq::b4, Sq::d5, Sq::e4, Sq::f3, Sq::h4}));
   EXPECT_FALSE(state->wk_castle);
   EXPECT_FALSE(state->wq_castle);
 
-  EXPECT_EQ(state->NumBlack(), state->NumBlackPawn() + 1);
-  EXPECT_THAT(state->BlackKing(), EqualToSq(SqList{Sq::f7}));
-  EXPECT_THAT(state->BlackPawn(),
+  auto black = state->black();
+  EXPECT_EQ(black.full_set().count(), black.pawn().count() + 1);
+  EXPECT_THAT(black.king(), EqualToSq(SqList{Sq::f7}));
+  EXPECT_THAT(black.pawn(),
       EqualToSq(SqList{Sq::a4, Sq::b5, Sq::d6, Sq::e5, Sq::f4, Sq::h5}));
   EXPECT_FALSE(state->bk_castle);
   EXPECT_FALSE(state->bq_castle);
