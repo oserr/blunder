@@ -21,7 +21,7 @@ enum struct Type : std::uint8_t {
 };
 
 inline unsigned
-uint(Type type) noexcept
+to_int(Type type) noexcept
 { return static_cast<unsigned>(type); }
 
 class Piece {
@@ -49,7 +49,7 @@ public:
   // Returns the underlying integral value of the type.
   unsigned
   uint() const noexcept
-  { return static_cast<unsigned>(ptype); }
+  { return to_int(ptype); }
 
   // Initializes a Piece form an int-like type.
   template<typename T>

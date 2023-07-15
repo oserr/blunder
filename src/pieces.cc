@@ -6,19 +6,6 @@
 namespace blunder {
 
 std::uint8_t
-GetPieceUint8(const std::array<BitBoard, 6> pieces, BitBoard piece) noexcept
-{
-  assert(piece.has_single_bit());
-
-  for (std::uint8_t i = 0; i < pieces.size(); ++i) {
-    if (piece & pieces[i])
-      return i;
-  }
-
-  return static_cast<std::uint8_t>(Type::None);
-}
-
-std::uint8_t
 Piece::letter(Color color) noexcept
 {
   unsigned char letter = '?';

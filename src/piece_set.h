@@ -135,7 +135,4 @@ inline bool
 operator==(const PieceSet& left, const PieceSet& right) noexcept
 { return left.eq(right); }
 
-std::uint8_t
-GetPieceUint8(const std::array<BitBoard, 6> pieces, BitBoard piece) noexcept;
-
 } // namespace blunder
