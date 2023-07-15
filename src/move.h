@@ -51,7 +51,7 @@ struct Move {
   // another without attacking, and hence this initializes the move with the
   // source square, piece type for moving piece, and destination square.
   // ------------------------------------------------------------------------
-  
+
   Move(
       std::uint8_t from_piece,
       std::uint8_t from_square,
@@ -109,6 +109,7 @@ struct Move {
   // pawn promos, etc.
   // --------------------------------------------------------------------------
 
+  // Returns a move for white king side castle.
   static constexpr Move
   wk_castle() noexcept
   {
@@ -118,6 +119,7 @@ struct Move {
     return m;
   }
 
+  // Returns a move for white queen side castle.
   static constexpr Move
   wq_castle() noexcept
   {
@@ -126,6 +128,7 @@ struct Move {
     return m;
   }
 
+  // Returns a move for black king side castle.
   static constexpr Move
   bk_castle() noexcept
   {
@@ -135,6 +138,7 @@ struct Move {
     return m;
   }
 
+  // Returns a move for black queen side castle.
   static constexpr Move
   bq_castle() noexcept
   {
@@ -143,6 +147,7 @@ struct Move {
     return m;
   }
 
+  // Returns a move for pawn promotion without capture.
   static Move
   promo(
       std::uint8_t from_sq,
@@ -158,6 +163,7 @@ struct Move {
     return m;
   }
 
+  // Returns a move for pawn promotion with capture.
   static Move
   promo(
       std::uint8_t from_sq,
@@ -174,6 +180,7 @@ struct Move {
     return m;
   }
 
+  // Returns a move for pawn promotion with capture.
   static Move
   promo(
       std::uint8_t from_sq,
@@ -182,6 +189,7 @@ struct Move {
       Piece promo) noexcept
   { return Move::promo(from_sq, to_piece.uint(), to_sq, promo); }
 
+  // Returns a move for en passant capture.
   static Move
   by_en_passant(
       std::uint8_t from_sq,
