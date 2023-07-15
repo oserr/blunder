@@ -5,15 +5,15 @@
 namespace blunder {
 
 constexpr BitBoard
-MoveNorth(BitBoard bb) noexcept
+move_north(BitBoard bb) noexcept
 { return bb << 8; }
 
 constexpr BitBoard
-MoveSouth(BitBoard bb) noexcept
+move_south(BitBoard bb) noexcept
 { return bb >> 8; }
 
 constexpr BitBoard
-MoveKing(BitBoard king) noexcept
+move_king(BitBoard king) noexcept
 {
   auto k = king;
   const auto left = (k & ~kFileA) >> 1;
@@ -26,7 +26,7 @@ MoveKing(BitBoard king) noexcept
 
 // Returns the set of squares where a king can move, except for castling.
 constexpr BitBoard
-MoveKnight(BitBoard knight) noexcept
+move_knight(BitBoard knight) noexcept
 {
   // One square up, two right.
   const auto bits1 = (knight & ~kFileG & ~kFileH) << 10;
@@ -51,50 +51,50 @@ MoveKnight(BitBoard knight) noexcept
 
 // Returns the set of white pawns after moving one square forward.
 constexpr BitBoard
-MoveWhitePawnsSingle(BitBoard pawns, BitBoard empty) noexcept
-{ return MoveNorth(pawns) & empty; }
+move_wp_single(BitBoard pawns, BitBoard empty) noexcept
+{ return move_north(pawns) & empty; }
 
 // Returns the set of white pawns afer moving two squares forward for pawns that
 // can move two squares forward.
 constexpr BitBoard
-MoveWhitePawnsDouble(BitBoard pawns, BitBoard empty) noexcept
+move_wp_double(BitBoard pawns, BitBoard empty) noexcept
 {
-  pawns = MoveWhitePawnsSingle(pawns, empty);
-  return MoveWhitePawnsSingle(pawns, empty) & kRank4;
+  pawns = move_wp_single(pawns, empty);
+  return move_wp_single(pawns, empty) & kRank4;
 }
 
 // Returns the set of white pawns after attacking diagonal left.
 constexpr BitBoard
-MoveWhitePawnsAttackLeft(BitBoard pawns, BitBoard all_black) noexcept
+move_wp_left(BitBoard pawns, BitBoard all_black) noexcept
 { return pawns << 7 & all_black & ~kFileH; }
 
 // Returns the set of white pawns after attacking diagonal right.
 constexpr BitBoard
-MoveWhitePawnsAttackRight(BitBoard pawns, BitBoard all_black) noexcept
+move_wp_right(BitBoard pawns, BitBoard all_black) noexcept
 { return pawns << 9 & all_black & ~kFileA; }
 
 // Returns the set of black pawns after moving one square forward.
 constexpr BitBoard
-MoveBlackPawnsSingle(BitBoard pawns, BitBoard empty) noexcept
-{ return MoveSouth(pawns) & empty; }
+move_bp_single(BitBoard pawns, BitBoard empty) noexcept
+{ return move_south(pawns) & empty; }
 
 // Returns the set of black pawns after moving two squares forward for pawns
 // that can move two squares forward.
 constexpr BitBoard
-MoveBlackPawnsDouble(BitBoard pawns, BitBoard empty) noexcept
+move_bp_double(BitBoard pawns, BitBoard empty) noexcept
 {
-  pawns = MoveBlackPawnsSingle(pawns, empty);
-  return MoveBlackPawnsSingle(pawns, empty) & kRank5;
+  pawns = move_bp_single(pawns, empty);
+  return move_bp_single(pawns, empty) & kRank5;
 }
 
 // Returns the set of black pawns after attacking diagonal left.
 constexpr BitBoard
-MoveBlackPawnsAttackLeft(BitBoard pawns, BitBoard all_white) noexcept
+move_bp_left(BitBoard pawns, BitBoard all_white) noexcept
 { return pawns >> 7 & all_white & ~kFileA; }
 
 // Returns the set of black pawns after attacking diagonal right.
 constexpr BitBoard
-MoveBlackPawnsAttackRight(BitBoard pawns, BitBoard all_white) noexcept
+move_bp_right(BitBoard pawns, BitBoard all_white) noexcept
 { return pawns >> 9 & all_white & ~kFileH; }
 
 }

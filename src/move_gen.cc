@@ -239,13 +239,13 @@ move_en_passant(
 
     auto to_bb = BitBoard::from_index(to_sq);
 
-    auto attack = MoveWhitePawnsAttackLeft(pawns, to_bb);
+    auto attack = move_wp_left(pawns, to_bb);
     if (attack) {
       auto from_sq = from_left_white(to_sq);
       moves.push_back(Move::by_en_passant(from_sq, to_sq, passant_sq));
     }
 
-    attack = MoveWhitePawnsAttackRight(pawns, to_bb);
+    attack = move_wp_right(pawns, to_bb);
     if (attack) {
       auto from_sq = from_right_white(to_sq);
       moves.push_back(Move::by_en_passant(from_sq, to_sq, passant_sq));
@@ -256,13 +256,13 @@ move_en_passant(
 
     auto to_bb = BitBoard::from_index(to_sq);
 
-    auto attack = MoveBlackPawnsAttackLeft(pawns, to_bb);
+    auto attack = move_bp_left(pawns, to_bb);
     if (attack) {
       auto from_sq = from_left_black(to_sq);
       moves.push_back(Move::by_en_passant(from_sq, to_sq, passant_sq));
     }
 
-    attack = MoveBlackPawnsAttackRight(pawns, to_bb);
+    attack = move_bp_right(pawns, to_bb);
     if (attack) {
       auto from_sq = from_right_black(to_sq);
       moves.push_back(Move::by_en_passant(from_sq, to_sq, passant_sq));
@@ -308,7 +308,7 @@ MoveGen::for_bishop(const BoardState& state) const
 std::vector<Move>
 MoveGen::for_knight(const BoardState& state) const
 {
-  return get_simple_moves(Piece::knight(), state, MoveKnight);
+  return get_simple_moves(Piece::knight(), state, move_knight);
 }
 
 std::vector<Move>
@@ -339,7 +339,7 @@ MoveGen::for_king(
     const BoardState& state,
     std::vector<Move>& moves) const
 {
-  get_simple_moves(Piece::king(), state, MoveKing, moves);
+  get_simple_moves(Piece::king(), state, move_king, moves);
 
   auto all_pieces = state.all_mine | state.all_other;
 
@@ -408,7 +408,7 @@ MoveGen::for_knight(
     const BoardState& state,
     std::vector<Move>& moves) const
 {
-  get_simple_moves(Piece::knight(), state, MoveKnight, moves);
+  get_simple_moves(Piece::knight(), state, move_knight, moves);
 }
 
 void
@@ -432,10 +432,10 @@ MoveGen::for_pawn(
 
   switch (state.next) {
   case Color::White:
-    single_fn = MoveWhitePawnsSingle;
-    double_fn = MoveWhitePawnsDouble;
-    attack_left_fn = MoveWhitePawnsAttackLeft;
-    attack_right_fn = MoveWhitePawnsAttackRight;
+    single_fn = move_wp_single;
+    double_fn = move_wp_double;
+    attack_left_fn = move_wp_left;
+    attack_right_fn = move_wp_right;
     from_single_fn = from_single_white;
     from_double_fn = from_double_white;
     from_left_fn = from_left_white;
@@ -443,10 +443,10 @@ MoveGen::for_pawn(
     is_promo_fn = is_white_promo;
     break;
   default:
-    single_fn = MoveBlackPawnsSingle;
-    double_fn = MoveBlackPawnsDouble;
-    attack_left_fn = MoveBlackPawnsAttackLeft;
-    attack_right_fn = MoveBlackPawnsAttackRight;
+    single_fn = move_bp_single;
+    double_fn = move_bp_double;
+    attack_left_fn = move_bp_left;
+    attack_right_fn = move_bp_right;
     from_single_fn = from_single_black;
     from_double_fn = from_double_black;
     from_left_fn = from_left_black;
