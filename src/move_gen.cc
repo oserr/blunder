@@ -214,7 +214,7 @@ attack(
 // We create a BitBoard with one bit set where the pawn moves after capturing
 // en passant, and use that to check if there are any captures.
 void
-move_en_passant(
+move_enpassant(
     const BoardState& state,
     MoveVec& moves)
 {
@@ -443,7 +443,7 @@ MoveGen::for_pawn(
   move_forward(pawns, no_pieces, double_fn, from_double_fn, is_promo_fn, moves);
   attack(pawns, state, attack_left_fn, from_left_fn, is_promo_fn, moves);
   attack(pawns, state, attack_right_fn, from_right_fn, is_promo_fn, moves);
-  move_en_passant(state, moves);
+  move_enpassant(state, moves);
 }
 
 } // namespace blunder
