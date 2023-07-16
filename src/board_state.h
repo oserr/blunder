@@ -186,23 +186,24 @@ private:
   Color next;
 
   // If set, indicates that en passant is possible.
-  std::uint8_t en_passant: 1 = 0;
+  bool en_passant = false;
 
-  // Bit field to indicate the file where en passant is possible.
-  std::uint8_t en_passant_file: 3 = 0;
+  // Indicates the file where en passant is possible.
+  bool en_passant_file = false;
 
   // Indicates if white can castle on kingside.
-  std::uint8_t wk_castle: 1 = 0;
+  bool wk_castle = false;
 
   // Indicates if white can castle on queenside.
-  std::uint8_t wq_castle: 1 = 0;
+  bool wq_castle = false;
 
   // Indicates if black can castle on kingside.
-  std::uint8_t bk_castle: 1 = 0;
+  bool bk_castle = false;
 
   // Indicates if black can castle on queenside.
-  std::uint8_t bq_castle: 1 = 0;
+  bool bq_castle = false;
 
+  // Indicates if player moving next is in check.
   bool in_check = false;
 };
 
@@ -290,7 +291,7 @@ public:
     }
 
     file_err = false;
-    state.en_passant = 1;
+    state.en_passant = true;
     state.en_passant_file = file;
 
     return *this;

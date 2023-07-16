@@ -55,13 +55,13 @@ BoardState::new_board() noexcept
 
   state.next = Color::White;
 
-  state.en_passant = 0;
-  state.en_passant_file = 0;
+  state.en_passant = false;
+  state.en_passant_file = false;
 
-  state.wk_castle = 1;
-  state.wq_castle = 1;
-  state.bk_castle = 1;
-  state.bq_castle = 1;
+  state.wk_castle = true;
+  state.wq_castle = true;
+  state.bk_castle = true;
+  state.bq_castle = true;
 
   return state;
 }
