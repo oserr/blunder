@@ -179,6 +179,12 @@ private:
   PieceSet bb_mine;
   PieceSet bb_other;
 
+  // A bitboard mask to indicate which squares are attacked by the oppentent,
+  // i.e. the other player not moving next. The purpose of this is to help
+  // detect checks and move legality, e.g. king cannot castle if it has to go
+  // through a check.
+  BitBoard bb_attacked;
+
   std::uint16_t half_move = 0;
   std::uint16_t full_move = 0;
 
