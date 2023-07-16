@@ -15,8 +15,8 @@ class MoveGen : public MoveGenerator {
 public:
   // Initializes MoveGen with magic bitboards for bishops and rooks.
   MoveGen(MagicAttacks bmagics, MagicAttacks rmagics) noexcept
-    : bmagics_(std::move(bmagics)),
-      rmagics_(std::move(rmagics)) {}
+    : bmagics(std::move(bmagics)),
+      rmagics(std::move(rmagics)) {}
 
   // Generates all possible moves for a king, including castling with the rook.
   // These may include moves that put the king in check. It is up to client to
@@ -78,10 +78,10 @@ private:
   for_pawn(const BoardState& state, std::vector<Move>& moves) const;
 
   // Magic bitboards for bishops.
-  MagicAttacks bmagics_;
+  MagicAttacks bmagics;
 
   // Magic bitboards for rooks.
-  MagicAttacks rmagics_;
+  MagicAttacks rmagics;
 };
 
 } // namespace blunder

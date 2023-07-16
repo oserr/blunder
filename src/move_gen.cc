@@ -356,8 +356,8 @@ MoveGen::for_queen(
   auto all_pieces = state.all_bits();
   auto moves_fn = [&](BitBoard bb) {
     auto from_square = bb.first_bit();
-    return rmagics_.get_attacks(from_square, all_pieces)
-         | bmagics_.get_attacks(from_square, all_pieces);
+    return rmagics.get_attacks(from_square, all_pieces)
+         | bmagics.get_attacks(from_square, all_pieces);
   };
   get_simple_moves(Piece::queen(), state, moves_fn, moves);
 }
@@ -370,7 +370,7 @@ MoveGen::for_rook(
   auto all_pieces = state.all_bits();
   auto moves_fn = [&](BitBoard bb) {
     auto from_square = bb.first_bit();
-    return rmagics_.get_attacks(from_square, all_pieces);
+    return rmagics.get_attacks(from_square, all_pieces);
   };
   get_simple_moves(Piece::rook(), state, moves_fn, moves);
 }
@@ -383,7 +383,7 @@ MoveGen::for_bishop(
   auto all_pieces = state.all_bits();
   auto moves_fn = [&](BitBoard bb) {
     auto from_square = bb.first_bit();
-    return bmagics_.get_attacks(from_square, all_pieces);
+    return bmagics.get_attacks(from_square, all_pieces);
   };
   get_simple_moves(Piece::bishop(), state, moves_fn, moves);
 }
