@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
 #include "pieces.h"
 #include "square.h"
@@ -226,5 +227,7 @@ operator==(Move left, Move right) noexcept
 inline std::ostream&
 operator<<(std::ostream& os, Move mv)
 { return os << mv.str(); }
+
+using MoveVec = std::vector<Move>;
 
 } // namespace blunder

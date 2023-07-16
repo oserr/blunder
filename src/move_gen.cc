@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <functional>
 #include <iostream>
-#include <vector>
 
 #include "bitboard.h"
 #include "board_state.h"
@@ -24,7 +23,7 @@ get_non_attacks(
     Piece piece,
     std::uint8_t from_square,
     BitBoard to_squares,
-    std::vector<Move>& moves)
+    MoveVec& moves)
 {
   while (to_squares)
     moves.emplace_back(piece, from_square, to_squares.first_bit_and_clear());
@@ -39,7 +38,7 @@ get_simple_attacks(
     std::uint8_t from_square,
     BitBoard to_squares,
     const PieceSet& other,
-    std::vector<Move>& moves)
+    MoveVec& moves)
 {
   while (to_squares) {
     auto [to_square, attacked] = to_squares.index_bb_and_clear();
@@ -58,7 +57,7 @@ get_simple_moves(
     Piece piece,
     const BoardState& state,
     const std::function<BitBoard(BitBoard)>& moves_fn,
-    std::vector<Move>& moves)
+    MoveVec& moves)
 {
   auto bb = state.mine().get(piece);
   auto no_pieces = state.none();
@@ -78,13 +77,13 @@ get_simple_moves(
 }
 
 // Same as above, but list of moves is returned as output.
-std::vector<Move>
+MoveVec
 get_simple_moves(
     Piece piece,
     const BoardState& state,
     const std::function<BitBoard(BitBoard)>& moves_fn)
 {
-  std::vector<Move> moves;
+  MoveVec moves;
   get_simple_moves(piece, state, moves_fn, moves);
   return moves;
 }
@@ -159,7 +158,7 @@ move_forward(
     PawnMovesFn move_fn,
     FromFn from_fn,
     IsPromoFn is_promo_fn,
-    std::vector<Move>& moves)
+    MoveVec& moves)
 {
   auto pawn_moves = move_fn(pawns, no_pieces);
 
@@ -187,7 +186,7 @@ attack(
     PawnMovesFn move_fn,
     FromFn from_fn,
     IsPromoFn is_promo_fn,
-    std::vector<Move>& moves)
+    MoveVec& moves)
 {
   auto pawn_moves = move_fn(pawns, state.all_other());
 
@@ -217,7 +216,7 @@ attack(
 void
 move_en_passant(
     const BoardState& state,
-    std::vector<Move>& moves)
+    MoveVec& moves)
 {
   if (not state.has_enpassant())
     return;
@@ -266,59 +265,59 @@ move_en_passant(
 
 } // namespace
 
-std::vector<Move>
+MoveVec
 MoveGen::for_king(const BoardState& state) const
 {
-  std::vector<Move> moves;
+  MoveVec moves;
   for_king(state, moves);
   return moves;
 }
 
 // Generates all possible moves for queens on the board.
-std::vector<Move>
+MoveVec
 MoveGen::for_queen(const BoardState& state) const
 {
-  std::vector<Move> moves;
+  MoveVec moves;
   for_queen(state, moves);
   return moves;
 }
 
-std::vector<Move>
+MoveVec
 MoveGen::for_rook(const BoardState& state) const
 {
-  std::vector<Move> moves;
+  MoveVec moves;
   for_rook(state, moves);
   return moves;
 }
 
-std::vector<Move>
+MoveVec
 MoveGen::for_bishop(const BoardState& state) const
 {
-  std::vector<Move> moves;
+  MoveVec moves;
   for_bishop(state, moves);
   return moves;
 }
 
-std::vector<Move>
+MoveVec
 MoveGen::for_knight(const BoardState& state) const
 {
   return get_simple_moves(Piece::knight(), state, move_knight);
 }
 
-std::vector<Move>
+MoveVec
 MoveGen::for_pawn(const BoardState& state) const
 {
-  std::vector<Move> moves;
+  MoveVec moves;
   for_pawn(state, moves);
   return moves;
 }
 
-std::vector<Move>
+MoveVec
 MoveGen::for_all(const BoardState& state) const
 {
   // TODO: determine if there are any performance gains from computing the moves
   // in parallel.
-  std::vector<Move> moves;
+  MoveVec moves;
   for_king(state, moves);
   for_queen(state, moves);
   for_rook(state, moves);
@@ -331,7 +330,7 @@ MoveGen::for_all(const BoardState& state) const
 void
 MoveGen::for_king(
     const BoardState& state,
-    std::vector<Move>& moves) const
+    MoveVec& moves) const
 {
   get_simple_moves(Piece::king(), state, move_king, moves);
 
@@ -351,7 +350,7 @@ MoveGen::for_king(
 void
 MoveGen::for_queen(
     const BoardState& state,
-    std::vector<Move>& moves) const
+    MoveVec& moves) const
 {
   auto all_pieces = state.all_bits();
   auto moves_fn = [&](BitBoard bb) {
@@ -365,7 +364,7 @@ MoveGen::for_queen(
 void
 MoveGen::for_rook(
     const BoardState& state,
-    std::vector<Move>& moves) const
+    MoveVec& moves) const
 {
   auto all_pieces = state.all_bits();
   auto moves_fn = [&](BitBoard bb) {
@@ -378,7 +377,7 @@ MoveGen::for_rook(
 void
 MoveGen::for_bishop(
     const BoardState& state,
-    std::vector<Move>& moves) const
+    MoveVec& moves) const
 {
   auto all_pieces = state.all_bits();
   auto moves_fn = [&](BitBoard bb) {
@@ -391,7 +390,7 @@ MoveGen::for_bishop(
 void
 MoveGen::for_knight(
     const BoardState& state,
-    std::vector<Move>& moves) const
+    MoveVec& moves) const
 {
   get_simple_moves(Piece::knight(), state, move_knight, moves);
 }
@@ -399,7 +398,7 @@ MoveGen::for_knight(
 void
 MoveGen::for_pawn(
     const BoardState& state,
-    std::vector<Move>& moves) const
+    MoveVec& moves) const
 {
   BitBoard pawns = state.mine().pawn();
 

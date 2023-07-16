@@ -36,7 +36,7 @@ protected:
 
 TEST_F(MoveGenTest, InitGamePawnMoves)
 {
-  std::vector<Move> moves;
+  MoveVec moves;
   moves.emplace_back(Piece::pawn(), Sq::a2, Sq::a3);
   moves.emplace_back(Piece::pawn(), Sq::a2, Sq::a4);
   moves.emplace_back(Piece::pawn(), Sq::b2, Sq::b3);
@@ -66,7 +66,7 @@ TEST_F(MoveGenTest, InitGameKingMoves)
 
 TEST_F(MoveGenTest, InitGameKnightMoves)
 {
-  std::vector<Move> moves;
+  MoveVec moves;
   moves.emplace_back(Piece::knight(), Sq::b1, Sq::a3);
   moves.emplace_back(Piece::knight(), Sq::b1, Sq::c3);
   moves.emplace_back(Piece::knight(), Sq::g1, Sq::f3);
@@ -96,7 +96,7 @@ TEST_F(MoveGenTest, InitGameBishopMoves)
 
 TEST_F(MoveGenTest, InitGameAllMoves)
 {
-  std::vector<Move> moves;
+  MoveVec moves;
   // Pawn moves
   moves.emplace_back(Piece::pawn(), Sq::a2, Sq::a3);
   moves.emplace_back(Piece::pawn(), Sq::a2, Sq::a4);
