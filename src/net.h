@@ -128,6 +128,9 @@ struct ValueNet : torch::nn::Module {
 // AlphaZero net
 //--------------
 
+// TODO: figure out how to enable the network to operate in inference mode to
+// make computations more efficient:
+// https://pytorch.org/cppdocs/notes/inference_mode.html.
 struct AlphaZeroNet : torch::nn::Module {
   AlphaZeroNet();
 
