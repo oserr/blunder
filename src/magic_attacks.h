@@ -46,15 +46,19 @@ private:
   std::vector<Magic> magics_;
 };
 
+// Computes bishop magics from scratch.
 std::expected<MagicAttacks, Err>
 compute_bmagics();
 
+// Computes rook magics from scratch.
 std::expected<MagicAttacks, Err>
 compute_rmagics();
 
+// Initializes bishop magics from precomputed |magics|.
 std::expected<MagicAttacks, Err>
 from_bmagics(std::span<const std::uint64_t> magics);
 
+// Initializes rook magics from precomputed |magics|.
 std::expected<MagicAttacks, Err>
 from_rmagics(std::span<const std::uint64_t> magics);
 
