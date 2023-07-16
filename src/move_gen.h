@@ -3,7 +3,7 @@
 #include <utility>
 
 #include "board_state.h"
-#include "magics.h"
+#include "magic_attacks.h"
 #include "move_generator.h"
 
 namespace blunder {

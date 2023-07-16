@@ -7,7 +7,7 @@
 #include <string>
 #include <unistd.h>
 
-#include "magics.h"
+#include "magic_attacks.h"
 #include "pre_computed_magics.h"
 
 using namespace blunder;

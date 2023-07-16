@@ -48,7 +48,8 @@ add_library(blunder STATIC
   src/err.h
   src/fen.cc
   src/fen.h
-  src/magics.cc
+  src/magic_attacks.cc
+  src/magic_attacks.h
   src/magics.h
   src/move.cc
   src/move.h
@@ -97,7 +98,7 @@ endfunction()
 
 create_test(moves)
 create_test(square)
-create_test(magics)
+create_test(magic_attacks)
 create_test(bitboard)
 create_test(fen)
 create_test(move_gen)

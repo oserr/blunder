@@ -7,7 +7,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "pre_computed_magics.h"
-#include "magic.h"
+#include "magic_attacks.h"
 
 using namespace blunder;
 

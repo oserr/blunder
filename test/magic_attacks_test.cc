@@ -1,4 +1,4 @@
-#include "magics.h"
+#include "magic_attacks.h"
 
 #include <memory>
 
