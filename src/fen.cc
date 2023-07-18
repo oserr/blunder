@@ -379,7 +379,7 @@ read_fen(std::string_view fen) noexcept
     fen = chunk;
   }
 
-  BoardStateBuilder builder;
+  BoardBuilder builder;
   if (en_passant)
     builder.set_enpassant_file(*en_passant % 8);
 

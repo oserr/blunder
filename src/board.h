@@ -41,7 +41,7 @@ can_castle(BitBoard all_pieces) noexcept
 
 // Forward declaration because we will make this a friend of Board to
 // make it easier to build Board while preserving invariants.
-class BoardStateBuilder;
+class BoardBuilder;
 
 // Board represents the current state of the board. Some of the fields are
 // written from the perspective of the player moving next to simplify move
@@ -162,7 +162,7 @@ public:
        and can_castle<Color::Black, BoardSide::Queen>(all_bits()); }
 
 private:
-  friend BoardStateBuilder;
+  friend BoardBuilder;
 
   // Arrays of bitboards for all pieces, in the following order:
   // - King
@@ -221,7 +221,7 @@ inline std::ostream&
 operator<<(std::ostream& os, const Board& state)
 { return os << state.str(); }
 
-enum class BoardStateErr {
+enum class BoardBuilderErr {
   // White pieces are not valid.
   White,
   // Black pieces are not valid.
@@ -232,29 +232,29 @@ enum class BoardStateErr {
   EnPassantFile
 };
 
-class BoardStateBuilder {
+class BoardBuilder {
 public:
-  std::expected<Board, BoardStateErr>
+  std::expected<Board, BoardBuilderErr>
   build() const noexcept
   {
     if (!state.white().is_valid())
-      return std::unexpected(BoardStateErr::White);
+      return std::unexpected(BoardBuilderErr::White);
 
     if (!state.black().is_valid())
-      return std::unexpected(BoardStateErr::White);
+      return std::unexpected(BoardBuilderErr::White);
 
     if (file_err)
-      return std::unexpected(BoardStateErr::EnPassantFile);
+      return std::unexpected(BoardBuilderErr::EnPassantFile);
 
     if (half_move_err)
-      return std::unexpected(BoardStateErr::HalfMove);
+      return std::unexpected(BoardBuilderErr::HalfMove);
 
     return state;
   }
 
   // All pieces are set simulateously to make sure that we set mine and other
   // correctly with respect to the color to move next.
-  BoardStateBuilder&
+  BoardBuilder&
   set_pieces(Color color, const PieceSet& white, const PieceSet& black) noexcept
   {
     if (color == Color::White) {
@@ -268,7 +268,7 @@ public:
     return *this;
   }
 
-  BoardStateBuilder&
+  BoardBuilder&
   set_half_move(unsigned hm) noexcept
   {
     if (hm > 100) {
@@ -281,14 +281,14 @@ public:
     return *this;
   }
 
-  BoardStateBuilder&
+  BoardBuilder&
   set_full_move(unsigned fm) noexcept
   {
     state.full_move = fm;
     return *this;
   }
 
-  BoardStateBuilder&
+  BoardBuilder&
   set_enpassant_file(unsigned file) noexcept
   {
     if (file >= 8) {
@@ -303,28 +303,28 @@ public:
     return *this;
   }
 
-  BoardStateBuilder&
+  BoardBuilder&
   set_wk_castling(bool has_right) noexcept
   {
     state.wk_castle = has_right;
     return *this;
   }
 
-  BoardStateBuilder&
+  BoardBuilder&
   set_wq_castling(bool has_right) noexcept
   {
     state.wq_castle = has_right;
     return *this;
   }
 
-  BoardStateBuilder&
+  BoardBuilder&
   set_bk_castling(bool has_right) noexcept
   {
     state.bk_castle = has_right;
     return *this;
   }
 
-  BoardStateBuilder&
+  BoardBuilder&
   set_bq_castling(bool has_right) noexcept
   {
     state.bq_castle = has_right;
