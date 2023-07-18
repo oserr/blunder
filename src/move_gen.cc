@@ -6,7 +6,7 @@
 #include <iostream>
 
 #include "bitboard.h"
-#include "board_state.h"
+#include "board.h"
 #include "color.h"
 #include "move.h"
 #include "moves.h"

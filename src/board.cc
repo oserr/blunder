@@ -1,4 +1,4 @@
-#include "board_state.h"
+#include "board.h"
 
 #include <algorithm>
 #include <bit>

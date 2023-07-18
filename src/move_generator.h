@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "board_state.h"
+#include "board.h"
 #include "move.h"
 
 namespace blunder {

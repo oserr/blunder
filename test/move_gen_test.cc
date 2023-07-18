@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-#include "board_state.h"
+#include "board.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "pre_computed_magics.h"

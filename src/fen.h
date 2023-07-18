@@ -4,7 +4,7 @@
 #include <ostream>
 #include <string_view>
 
-#include "board_state.h"
+#include "board.h"
 
 namespace blunder {
 

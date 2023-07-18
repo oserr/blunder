@@ -2,7 +2,7 @@
 
 #include <utility>
 
-#include "board_state.h"
+#include "board.h"
 #include "magic_attacks.h"
 #include "move_generator.h"
 
