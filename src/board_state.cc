@@ -42,10 +42,10 @@ fill_ascii_board(
 
 } // namespace
 
-BoardState
-BoardState::new_board() noexcept
+Board
+Board::new_board() noexcept
 {
-  BoardState state;
+  Board state;
 
   state.bb_mine = PieceSet::init_white();
   state.bb_other = PieceSet::init_black();
@@ -67,7 +67,7 @@ BoardState::new_board() noexcept
 }
 
 bool
-BoardState::eq(const BoardState& bs) const noexcept
+Board::eq(const Board& bs) const noexcept
 {
   return bb_mine == bs.bb_mine
      and bb_other == bs.bb_other
@@ -82,7 +82,7 @@ BoardState::eq(const BoardState& bs) const noexcept
 }
 
 std::string
-BoardState::str() const
+Board::str() const
 {
   std::array<char, 64> board;
   board.fill('-');

@@ -14,7 +14,7 @@
 
 namespace blunder {
 
-// TODO: make this a function of BoardState.
+// TODO: make this a function of Board.
 template<Color color, BoardSide side>
 constexpr bool
 can_castle(BitBoard all_pieces) noexcept
@@ -39,14 +39,14 @@ can_castle(BitBoard all_pieces) noexcept
   return bits == all_pieces;
 }
 
-// Forward declaration because we will make this a friend of BoardState to
-// make it easier to build BoardState while preserving invariants.
+// Forward declaration because we will make this a friend of Board to
+// make it easier to build Board while preserving invariants.
 class BoardStateBuilder;
 
-// BoardState represents the current state of the board. Some of the fields are
+// Board represents the current state of the board. Some of the fields are
 // written from the perspective of the player moving next to simplify move
 // generation.
-class BoardState {
+class Board {
 public:
   // Returns a reference to piece set for player moving next.
   const PieceSet& mine() const noexcept
@@ -100,10 +100,10 @@ public:
   str() const;
 
   bool
-  eq(const BoardState& other) const noexcept;
+  eq(const Board& other) const noexcept;
 
-  // Initializes a BoardState for a new game.
-  static BoardState
+  // Initializes a Board for a new game.
+  static Board
   new_board() noexcept;
 
   // Returns true if there is an opportunity for a pawn capture by en passant
@@ -214,11 +214,11 @@ private:
 };
 
 inline bool
-operator==(const BoardState& left, const BoardState& right) noexcept
+operator==(const Board& left, const Board& right) noexcept
 { return left.eq(right); }
 
 inline std::ostream&
-operator<<(std::ostream& os, const BoardState& state)
+operator<<(std::ostream& os, const Board& state)
 { return os << state.str(); }
 
 enum class BoardStateErr {
@@ -234,7 +234,7 @@ enum class BoardStateErr {
 
 class BoardStateBuilder {
 public:
-  std::expected<BoardState, BoardStateErr>
+  std::expected<Board, BoardStateErr>
   build() const noexcept
   {
     if (!state.white().is_valid())
@@ -332,7 +332,7 @@ public:
   }
 
 private:
-  BoardState state;
+  Board state;
   bool file_err = false;
   bool half_move_err = false;
 };

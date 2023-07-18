@@ -116,7 +116,7 @@ TEST(ReadFen, InitNewGame)
   auto state = read_fen(
       "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
   ASSERT_TRUE(state);
-  EXPECT_EQ(*state, BoardState::new_board());
+  EXPECT_EQ(*state, Board::new_board());
 }
 
 TEST(ReadFen, PawnsAndKing)

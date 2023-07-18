@@ -299,7 +299,7 @@ missing_field(FieldType field_type) noexcept
 
 } // namespace
 
-std::expected<BoardState, FenErr>
+std::expected<Board, FenErr>
 read_fen(std::string_view fen) noexcept
 {
   FieldType fields[] = {

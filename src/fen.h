@@ -34,9 +34,9 @@ enum class FenErr {
   Internal,
 };
 
-// Returns the BoardState representing the chess position in the |fen| string,
+// Returns the Board representing the chess position in the |fen| string,
 // or an error code if unable to parse the position.
-std::expected<BoardState, FenErr>
+std::expected<Board, FenErr>
 read_fen(std::string_view fen) noexcept;
 
 std::string_view

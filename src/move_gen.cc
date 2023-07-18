@@ -55,7 +55,7 @@ get_simple_attacks(
 void
 get_simple_moves(
     Piece piece,
-    const BoardState& state,
+    const Board& state,
     const std::function<BitBoard(BitBoard)>& moves_fn,
     MoveVec& moves)
 {
@@ -80,7 +80,7 @@ get_simple_moves(
 MoveVec
 get_simple_moves(
     Piece piece,
-    const BoardState& state,
+    const Board& state,
     const std::function<BitBoard(BitBoard)>& moves_fn)
 {
   MoveVec moves;
@@ -182,7 +182,7 @@ move_forward(
 void
 attack(
     BitBoard pawns,
-    BoardState state,
+    Board state,
     PawnMovesFn move_fn,
     FromFn from_fn,
     IsPromoFn is_promo_fn,
@@ -215,7 +215,7 @@ attack(
 // en passant, and use that to check if there are any captures.
 void
 move_enpassant(
-    const BoardState& state,
+    const Board& state,
     MoveVec& moves)
 {
   if (not state.has_enpassant())
@@ -266,7 +266,7 @@ move_enpassant(
 } // namespace
 
 MoveVec
-MoveGen::for_king(const BoardState& state) const
+MoveGen::for_king(const Board& state) const
 {
   MoveVec moves;
   for_king(state, moves);
@@ -275,7 +275,7 @@ MoveGen::for_king(const BoardState& state) const
 
 // Generates all possible moves for queens on the board.
 MoveVec
-MoveGen::for_queen(const BoardState& state) const
+MoveGen::for_queen(const Board& state) const
 {
   MoveVec moves;
   for_queen(state, moves);
@@ -283,7 +283,7 @@ MoveGen::for_queen(const BoardState& state) const
 }
 
 MoveVec
-MoveGen::for_rook(const BoardState& state) const
+MoveGen::for_rook(const Board& state) const
 {
   MoveVec moves;
   for_rook(state, moves);
@@ -291,7 +291,7 @@ MoveGen::for_rook(const BoardState& state) const
 }
 
 MoveVec
-MoveGen::for_bishop(const BoardState& state) const
+MoveGen::for_bishop(const Board& state) const
 {
   MoveVec moves;
   for_bishop(state, moves);
@@ -299,13 +299,13 @@ MoveGen::for_bishop(const BoardState& state) const
 }
 
 MoveVec
-MoveGen::for_knight(const BoardState& state) const
+MoveGen::for_knight(const Board& state) const
 {
   return get_simple_moves(Piece::knight(), state, move_knight);
 }
 
 MoveVec
-MoveGen::for_pawn(const BoardState& state) const
+MoveGen::for_pawn(const Board& state) const
 {
   MoveVec moves;
   for_pawn(state, moves);
@@ -313,7 +313,7 @@ MoveGen::for_pawn(const BoardState& state) const
 }
 
 MoveVec
-MoveGen::for_all(const BoardState& state) const
+MoveGen::for_all(const Board& state) const
 {
   // TODO: determine if there are any performance gains from computing the moves
   // in parallel.
@@ -329,7 +329,7 @@ MoveGen::for_all(const BoardState& state) const
 
 void
 MoveGen::for_king(
-    const BoardState& state,
+    const Board& state,
     MoveVec& moves) const
 {
   get_simple_moves(Piece::king(), state, move_king, moves);
@@ -349,7 +349,7 @@ MoveGen::for_king(
 
 void
 MoveGen::for_queen(
-    const BoardState& state,
+    const Board& state,
     MoveVec& moves) const
 {
   auto all_pieces = state.all_bits();
@@ -363,7 +363,7 @@ MoveGen::for_queen(
 
 void
 MoveGen::for_rook(
-    const BoardState& state,
+    const Board& state,
     MoveVec& moves) const
 {
   auto all_pieces = state.all_bits();
@@ -376,7 +376,7 @@ MoveGen::for_rook(
 
 void
 MoveGen::for_bishop(
-    const BoardState& state,
+    const Board& state,
     MoveVec& moves) const
 {
   auto all_pieces = state.all_bits();
@@ -389,7 +389,7 @@ MoveGen::for_bishop(
 
 void
 MoveGen::for_knight(
-    const BoardState& state,
+    const Board& state,
     MoveVec& moves) const
 {
   get_simple_moves(Piece::knight(), state, move_knight, moves);
@@ -397,7 +397,7 @@ MoveGen::for_knight(
 
 void
 MoveGen::for_pawn(
-    const BoardState& state,
+    const Board& state,
     MoveVec& moves) const
 {
   BitBoard pawns = state.mine().pawn();

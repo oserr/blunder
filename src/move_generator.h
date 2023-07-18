@@ -12,25 +12,25 @@ namespace blunder {
 class MoveGenerator {
 public:
   virtual MoveVec
-  for_king(const BoardState& state) const = 0;
+  for_king(const Board& state) const = 0;
 
   virtual MoveVec
-  for_queen(const BoardState& state) const = 0;
+  for_queen(const Board& state) const = 0;
 
   virtual MoveVec
-  for_rook(const BoardState& state) const = 0;
+  for_rook(const Board& state) const = 0;
 
   virtual MoveVec
-  for_bishop(const BoardState& state) const = 0;
+  for_bishop(const Board& state) const = 0;
 
   virtual MoveVec
-  for_knight(const BoardState& state) const = 0;
+  for_knight(const Board& state) const = 0;
 
   virtual MoveVec
-  for_pawn(const BoardState& state) const = 0;
+  for_pawn(const Board& state) const = 0;
 
   virtual MoveVec
-  for_all(const BoardState& state) const = 0;
+  for_all(const Board& state) const = 0;
 };
 
 } // namespace blunder
