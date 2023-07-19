@@ -1,14 +1,16 @@
 #pragma once
 
-#include <array>
+#include <cassert>
 #include <cstdint>
 #include <expected>
+#include <memory>
 #include <ostream>
 #include <string>
 
 #include "bitboard.h"
 #include "board_side.h"
 #include "color.h"
+#include "magics.h"
 #include "pieces.h"
 #include "piece_set.h"
 
@@ -161,8 +163,31 @@ public:
   { return bq_castle
        and can_castle<Color::Black, BoardSide::Queen>(all_bits()); }
 
+  // Registers the Magics so instances of Board can generate moves.
+  static void
+  register_magics(
+      std::unique_ptr<Magics> bmagics,
+      std::unique_ptr<Magics> rmagics)
+  {
+    assert(bmagics != nullptr);
+    assert(rmagics != nullptr);
+    Board::bmagics = std::move(bmagics);
+    Board::rmagics = std::move(rmagics);
+  }
+
 private:
   friend BoardBuilder;
+
+  // Note that we use static members for bmagics and rmagics below to avoid
+  // using global variables, and to avoid having to pass these in as function
+  // arguments. Move generation is best done from Board because moves are
+  // tightly coupled to the state of a board.
+
+  // For computing bishop magics.
+  inline constinit static std::unique_ptr<Magics> bmagics = nullptr;
+
+  // For computing rook magics.
+  inline constinit static std::unique_ptr<Magics> rmagics = nullptr;
 
   // Arrays of bitboards for all pieces, in the following order:
   // - King
