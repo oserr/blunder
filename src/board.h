@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cstdint>
 #include <expected>
+#include <functional>
 #include <memory>
 #include <ostream>
 #include <string>
@@ -11,6 +12,8 @@
 #include "board_side.h"
 #include "color.h"
 #include "magics.h"
+#include "move.h"
+#include "moves.h"
 #include "pieces.h"
 #include "piece_set.h"
 
@@ -175,7 +178,28 @@ public:
     Board::rmagics = std::move(rmagics);
   }
 
+  //-----------------
+  // Move generation.
+  //-----------------
+
+  MoveVec
+  king_moves() const;
+
 private:
+  //-------------------------------------
+  // Private helpers for move generation.
+  //-------------------------------------
+
+  // Computes simples moves for Bishops, Kights, Rooks, and Queens. Simple moves
+  // consists of non-attack moves and attacks. |piece| is the piece moving, and
+  // |moves_fn| is a function to compute moves for the given piece, including
+  // non-attacks and attacks.
+  void
+  get_simple_moves(
+      Piece piece,
+      const std::function<BitBoard(BitBoard)>& moves_fn,
+      MoveVec& moves) const;
+
   friend BoardBuilder;
 
   // Note that we use static members for bmagics and rmagics below to avoid

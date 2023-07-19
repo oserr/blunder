@@ -40,6 +40,43 @@ fill_ascii_board(
   }
 }
 
+//---------------------------
+// Move generation utilities.
+//---------------------------
+
+// Returns all the non-attack moves for |piece| from square |from_square| to all
+// squares in |to_squares|. The moves are returned in |moves|, an output
+// parameter.
+inline void
+get_non_attacks(
+    Piece piece,
+    std::uint8_t from_square,
+    BitBoard to_squares,
+    MoveVec& moves)
+{
+  while (to_squares)
+    moves.emplace_back(piece, from_square, to_squares.first_bit_and_clear());
+}
+
+// Returns all the simple attack moves for |piece| from square |from_square| to
+// squares in |to_squares|. We pass in the |other| pieces to be able to figure
+// out what the attacked pieces are.
+void
+get_simple_attacks(
+    Piece piece,
+    std::uint8_t from_square,
+    BitBoard to_squares,
+    const PieceSet& other,
+    MoveVec& moves)
+{
+  while (to_squares) {
+    auto [to_square, attacked] = to_squares.index_bb_and_clear();
+    auto to_piece = other.find_type(attacked);
+    assert(to_piece.type() != Type::None);
+    moves.emplace_back(piece, from_square, to_piece, to_square);
+  }
+}
+
 } // namespace
 
 Board
@@ -130,6 +167,62 @@ Board::str() const
         std::back_inserter(buff), "EnPassant: {}\n", en_passant_file);
 
   return buff;
+}
+
+//-----------------
+// Move generation.
+//-----------------
+
+// TODO: check any moves are illegal. For example:
+// - king cannot put himself in check.
+// - castling is not possible if one of the squares the king has to cross is
+//   attacked.
+//
+// This can be done while we generating the king moves, to prevent creating a
+// move that is not legal, or after the moves are generated. The latter might
+// be necessary and simpler to do.
+MoveVec
+Board::king_moves() const
+{
+  MoveVec moves;
+  get_simple_moves(Piece::pawn(), move_king, moves);
+
+  if (is_white_next()) {
+    if (wk_can_castle())
+      moves.push_back(Move::wk_castle());
+    if (wq_can_castle())
+      moves.push_back(Move::wq_castle());
+  } else {
+    if (bk_can_castle())
+      moves.push_back(Move::bk_castle());
+    if (bq_can_castle())
+      moves.push_back(Move::wq_castle());
+  }
+
+  return moves;
+}
+
+void
+Board::get_simple_moves(
+    Piece piece,
+    const std::function<BitBoard(BitBoard)>& moves_fn,
+    MoveVec& moves) const
+{
+  auto bb = mine().get(piece);
+  auto no_pieces = none();
+
+  while (bb) {
+    auto [from_square, bb_piece] = bb.index_bb_and_clear();
+    auto bb_moves = moves_fn(bb_piece);
+
+    // Compute moves to empty squares.
+    auto to_squares = bb_moves & no_pieces;
+    get_non_attacks(piece, from_square, to_squares, moves);
+
+    // Compute attacks.
+    to_squares = bb_moves & all_other();
+    get_simple_attacks(piece, from_square, to_squares, other(), moves);
+  }
 }
 
 } // namespace blunder
