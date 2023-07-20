@@ -7,6 +7,7 @@
 #include <memory>
 #include <ostream>
 #include <string>
+#include <utility>
 
 #include "bitboard.h"
 #include "board_side.h"
@@ -185,6 +186,10 @@ public:
   MoveVec
   king_moves() const;
 
+  MoveVec
+  knight_moves() const
+  { return get_simple_moves(Piece::knight(), move_knight); }
+
 private:
   //-------------------------------------
   // Private helpers for move generation.
@@ -199,6 +204,18 @@ private:
       Piece piece,
       const std::function<BitBoard(BitBoard)>& moves_fn,
       MoveVec& moves) const;
+
+  // Overload for get_simple_moves above, moves is returned instead of being
+  // an output argument.
+  MoveVec
+  get_simple_moves(
+      Piece piece,
+      const std::function<BitBoard(BitBoard)>& moves_fn) const
+  {
+    MoveVec moves;
+    get_simple_moves(piece, std::move(moves_fn), moves);
+    return moves;
+  }
 
   friend BoardBuilder;
 
