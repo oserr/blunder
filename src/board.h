@@ -190,6 +190,9 @@ public:
   knight_moves() const
   { return get_simple_moves(Piece::knight(), move_knight); }
 
+  MoveVec
+  bishop_moves() const;
+
 private:
   //-------------------------------------
   // Private helpers for move generation.

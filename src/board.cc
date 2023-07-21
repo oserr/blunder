@@ -202,6 +202,17 @@ Board::king_moves() const
   return moves;
 }
 
+MoveVec
+Board::bishop_moves() const
+{
+  assert(bmagics);
+  auto moves_fn = [&](BitBoard bb) {
+    auto from_square = bb.first_bit();
+    return bmagics->get_attacks(from_square, all_bits());
+  };
+  return get_simple_moves(Piece::bishop(), moves_fn);
+}
+
 void
 Board::get_simple_moves(
     Piece piece,
