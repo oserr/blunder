@@ -213,6 +213,17 @@ Board::bishop_moves() const
   return get_simple_moves(Piece::bishop(), moves_fn);
 }
 
+MoveVec
+Board::rook_moves() const
+{
+  assert(rmagics);
+  auto moves_fn = [&](BitBoard bb) {
+    auto from_square = bb.first_bit();
+    return rmagics->get_attacks(from_square, all_bits());
+  };
+  return get_simple_moves(Piece::rook(), moves_fn);
+}
+
 void
 Board::get_simple_moves(
     Piece piece,

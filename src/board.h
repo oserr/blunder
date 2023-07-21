@@ -193,6 +193,9 @@ public:
   MoveVec
   bishop_moves() const;
 
+  MoveVec
+  rook_moves() const;
+
 private:
   //-------------------------------------
   // Private helpers for move generation.
