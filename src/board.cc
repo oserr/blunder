@@ -224,6 +224,19 @@ Board::rook_moves() const
   return get_simple_moves(Piece::rook(), moves_fn);
 }
 
+MoveVec
+Board::queen_moves() const
+{
+  assert(bmagics and rmagics);
+  auto moves_fn = [&](BitBoard bb) {
+    auto blockers = all_bits();
+    auto from_square = bb.first_bit();
+    return bmagics->get_attacks(from_square, blockers)
+         | rmagics->get_attacks(from_square, blockers);
+  };
+  return get_simple_moves(Piece::rook(), moves_fn);
+}
+
 void
 Board::get_simple_moves(
     Piece piece,

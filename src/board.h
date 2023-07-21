@@ -196,6 +196,9 @@ public:
   MoveVec
   rook_moves() const;
 
+  MoveVec
+  queen_moves() const;
+
 private:
   //-------------------------------------
   // Private helpers for move generation.
