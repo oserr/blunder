@@ -62,7 +62,8 @@ add_library(blunder STATIC
   src/piece_set.h
   src/pre_computed_magics.h
   src/square.cc
-  src/square.h)
+  src/square.h
+  src/square_iter.h)
 set_target_properties(blunder PROPERTIES CXX_STANDARD 23)
 target_compile_options(blunder PUBLIC ${TORCH_CXX_FLAGS})
 target_include_directories(blunder PUBLIC ${TORCH_INCLUDE_DIRS})
