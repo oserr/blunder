@@ -184,25 +184,72 @@ public:
   //-----------------
 
   MoveVec
-  king_moves() const;
+  king_moves() const
+  {
+    MoveVec moves;
+    king_moves(moves);
+    return moves;
+  }
 
   MoveVec
   knight_moves() const
   { return get_simple_moves(Piece::knight(), move_knight); }
 
   MoveVec
-  bishop_moves() const;
+  bishop_moves() const
+  {
+    MoveVec moves;
+    bishop_moves(moves);
+    return moves;
+  }
 
   MoveVec
-  rook_moves() const;
+  rook_moves() const
+  {
+    MoveVec moves;
+    rook_moves(moves);
+    return moves;
+  }
 
   MoveVec
-  queen_moves() const;
+  queen_moves() const
+  {
+    MoveVec moves;
+    queen_moves(moves);
+    return moves;
+  }
+
+  MoveVec
+  pawn_moves() const
+  {
+    MoveVec moves;
+    pawn_moves(moves);
+    return moves;
+  }
 
 private:
   //-------------------------------------
   // Private helpers for move generation.
   //-------------------------------------
+
+  void
+  king_moves(MoveVec& moves) const;
+
+  void
+  knight_moves(MoveVec& moves) const
+  { return get_simple_moves(Piece::knight(), move_knight, moves); }
+
+  void
+  bishop_moves(MoveVec& moves) const;
+
+  void
+  rook_moves(MoveVec& moves) const;
+
+  void
+  queen_moves(MoveVec& moves) const;
+
+  void
+  pawn_moves(MoveVec& moves) const;
 
   // Computes simples moves for Bishops, Kights, Rooks, and Queens. Simple moves
   // consists of non-attack moves and attacks. |piece| is the piece moving, and
@@ -225,6 +272,10 @@ private:
     get_simple_moves(piece, std::move(moves_fn), moves);
     return moves;
   }
+
+  // Helper function to compute en passant moves.
+  void
+  move_enpassant(MoveVec& moves) const;
 
   friend BoardBuilder;
 

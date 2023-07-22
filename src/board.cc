@@ -77,6 +77,129 @@ get_simple_attacks(
   }
 }
 
+//----------------------------------------
+// Helper functions to compute pawn moves.
+//----------------------------------------
+
+using PawnMovesFn = BitBoard(*)(BitBoard, BitBoard);
+using FromFn = std::uint8_t(*)(std::uint8_t);
+using IsPromoFn = bool(*)(std::uint8_t);
+
+// Used to check if the move represents a promotion for white.
+bool
+is_white_promo(std::uint8_t to_square) noexcept
+{ return to_square >= 56; }
+
+// Used to check if the move represents a promotion for black.
+bool
+is_black_promo(std::uint8_t to_square) noexcept
+{ return to_square <= 7; }
+
+// Computes the from square for a one-square white pawn move given the
+// destination square.
+std::uint8_t
+from_single_white(std::uint8_t to_square) noexcept
+{ return to_square - 8; }
+
+// Computes the from square for a double-square white pawn move given the
+// destination square.
+std::uint8_t
+from_double_white(std::uint8_t to_square) noexcept
+{ return to_square - 16; }
+
+// Computes the from square for a white pawn attack diagonal left.
+std::uint8_t
+from_left_white(std::uint8_t to_square) noexcept
+{ return to_square - 7; }
+
+// Computes the from square for a white pawn attack diagonal right.
+std::uint8_t
+from_right_white(std::uint8_t to_square) noexcept
+{ return to_square - 9; }
+
+// Computes the from square for a one-square black pawn move given the
+// destination square.
+std::uint8_t
+from_single_black(std::uint8_t to_square) noexcept
+{ return to_square + 8; }
+
+// Computes the from square for a double-square black pawn move given the
+// destination square.
+std::uint8_t
+from_double_black(std::uint8_t to_square) noexcept
+{ return to_square + 16; }
+
+// Computes the from square for a black pawn attack diagonal left.
+std::uint8_t
+from_left_black(std::uint8_t to_square) noexcept
+{ return to_square + 7; }
+
+// Computes the from square for a black pawn attack diagonal right.
+std::uint8_t
+from_right_black(std::uint8_t to_square) noexcept
+{ return to_square + 9; }
+
+// Function to generate forward pawn moves.
+void
+move_forward(
+    BitBoard pawns,
+    BitBoard no_pieces,
+    PawnMovesFn move_fn,
+    FromFn from_fn,
+    IsPromoFn is_promo_fn,
+    MoveVec& moves)
+{
+  auto pawn_moves = move_fn(pawns, no_pieces);
+
+  while (pawn_moves) {
+    auto to_square = pawn_moves.first_bit_and_clear();
+    auto from_square = from_fn(to_square);
+
+    if (not is_promo_fn(to_square))
+      moves.emplace_back(Piece::pawn(), from_square, to_square);
+    else {
+      // Pawn is moving to the last rank for promotion.
+      moves.push_back(Move::promo(from_square, to_square, Piece::queen()));
+      moves.push_back(Move::promo(from_square, to_square, Piece::rook()));
+      moves.push_back(Move::promo(from_square, to_square, Piece::bishop()));
+      moves.push_back(Move::promo(from_square, to_square, Piece::knight()));
+    }
+  }
+}
+
+// Function to generate pawn attacks.
+void
+attack(
+    BitBoard pawns,
+    Board state,
+    PawnMovesFn move_fn,
+    FromFn from_fn,
+    IsPromoFn is_promo_fn,
+    MoveVec& moves)
+{
+  auto pawn_moves = move_fn(pawns, state.all_other());
+
+  while (pawn_moves) {
+    auto [to_square, to_bb] = pawn_moves.index_bb_and_clear();
+    auto to_piece = state.other().find_type(to_bb);
+    assert(to_piece.type() != Type::None);
+    auto from_square = from_fn(to_square);
+
+    if (not is_promo_fn(to_square))
+      moves.emplace_back(Piece::pawn(), from_square, to_piece, to_square);
+    else {
+      moves.push_back(Move::promo(
+            from_square, to_piece, to_square, Piece::queen()));
+      moves.push_back(Move::promo(
+            from_square, to_piece, to_square, Piece::rook()));
+      moves.push_back(Move::promo(
+            from_square, to_piece, to_square, Piece::bishop()));
+      moves.push_back(Move::promo(
+            from_square, to_piece, to_square, Piece::knight()));
+    }
+  }
+}
+
 } // namespace
 
 Board
@@ -181,10 +304,9 @@ Board::str() const
 // This can be done while we generating the king moves, to prevent creating a
 // move that is not legal, or after the moves are generated. The latter might
 // be necessary and simpler to do.
-MoveVec
-Board::king_moves() const
+void
+Board::king_moves(MoveVec& moves) const
 {
-  MoveVec moves;
   get_simple_moves(Piece::pawn(), move_king, moves);
 
   if (is_white_next()) {
@@ -198,34 +320,32 @@ Board::king_moves() const
     if (bq_can_castle())
       moves.push_back(Move::wq_castle());
   }
-
-  return moves;
 }
 
-MoveVec
-Board::bishop_moves() const
+void
+Board::bishop_moves(MoveVec& moves) const
 {
   assert(bmagics);
   auto moves_fn = [&](BitBoard bb) {
     auto from_square = bb.first_bit();
     return bmagics->get_attacks(from_square, all_bits());
   };
-  return get_simple_moves(Piece::bishop(), moves_fn);
+  return get_simple_moves(Piece::bishop(), moves_fn, moves);
 }
 
-MoveVec
-Board::rook_moves() const
+void
+Board::rook_moves(MoveVec& moves) const
 {
   assert(rmagics);
   auto moves_fn = [&](BitBoard bb) {
     auto from_square = bb.first_bit();
     return rmagics->get_attacks(from_square, all_bits());
   };
-  return get_simple_moves(Piece::rook(), moves_fn);
+  return get_simple_moves(Piece::rook(), moves_fn, moves);
 }
 
-MoveVec
-Board::queen_moves() const
+void
+Board::queen_moves(MoveVec& moves) const
 {
   assert(bmagics and rmagics);
   auto moves_fn = [&](BitBoard bb) {
@@ -234,7 +354,56 @@ Board::queen_moves() const
     return bmagics->get_attacks(from_square, blockers)
          | rmagics->get_attacks(from_square, blockers);
   };
-  return get_simple_moves(Piece::rook(), moves_fn);
+  return get_simple_moves(Piece::rook(), moves_fn, moves);
+}
+
+void
+Board::pawn_moves(MoveVec& moves) const
+{
+  BitBoard pawns = mine().pawn();
+
+  if (not pawns)
+    return;
+
+  PawnMovesFn single_fn;
+  PawnMovesFn double_fn;
+  PawnMovesFn attack_left_fn;
+  PawnMovesFn attack_right_fn;
+  FromFn from_single_fn;
+  FromFn from_double_fn;
+  FromFn from_left_fn;
+  FromFn from_right_fn;
+  IsPromoFn is_promo_fn;
+
+  if (is_white_next()) {
+    single_fn = move_wp_single;
+    double_fn = move_wp_double;
+    attack_left_fn = move_wp_left;
+    attack_right_fn = move_wp_right;
+    from_single_fn = from_single_white;
+    from_double_fn = from_double_white;
+    from_left_fn = from_left_white;
+    from_right_fn = from_right_white;
+    is_promo_fn = is_white_promo;
+  } else {
+    single_fn = move_bp_single;
+    double_fn = move_bp_double;
+    attack_left_fn = move_bp_left;
+    attack_right_fn = move_bp_right;
+    from_single_fn = from_single_black;
+    from_double_fn = from_double_black;
+    from_left_fn = from_left_black;
+    from_right_fn = from_right_black;
+    is_promo_fn = is_black_promo;
+  }
+
+  auto no_pieces = none();
+
+  move_forward(pawns, no_pieces, single_fn, from_single_fn, is_promo_fn, moves);
+  move_forward(pawns, no_pieces, double_fn, from_double_fn, is_promo_fn, moves);
+  attack(pawns, *this, attack_left_fn, from_left_fn, is_promo_fn, moves);
+  attack(pawns, *this, attack_right_fn, from_right_fn, is_promo_fn, moves);
+  move_enpassant(moves);
 }
 
 void
@@ -257,6 +426,56 @@ Board::get_simple_moves(
     // Compute attacks.
     to_squares = bb_moves & all_other();
     get_simple_attacks(piece, from_square, to_squares, other(), moves);
+  }
+}
+
+// We create a BitBoard with one bit set where the pawn moves after capturing
+// en passant, and use that to check if there are any captures.
+void
+Board::move_enpassant(MoveVec& moves) const
+{
+  if (not has_enpassant())
+    return;
+
+  // Fake square
+  auto pawns = mine().pawn();
+  unsigned to_sq = enpassant_file();
+  unsigned passant_sq = to_sq;
+
+  if (is_white_next()) {
+    to_sq += 40; // 6th row
+    passant_sq += 32; // 5th row
+
+    auto to_bb = BitBoard::from_index(to_sq);
+
+    auto attack = move_wp_left(pawns, to_bb);
+    if (attack) {
+      auto from_sq = from_left_white(to_sq);
+      moves.push_back(Move::by_en_passant(from_sq, to_sq, passant_sq));
+    }
+
+    attack = move_wp_right(pawns, to_bb);
+    if (attack) {
+      auto from_sq = from_right_white(to_sq);
+      moves.push_back(Move::by_en_passant(from_sq, to_sq, passant_sq));
+    }
+  } else {
+    to_sq += 16; // 3rd row
+    passant_sq += 24; // 4th row
+
+    auto to_bb = BitBoard::from_index(to_sq);
+
+    auto attack = move_bp_left(pawns, to_bb);
+    if (attack) {
+      auto from_sq = from_left_black(to_sq);
+      moves.push_back(Move::by_en_passant(from_sq, to_sq, passant_sq));
+    }
+
+    attack = move_bp_right(pawns, to_bb);
+    if (attack) {
+      auto from_sq = from_right_black(to_sq);
+      moves.push_back(Move::by_en_passant(from_sq, to_sq, passant_sq));
+    }
   }
 }
 
