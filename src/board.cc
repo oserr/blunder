@@ -54,8 +54,8 @@ get_non_attacks(
     BitBoard to_squares,
     MoveVec& moves)
 {
-  while (to_squares)
-    moves.emplace_back(piece, from_square, to_squares.first_bit_and_clear());
+  for (auto to_square : to_squares.square_iter())
+    moves.emplace_back(piece, from_square, to_square);
 }
 
 // Returns all the simple attack moves for |piece| from square |from_square| to
