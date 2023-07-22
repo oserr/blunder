@@ -53,9 +53,6 @@ add_library(blunder STATIC
   src/magics.h
   src/move.cc
   src/move.h
-  src/move_gen.cc
-  src/move_gen.h
-  src/move_generator.h
   src/moves.h
   src/net.cc
   src/net.h
@@ -101,5 +98,4 @@ create_test(square)
 create_test(magic_attacks)
 create_test(bitboard)
 create_test(fen)
-create_test(move_gen)
 create_test(board)
