@@ -521,6 +521,7 @@ Board::set_attacked() noexcept
   }
 
   auto blockers = all_bits();
+
   for (auto s : other().bishop().square_iter())
     bb_attacked |= bmagics->get_attacks(s, blockers) & no_pieces;
 
