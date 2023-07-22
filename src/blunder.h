@@ -18,10 +18,6 @@ class Blunder {
 public:
 
 private:
-  // The move generator. Here we use a shared pointer to be able to share the
-  // move generator across instances of Blunder in the same binary, e.g. to be
-  // able to handle simultaneous games.
-  std::shared_ptr<MoveGenerator> move_gen;
 };
 
 } // namespace blunder
