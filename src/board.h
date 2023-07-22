@@ -12,6 +12,7 @@
 #include "bitboard.h"
 #include "board_side.h"
 #include "color.h"
+#include "game_state.h"
 #include "magics.h"
 #include "move.h"
 #include "moves.h"
@@ -102,6 +103,22 @@ public:
   BitBoard
   get_attacked() const noexcept
   { return bb_attacked; }
+
+  // Returns true if we have reached a terminal state, i.e. we have a checkmate
+  // or the game has been drawn.
+  bool
+  is_terminal() const noexcept
+  {
+    switch (game_state) {
+      case GameState::Playing:
+        [[fallthrough]];
+      case GameState::Check:
+        return false;
+      default: break;
+    }
+    // We have a check mate or draw.
+    return true;
+  }
 
   //---------------------------
   // Check for castling rights.
@@ -349,6 +366,10 @@ private:
 
   // Indicates if player moving next is in check.
   bool in_check = false;
+
+  // Indicates the state of the current position, e.g. the position represents
+  // check mate.
+  GameState game_state = GameState::Playing;
 };
 
 inline bool

@@ -48,6 +48,7 @@ add_library(blunder STATIC
   src/err.h
   src/fen.cc
   src/fen.h
+  src/game_state.h
   src/magic_attacks.cc
   src/magic_attacks.h
   src/magics.h
