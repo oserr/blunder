@@ -280,6 +280,9 @@ private:
   void
   move_enpassant(MoveVec& moves) const;
 
+  // Computes all the empty squares that are attacked by other.
+  Board& set_attacked() noexcept;
+
   friend BoardBuilder;
 
   // Note that we use static members for bmagics and rmagics below to avoid
