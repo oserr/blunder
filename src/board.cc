@@ -322,7 +322,11 @@ Board::moves() const
 void
 Board::king_moves(MoveVec& moves) const
 {
-  get_simple_moves(Piece::king(), move_king, moves);
+  auto move_king_fn = [&](auto bb) -> BitBoard {
+    // Make sure that none of the squares where the king is moving are attacked.
+    return move_king(bb) & get_attacked().bit_not();
+  };
+  get_simple_moves(Piece::king(), move_king_fn, moves);
 
   if (is_white_next()) {
     if (wk_can_castle())

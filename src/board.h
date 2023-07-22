@@ -20,31 +20,6 @@
 
 namespace blunder {
 
-// TODO: make this a function of Board.
-template<Color color, BoardSide side>
-constexpr bool
-can_castle(BitBoard all_pieces) noexcept
-{
-  BitBoard bits;
-  BitBoard mask;
-
-  if constexpr (side == BoardSide::King) {
-    bits.set_bits(0b00001001ull);
-    mask.set_bits(0b00001111ull);
-  } else {
-    bits.set_bits(0b10001000ull);
-    mask.set_bits(0b11111000ull);
-  }
-
-  if constexpr (color == Color::Black)
-    all_pieces >>= 56;
-
-  all_pieces &= 0xffull;
-  all_pieces &= mask;
-
-  return bits == all_pieces;
-}
-
 // Forward declaration because we will make this a friend of Board to
 // make it easier to build Board while preserving invariants.
 class BoardBuilder;
@@ -123,6 +98,11 @@ public:
   enpassant_file() const noexcept
   { return en_passant_file; }
 
+  // Returns a BitBoard with all of the squares attacked by other set.
+  BitBoard
+  get_attacked() const noexcept
+  { return bb_attacked; }
+
   //---------------------------
   // Check for castling rights.
   //---------------------------
@@ -147,25 +127,51 @@ public:
   // Check if castling is possible.
   //-------------------------------
 
+private:
+  // Used internally to check if castling is possible for a color and a side.
+  template<Color color, BoardSide side>
+  bool
+  can_castle() const noexcept
+  {
+    BitBoard bits;
+    BitBoard mask;
+
+    if constexpr (side == BoardSide::King) {
+      bits.set_bits(0b00001001ull);
+      mask.set_bits(0b00001111ull);
+    } else {
+      bits.set_bits(0b10001000ull);
+      mask.set_bits(0b11111000ull);
+    }
+
+    // Here we treat attacked squares as if they were occupied.
+    auto all_pieces = all_bits() | get_attacked();
+
+    if constexpr (color == Color::Black)
+      all_pieces >>= 56;
+
+    all_pieces &= 0xffull;
+    all_pieces &= mask;
+
+    return bits == all_pieces;
+  }
+
+public:
   unsigned
   wk_can_castle() const noexcept
-  { return wk_castle
-       and can_castle<Color::White, BoardSide::King>(all_bits()); }
+  { return wk_castle and can_castle<Color::White, BoardSide::King>(); }
 
   unsigned
   wq_can_castle() const noexcept
-  { return wq_castle
-       and can_castle<Color::White, BoardSide::Queen>(all_bits()); }
+  { return wq_castle and can_castle<Color::White, BoardSide::Queen>(); }
 
   unsigned
   bk_can_castle() const noexcept
-  { return bk_castle
-       and can_castle<Color::Black, BoardSide::King>(all_bits()); }
+  { return bk_castle and can_castle<Color::Black, BoardSide::King>(); }
 
   unsigned
   bq_can_castle() const noexcept
-  { return bq_castle
-       and can_castle<Color::Black, BoardSide::Queen>(all_bits()); }
+  { return bq_castle and can_castle<Color::Black, BoardSide::Queen>(); }
 
   // Registers the Magics so instances of Board can generate moves.
   static void
