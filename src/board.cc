@@ -205,25 +205,27 @@ attack_with_pawns(
 Board
 Board::new_board() noexcept
 {
-  Board state;
+  Board board;
 
-  state.bb_mine = PieceSet::init_white();
-  state.bb_other = PieceSet::init_black();
+  board.bb_mine = PieceSet::init_white();
+  board.bb_other = PieceSet::init_black();
 
-  state.half_move = 0;
-  state.full_move = 1;
+  board.half_move = 0;
+  board.full_move = 1;
 
-  state.next = Color::White;
+  board.next = Color::White;
 
-  state.en_passant = false;
-  state.en_passant_file = false;
+  board.en_passant = false;
+  board.en_passant_file = false;
 
-  state.wk_castle = true;
-  state.wq_castle = true;
-  state.bk_castle = true;
-  state.bq_castle = true;
+  board.wk_castle = true;
+  board.wq_castle = true;
+  board.bk_castle = true;
+  board.bq_castle = true;
 
-  return state;
+  board.set_attacked();
+
+  return board;
 }
 
 bool
