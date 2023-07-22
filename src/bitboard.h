@@ -10,6 +10,8 @@
 #include <string>
 #include <utility>
 
+#include "square_iter.h"
+
 namespace blunder {
 
 class BitBoard {
@@ -232,6 +234,10 @@ public:
   static BitBoard
   from_index(unsigned index) noexcept
   { return BitBoard().set_bit(index); }
+
+  SquareIter
+  square_iter() const noexcept
+  { return SquareIter(raw()); }
 
 private:
   std::uint64_t bits;
