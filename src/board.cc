@@ -169,7 +169,7 @@ move_forward(
 
 // Function to generate pawn attacks.
 void
-attack(
+attack_with_pawns(
     BitBoard pawns,
     Board state,
     PawnMovesFn move_fn,
@@ -414,8 +414,10 @@ Board::pawn_moves(MoveVec& moves) const
 
   move_forward(pawns, no_pieces, single_fn, from_single_fn, is_promo_fn, moves);
   move_forward(pawns, no_pieces, double_fn, from_double_fn, is_promo_fn, moves);
-  attack(pawns, *this, attack_left_fn, from_left_fn, is_promo_fn, moves);
-  attack(pawns, *this, attack_right_fn, from_right_fn, is_promo_fn, moves);
+  attack_with_pawns(
+      pawns, *this, attack_left_fn, from_left_fn, is_promo_fn, moves);
+  attack_with_pawns(
+      pawns, *this, attack_right_fn, from_right_fn, is_promo_fn, moves);
   move_enpassant(moves);
 }
 
