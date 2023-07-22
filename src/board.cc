@@ -296,6 +296,19 @@ Board::str() const
 // Move generation.
 //-----------------
 
+MoveVec
+Board::moves() const
+{
+  MoveVec moves;
+  pawn_moves(moves);
+  knight_moves(moves);
+  bishop_moves(moves);
+  rook_moves(moves);
+  queen_moves(moves);
+  king_moves(moves);
+  return moves;
+}
+
 // TODO: check any moves are illegal. For example:
 // - king cannot put himself in check.
 // - castling is not possible if one of the squares the king has to cross is
@@ -307,7 +320,7 @@ Board::str() const
 void
 Board::king_moves(MoveVec& moves) const
 {
-  get_simple_moves(Piece::pawn(), move_king, moves);
+  get_simple_moves(Piece::king(), move_king, moves);
 
   if (is_white_next()) {
     if (wk_can_castle())

@@ -184,6 +184,9 @@ public:
   //-----------------
 
   MoveVec
+  moves() const;
+
+  MoveVec
   king_moves() const
   {
     MoveVec moves;
