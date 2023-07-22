@@ -171,17 +171,17 @@ move_forward(
 void
 attack_with_pawns(
     BitBoard pawns,
-    Board state,
+    Board board,
     PawnMovesFn move_fn,
     FromFn from_fn,
     IsPromoFn is_promo_fn,
     MoveVec& moves)
 {
-  auto pawn_moves = move_fn(pawns, state.all_other());
+  auto pawn_moves = move_fn(pawns, board.all_other());
 
   while (pawn_moves) {
     auto [to_square, to_bb] = pawn_moves.index_bb_and_clear();
-    auto to_piece = state.other().find_type(to_bb);
+    auto to_piece = board.other().find_type(to_bb);
     assert(to_piece.type() != Type::None);
     auto from_square = from_fn(to_square);
 

@@ -350,8 +350,8 @@ operator==(const Board& left, const Board& right) noexcept
 { return left.eq(right); }
 
 inline std::ostream&
-operator<<(std::ostream& os, const Board& state)
-{ return os << state.str(); }
+operator<<(std::ostream& os, const Board& board)
+{ return os << board.str(); }
 
 enum class BoardBuilderErr {
   // White pieces are not valid.
@@ -369,10 +369,10 @@ public:
   std::expected<Board, BoardBuilderErr>
   build() const noexcept
   {
-    if (!state.white().is_valid())
+    if (!board.white().is_valid())
       return std::unexpected(BoardBuilderErr::White);
 
-    if (!state.black().is_valid())
+    if (!board.black().is_valid())
       return std::unexpected(BoardBuilderErr::White);
 
     if (file_err)
@@ -381,7 +381,7 @@ public:
     if (half_move_err)
       return std::unexpected(BoardBuilderErr::HalfMove);
 
-    return state;
+    return board;
   }
 
   // All pieces are set simulateously to make sure that we set mine and other
@@ -390,13 +390,13 @@ public:
   set_pieces(Color color, const PieceSet& white, const PieceSet& black) noexcept
   {
     if (color == Color::White) {
-      state.bb_mine = white;
-      state.bb_other = black;
+      board.bb_mine = white;
+      board.bb_other = black;
     } else {
-      state.bb_mine = black;
-      state.bb_other = white;
+      board.bb_mine = black;
+      board.bb_other = white;
     }
-    state.next = color;
+    board.next = color;
     return *this;
   }
 
@@ -409,14 +409,14 @@ public:
     }
 
     half_move_err = false;
-    state.half_move = hm;
+    board.half_move = hm;
     return *this;
   }
 
   BoardBuilder&
   set_full_move(unsigned fm) noexcept
   {
-    state.full_move = fm;
+    board.full_move = fm;
     return *this;
   }
 
@@ -429,8 +429,8 @@ public:
     }
 
     file_err = false;
-    state.en_passant = true;
-    state.en_passant_file = file;
+    board.en_passant = true;
+    board.en_passant_file = file;
 
     return *this;
   }
@@ -438,33 +438,33 @@ public:
   BoardBuilder&
   set_wk_castling(bool has_right) noexcept
   {
-    state.wk_castle = has_right;
+    board.wk_castle = has_right;
     return *this;
   }
 
   BoardBuilder&
   set_wq_castling(bool has_right) noexcept
   {
-    state.wq_castle = has_right;
+    board.wq_castle = has_right;
     return *this;
   }
 
   BoardBuilder&
   set_bk_castling(bool has_right) noexcept
   {
-    state.bk_castle = has_right;
+    board.bk_castle = has_right;
     return *this;
   }
 
   BoardBuilder&
   set_bq_castling(bool has_right) noexcept
   {
-    state.bq_castle = has_right;
+    board.bq_castle = has_right;
     return *this;
   }
 
 private:
-  Board state;
+  Board board;
   bool file_err = false;
   bool half_move_err = false;
 };

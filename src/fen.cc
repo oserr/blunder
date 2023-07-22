@@ -383,7 +383,7 @@ read_fen(std::string_view fen) noexcept
   if (en_passant)
     builder.set_enpassant_file(*en_passant % 8);
 
-  auto state = builder
+  auto board = builder
          .set_pieces(color, white, black)
          .set_wk_castling(castling.wking)
          .set_wq_castling(castling.wqueen)
@@ -393,10 +393,10 @@ read_fen(std::string_view fen) noexcept
          .set_full_move(full_move)
          .build();
 
-  if (not state)
+  if (not board)
     return std::unexpected(FenErr::Internal);
 
-  return *state;
+  return *board;
 }
 
 std::string_view
