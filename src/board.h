@@ -41,7 +41,7 @@ public:
   // Returns true if white is next to move.
   bool
   is_white_next() const noexcept
-  { return next == Color::White; }
+  { return next_to_move == Color::White; }
 
   // Returns a bitboard with all the pieces for the player moving next.
   BitBoard
@@ -344,7 +344,7 @@ private:
   std::uint16_t full_move = 0;
 
   // The next color to move.
-  Color next;
+  Color next_to_move;
 
   // If set, indicates that en passant is possible.
   bool en_passant = false;
@@ -423,7 +423,7 @@ public:
       board.bb_mine = black;
       board.bb_other = white;
     }
-    board.next = color;
+    board.next_to_move = color;
     return *this;
   }
 

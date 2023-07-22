@@ -213,7 +213,7 @@ Board::new_board() noexcept
   board.half_move = 0;
   board.full_move = 1;
 
-  board.next = Color::White;
+  board.next_to_move = Color::White;
 
   board.en_passant = false;
   board.en_passant_file = false;
@@ -269,7 +269,7 @@ Board::str() const
   }
 
   buff += "Color:";
-  buff += next == Color::White ? 'w' : 'b';
+  buff += is_white_next() ? 'w' : 'b';
   buff += '\n';
 
   buff += "Castling:";
