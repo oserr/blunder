@@ -430,28 +430,30 @@ Board::pawn_moves(MoveVec& moves) const
 Board&
 Board::update(Move mv) noexcept
 {
-  auto fp = mv.piece();
-  assert(fp.type() != Type::None);
+  auto from_piece = mv.piece();
+  assert(from_piece.type() != Type::None);
 
-  auto fs = mv.from();
-  auto ts = mv.to();
-  auto tp = mv.capture();
+  auto from_square = mv.from();
+  auto to_square = mv.to();
 
-  // King and pawn moves have edge cases like en-passant, pawn promos, and
-  // castling, which require special handling.
-  switch (fp.type()) {
-    case Type::King:
-      // TODO: handle castling moves.
-      break;
-    case Type::Pawn:
-      // TODO: handle en passant and pawn promos.
-      break;
-    default:
-      mine_mut().clear_bit(fp, fs);
-      mine_mut().set_bit(fp, ts);
-      if (tp.type() != Type::None)
-        other_mut().clear_bit(tp, ts);
-      break;
+  bb_mine.update_bit(from_piece, from_square, to_square);
+
+  // En passant capture square is different from square where piece is moving.
+  if (mv.is_capture() and mv.is_enpassant())
+    bb_other.clear_bit(mv.capture(), mv.passant());
+  else if (mv.is_capture())
+    bb_other.clear_bit(mv.capture(), to_square);
+
+  if (mv.is_promo()) {
+    bb_mine.clear_bit(Piece::pawn(), to_square);
+    bb_mine.set_bit(mv.promoted(), to_square);
+  }
+
+  if (mv.is_castling()) {
+    auto rk_from_to = mv.get_rook_from_to();
+    assert(rk_from_to);
+    auto [rk_from, rk_to] = *rk_from_to;
+    bb_mine.update_bit(Piece::rook(), rk_from, rk_to);
   }
 
   // TODO: update half move and full move counts.
