@@ -448,7 +448,7 @@ Board::update(Move mv) noexcept
       break;
     default:
       mine_mut().clear_bit(fp, fs);
-      mine_mut().set_bit(fp, fs);
+      mine_mut().set_bit(fp, ts);
       if (tp.type() != Type::None)
         other_mut().clear_bit(tp, ts);
       break;
