@@ -439,7 +439,7 @@ Board::update(Move mv) noexcept
   bb_mine.update_bit(from_piece, from_square, to_square);
 
   // En passant capture square is different from square where piece is moving.
-  if (mv.is_capture() and mv.is_enpassant())
+  if (mv.is_enpassant())
     bb_other.clear_bit(mv.capture(), mv.passant());
   else if (mv.is_capture())
     bb_other.clear_bit(mv.capture(), to_square);
