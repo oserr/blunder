@@ -30,14 +30,30 @@ class BoardBuilder;
 // generation.
 class Board {
 public:
-  // Returns a reference to piece set for player moving next.
-  const PieceSet& mine() const noexcept
+  // Returns a const reference to piece set for player moving next.
+  const PieceSet&
+  mine() const noexcept
   { return bb_mine; }
 
+private:
+  // Returns a mutable reference to piece set for player moving next.
+  PieceSet&
+  mine_mut() noexcept
+  { return bb_mine; }
+
+public:
   // Returns a reference to piece set for player not moving next.
-  const PieceSet& other() const noexcept
+  const PieceSet&
+  other() const noexcept
   { return bb_other; }
 
+private:
+  // Returns a reference to piece set for player not moving next.
+  PieceSet&
+  other_mut() noexcept
+  { return bb_other; }
+
+public:
   // Returns true if white is next to move.
   bool
   is_white_next() const noexcept
@@ -253,6 +269,7 @@ public:
     return moves;
   }
 
+
 private:
   //-------------------------------------
   // Private helpers for move generation.
@@ -276,6 +293,10 @@ private:
 
   void
   pawn_moves(MoveVec& moves) const;
+
+  // Updates this board with move |mv|.
+  Board&
+  update(Move mv) noexcept;
 
   // Computes simples moves for Bishops, Kights, Rooks, and Queens. Simple moves
   // consists of non-attack moves and attacks. |piece| is the piece moving, and

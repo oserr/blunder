@@ -427,6 +427,44 @@ Board::pawn_moves(MoveVec& moves) const
   move_enpassant(moves);
 }
 
+Board&
+Board::update(Move mv) noexcept
+{
+  auto fp = mv.fromp();
+  assert(fp.type() != Type::None);
+
+  auto fs = mv.froms();
+  auto ts = mv.tos();
+  auto tp = mv.top();
+
+  // King and pawn moves have edge cases like en-passant, pawn promos, and
+  // castling, which require special handling.
+  switch (fp.type()) {
+    case Type::King:
+      // TODO: handle castling moves.
+      break;
+    case Type::Pawn:
+      // TODO: handle en passant and pawn promos.
+      break;
+    default:
+      mine_mut().clear_bit(fp, fs);
+      mine_mut().set_bit(fp, fs);
+      if (tp.type() != Type::None)
+        other_mut().clear_bit(tp, ts);
+      break;
+  }
+
+  // TODO: update half move and full move counts.
+
+  // TODO: after setting and clearing bits, check that we have not reached a
+  // terminal state. For example, if one or more pieces are attacking the king,
+  // we need to determine if we are in check, or if its check mate. We also need
+  // to check that it's not a draw, e.g. stalemate or draw by insufficient
+  // material.
+
+  return *this;
+}
+
 void
 Board::get_simple_moves(
     Piece piece,
