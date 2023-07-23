@@ -47,6 +47,14 @@ public:
     return *this;
   }
 
+  // Clears the bit set at index |index|.
+  BitBoard&
+  clear_bit(unsigned index) noexcept
+  {
+    bits &= ~(1ull << index);
+    return *this;
+  }
+
   // Sets the bits with other_bits.
   BitBoard&
   set_bits(std::uint64_t other_bits) noexcept
