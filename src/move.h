@@ -9,41 +9,18 @@
 
 namespace blunder {
 
+enum class MoveType : std::uint8_t {
+  Normal,
+  KingCastle,
+  QueenCastle,
+  EnPassant,
+  Promo
+};
+
 // Move contains multiple bitfields to represent a chess move, taking less than
 // 4 total bytes.
-struct Move {
-  // Represents the piece being moved.
-  // - 0: King
-  // - 1: Queen
-  // - 2: Rook
-  // - 3: Bishop
-  // - 4: Knight
-  // - 5: Pawn
-  // - 6: None
-  //
-  // If the move does not represent an attack, then |to_piece| should be set to
-  // None.
-  std::uint8_t from_piece: 3 = 0;
-  std::uint8_t to_piece: 3 = to_int(Type::None);
-
-  // The source and destination squares.
-  std::uint8_t from_square: 6 = 0;
-  std::uint8_t to_square: 6 = 0;
-
-  // The square of the captured piece on an en-passant move.
-  std::uint8_t passant_square: 6 = 0;
-
-  // For king moves, indicates if the king is castling. kside=1 indicates
-  // kingside, and kside=0 indicates queenside.
-  std::uint8_t castle: 1 = 0;
-  std::uint8_t kside: 1 = 0;
-
-  // For pawn moves, indicates en-passant and whether the move is a promotion.
-  // If it is, promo_piece will be set to promoted piece.
-  std::uint8_t en_passant: 1 = 0;
-  std::uint8_t is_promo: 1 = 0;
-  std::uint8_t promo_piece: 3 = to_int(Type::None);
-
+class Move {
+public:
   // Initializes all fields.
   Move() = default;
 
@@ -53,56 +30,26 @@ struct Move {
   // source square, piece type for moving piece, and destination square.
   // ------------------------------------------------------------------------
 
-  Move(
-      std::uint8_t from_piece,
-      std::uint8_t from_square,
-      std::uint8_t to_square) noexcept
-    : from_piece(from_piece),
-      from_square(from_square),
-      to_square(to_square) {}
+  Move(Piece fp, std::uint8_t fs, std::uint8_t ts) noexcept
+    : from_piece(fp),
+      from_square(fs),
+      to_square(ts) {}
 
-  Move(
-      Piece from_piece,
-      std::uint8_t from_square,
-      std::uint8_t to_square) noexcept
-    : Move(from_piece.uint(), from_square, to_square) {}
-
-  Move(
-      Piece from_piece,
-      Sq from_square,
-      Sq to_square) noexcept
-    : Move(from_piece.uint(), to_int(from_square), to_int(to_square)) {}
+  Move(Piece fp, Sq fs, Sq ts) noexcept
+    : Move(fp, to_int(fs), to_int(ts)) {}
 
   // ------------------------------------------------------------------------
   // Next most common scenario, we move a piece with capture, with overloads.
   // ------------------------------------------------------------------------
 
-  Move(
-      std::uint8_t from_piece,
-      std::uint8_t from_square,
-      std::uint8_t to_piece,
-      std::uint8_t to_square) noexcept
-    : from_piece(from_piece),
-      to_piece(to_piece),
-      from_square(from_square),
-      to_square(to_square) {}
-
-  Move(
-      Piece from_piece,
-      std::uint8_t from_square,
-      std::uint8_t to_piece,
-      std::uint8_t to_square) noexcept
-    : Move(from_piece.uint(), from_square, to_piece, to_square) {}
-
-  Move(
-      Piece from_piece,
-      std::uint8_t from_square,
-      Piece to_piece,
-      std::uint8_t to_square) noexcept
-    : Move(from_piece.uint(), from_square, to_piece.uint(), to_square) {}
+  Move(Piece fp, std::uint8_t fs, Piece tp, std::uint8_t ts) noexcept
+    : from_piece(fp),
+      to_piece(tp),
+      from_square(fs),
+      to_square(ts) {}
 
   // Copy control.
-  constexpr Move(const Move& m) noexcept = default;
+  Move(const Move& m) noexcept = default;
   Move& operator=(const Move& m) noexcept = default;
 
   // --------------------------------------------------------------------------
@@ -111,99 +58,79 @@ struct Move {
   // --------------------------------------------------------------------------
 
   // Returns a move for white king side castle.
-  static constexpr Move
+  static Move
   wk_castle() noexcept
   {
-    Move m(Piece::king(), 4, 6);
-    m.castle = 1;
-    m.kside = 1;
-    return m;
+    Move mv(Piece::king(), 4, 6);
+    mv.move_type = MoveType::KingCastle;
+    return mv;
   }
 
   // Returns a move for white queen side castle.
-  static constexpr Move
+  static Move
   wq_castle() noexcept
   {
-    Move m(Piece::king(), 4, 2);
-    m.castle = 1;
-    return m;
+    Move mv(Piece::king(), 4, 2);
+    mv.move_type = MoveType::QueenCastle;
+    return mv;
   }
 
   // Returns a move for black king side castle.
   static constexpr Move
   bk_castle() noexcept
   {
-    Move m(Piece::king(), 60, 62);
-    m.castle = 1;
-    m.kside = 1;
-    return m;
+    Move mv(Piece::king(), 60, 62);
+    mv.move_type = MoveType::KingCastle;
+    return mv;
   }
 
   // Returns a move for black queen side castle.
   static constexpr Move
   bq_castle() noexcept
   {
-    Move m(Piece::king(), 60, 58);
-    m.castle = 1;
-    return m;
+    Move mv(Piece::king(), 60, 58);
+    mv.move_type = MoveType::QueenCastle;
+    return mv;
   }
 
   // Returns a move for pawn promotion without capture.
   static Move
-  promo(
-      std::uint8_t from_sq,
-      std::uint8_t to_sq,
-      Piece promo) noexcept
+  promo(std::uint8_t fs, std::uint8_t ts, Piece promo) noexcept
   {
-    assert(from_sq < 64);
-    assert(to_sq < 64);
+    assert(fs < 64);
+    assert(ts < 64);
 
-    Move m(Piece::pawn(), from_sq, to_sq);
-    m.is_promo = 1;
-    m.promo_piece = promo.uint();
-    return m;
+    Move mv(Piece::pawn(), fs, ts);
+    mv.move_type = MoveType::Promo;
+    mv.promo_piece = promo;
+    return mv;
   }
 
   // Returns a move for pawn promotion with capture.
   static Move
-  promo(
-      std::uint8_t from_sq,
-      std::uint8_t to_piece,
-      std::uint8_t to_sq,
-      Piece promo) noexcept
+  promo(std::uint8_t fs, Piece tp, std::uint8_t ts, Piece promo) noexcept
   {
-    assert(from_sq < 64);
-    assert(to_sq < 64);
-
-    Move m(Piece::pawn(), from_sq, to_piece, to_sq);
-    m.is_promo = 1;
-    m.promo_piece = promo.uint();
-    return m;
+    Move mv(Piece::pawn(), fs, tp, ts);
+    mv.move_type = MoveType::Promo;
+    mv.promo_piece = promo;
+    return mv;
   }
-
-  // Returns a move for pawn promotion with capture.
-  static Move
-  promo(
-      std::uint8_t from_sq,
-      Piece to_piece,
-      std::uint8_t to_sq,
-      Piece promo) noexcept
-  { return Move::promo(from_sq, to_piece.uint(), to_sq, promo); }
 
   // Returns a move for en passant capture.
+  //
+  // @param fs The source square where piece is moving from.
+  // @param ts The destination square, where piece is moving to.
+  // @param ts The en-passant squaure, where pawn is being captured.
   static Move
-  by_en_passant(
-      std::uint8_t from_sq,
-      std::uint8_t to_sq,
-      std::uint8_t passant_sq) noexcept
+  by_enpassant(std::uint8_t fs, std::uint8_t ts, std::uint8_t ps) noexcept
   {
-    assert(from_sq < 64);
-    assert(to_sq < 64);
+    assert(fs < 64);
+    assert(ts < 64);
 
-    Move m(Piece::pawn(), from_sq, to_sq);
-    m.passant_square = passant_sq;
-    m.en_passant = true;
-    return m;
+    Move mv(Piece::pawn(), fs, ts);
+    mv.passant_square = ps;
+    mv.move_type = MoveType::EnPassant;
+    return mv;
   }
 
   // Cretes a printable debug string for Move in the form
@@ -219,24 +146,85 @@ struct Move {
   bool
   eq(Move mv) const noexcept;
 
-  // TODO: Make all members and private and define getters. Rename member
-  // variables and functions.
+  //-----------
+  // Accessors.
+  //-----------
+ 
+  Piece
+  piece() const noexcept
+  { return from_piece; }
 
   Piece
-  fromp() const noexcept
-  { return Piece::from_int(from_piece); }
+  capture() const noexcept
+  { return to_piece; }
 
   unsigned
-  froms() const noexcept
+  from() const noexcept
   { return from_square; }
 
-  Piece
-  top() const noexcept
-  { return Piece::from_int(from_piece); }
-
   unsigned
-  tos() const noexcept
+  to() const noexcept
   { return to_square; }
+
+  MoveType
+  type() const noexcept
+  { return move_type; }
+
+  Piece
+  promoted() const noexcept
+  { return promo_piece; }
+
+  // Returns the square of the pawn being captured by en-passant.
+  unsigned
+  passant() const noexcept
+  { return passant_square; }
+
+  bool
+  is_promo() const noexcept
+  { return type() == MoveType::Promo; }
+
+  bool
+  is_enpassant() const noexcept
+  { return type() == MoveType::EnPassant; }
+
+  bool
+  is_castling() const noexcept
+  {
+    return type() == MoveType::KingCastle
+        or type() == MoveType::QueenCastle;
+  }
+
+  bool
+  is_capture() const noexcept
+  { return capture().type() != Type::None; }
+
+private:
+  // The color of the piece moving is not encoded as a member because moves are
+  // done in the context of a Board and a game, and the color can be determined
+  // from the context. 
+
+  // Represents the piece being moved. If the move does not represent an attack,
+  // then |capture| is set to none.
+  Piece from_piece = Piece::none();
+  Piece to_piece = Piece::none();
+
+  // The source and destination squares.
+  std::uint8_t from_square = 0;
+  std::uint8_t to_square = 0;
+
+  // Identifies special move types, e.g. castling, pawn promo, etc.
+  MoveType move_type = MoveType::Normal;
+
+  // The square of the captured piece on an en-passant move. Note that this can
+  // be deduced from context, but include here to make it easier to apply the
+  // moves.
+  std::uint8_t passant_square = 0;
+
+  // For pawn promotions, the promoted piece type.
+  Piece promo_piece = Piece::none();
+
+  // TODO: add one more member with a numeric ID to represent the move code
+  // for use with the neural network.
 };
 
 inline bool

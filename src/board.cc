@@ -430,12 +430,12 @@ Board::pawn_moves(MoveVec& moves) const
 Board&
 Board::update(Move mv) noexcept
 {
-  auto fp = mv.fromp();
+  auto fp = mv.piece();
   assert(fp.type() != Type::None);
 
-  auto fs = mv.froms();
-  auto ts = mv.tos();
-  auto tp = mv.top();
+  auto fs = mv.from();
+  auto ts = mv.to();
+  auto tp = mv.capture();
 
   // King and pawn moves have edge cases like en-passant, pawn promos, and
   // castling, which require special handling.
@@ -510,13 +510,13 @@ Board::move_enpassant(MoveVec& moves) const
     auto attack = move_wp_left(pawns, to_bb);
     if (attack) {
       auto from_sq = from_left_white(to_sq);
-      moves.push_back(Move::by_en_passant(from_sq, to_sq, passant_sq));
+      moves.push_back(Move::by_enpassant(from_sq, to_sq, passant_sq));
     }
 
     attack = move_wp_right(pawns, to_bb);
     if (attack) {
       auto from_sq = from_right_white(to_sq);
-      moves.push_back(Move::by_en_passant(from_sq, to_sq, passant_sq));
+      moves.push_back(Move::by_enpassant(from_sq, to_sq, passant_sq));
     }
   } else {
     to_sq += 16; // 3rd row
@@ -527,13 +527,13 @@ Board::move_enpassant(MoveVec& moves) const
     auto attack = move_bp_left(pawns, to_bb);
     if (attack) {
       auto from_sq = from_left_black(to_sq);
-      moves.push_back(Move::by_en_passant(from_sq, to_sq, passant_sq));
+      moves.push_back(Move::by_enpassant(from_sq, to_sq, passant_sq));
     }
 
     attack = move_bp_right(pawns, to_bb);
     if (attack) {
       auto from_sq = from_right_black(to_sq);
-      moves.push_back(Move::by_en_passant(from_sq, to_sq, passant_sq));
+      moves.push_back(Move::by_enpassant(from_sq, to_sq, passant_sq));
     }
   }
 }

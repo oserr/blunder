@@ -8,15 +8,13 @@ namespace blunder {
 bool
 Move::eq(Move mv) const noexcept
 {
-  return from_piece == mv.from_piece
-     and to_piece == mv.to_piece
-     and from_square == mv.from_square
-     and to_square == mv.to_square
-     and castle == mv.castle
-     and kside == mv.kside
-     and en_passant == mv.en_passant
-     and is_promo == mv.is_promo
-     and promo_piece == mv.promo_piece;
+  return piece() == mv.piece()
+     and capture() == mv.capture()
+     and from() == mv.from()
+     and to() == mv.to()
+     and type() == mv.type()
+     and passant() == mv.passant()
+     and promoted() == mv.promoted();
 }
 
 std::string
@@ -26,16 +24,16 @@ Move::str() const
   buff.reserve(128);
 
   buff += '{';
-  buff += Piece::from_int(from_piece).letter();
+  buff += piece().letter();
   buff += ':';
   buff += to_sq_str(from_square);
   buff += "->";
   buff += to_sq_str(to_square);
 
-  if (castle) {
+  if (is_castling()) {
     std::uint8_t from_sq = from_square;
     std::uint8_t to_sq = to_square;
-    if (kside) {
+    if (type() == MoveType::KingCastle) {
       from_sq += 3;
       --to_sq;
     } else {
@@ -51,14 +49,14 @@ Move::str() const
     buff += to_sq_str(to_sq);
   }
 
-  if (auto piece = Piece::from_int(to_piece); piece != Type::None) {
+  if (is_capture()) {
     buff += ", !";
-    buff += piece.letter();
+    buff += capture().letter();
   }
 
-  if (is_promo) {
+  if (is_promo()) {
     buff += ", ^";
-    buff += Piece::from_int(promo_piece).letter();
+    buff += promoted().letter();
   }
 
   buff += '}';
