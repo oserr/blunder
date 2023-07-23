@@ -47,12 +47,34 @@ public:
     return *this;
   }
 
-  // Clears the bit set at index |index|.
+  // Returns true if bit at index |index| is set.
+  BitBoard&
+  has_bit(unsigned index) noexcept
+  { return bits & (1ull << index); }
+
+  // Clears the bit set at index |index|. Doesn't have any effect if the bit is
+  // not set.
   BitBoard&
   clear_bit(unsigned index) noexcept
   {
     bits &= ~(1ull << index);
     return *this;
+  }
+
+  // Sets the bit at the given index.
+  BitBoard&
+  set_bit(unsigned index) noexcept
+  {
+    bits |= 1ull << index;
+    return *this;
+  }
+
+  BitBoard&
+  update_bit(unsigned from, unsigned to) noexcept
+  {
+    assert(has_bit(from));
+    assert(!has_bit(to));
+    return clear_bit(from).set_bit(to);
   }
 
   // Sets the bits with other_bits.
@@ -224,14 +246,6 @@ public:
   // +---+---+---+---+---+---+---+---+
   std::string
   fancy_str() const;
-
-  // Sets the bit at the given index.
-  BitBoard&
-  set_bit(unsigned index) noexcept
-  {
-    bits |= 1ull << index;
-    return *this;
-  }
 
   // Returns true if bb is equal, i.e. they have the same set of bits set.
   bool
