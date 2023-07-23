@@ -1,7 +1,9 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "pieces.h"
@@ -127,7 +129,7 @@ public:
     assert(fs < 64);
     assert(ts < 64);
 
-    Move mv(Piece::pawn(), fs, ts);
+    Move mv(Piece::pawn(), fs, Piece::pawn(), ts);
     mv.passant_square = ps;
     mv.move_type = MoveType::EnPassant;
     return mv;
@@ -149,7 +151,7 @@ public:
   //-----------
   // Accessors.
   //-----------
- 
+
   Piece
   piece() const noexcept
   { return from_piece; }
@@ -203,10 +205,15 @@ public:
   is_capture() const noexcept
   { return capture().type() != Type::None; }
 
+  // If this is a castling move, returns a pair of (from, to) with source and
+  // destination squares for the rook.
+  std::optional<std::pair<unsigned, unsigned>>
+  get_rook_from_to() const noexcept;
+
 private:
   // The color of the piece moving is not encoded as a member because moves are
   // done in the context of a Board and a game, and the color can be determined
-  // from the context. 
+  // from the context.
 
   // Represents the piece being moved. If the move does not represent an attack,
   // then |capture| is set to none.

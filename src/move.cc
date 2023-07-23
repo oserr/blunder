@@ -64,4 +64,15 @@ Move::str() const
   return buff;
 }
 
+std::optional<std::pair<unsigned, unsigned>>
+Move::get_rook_from_to() const noexcept
+{
+  if (is_kcastling())
+    return std::make_pair(from_square + 3, to_square - 1);
+  else if (is_qcastling())
+    return std::make_pair(from_square - 4, to_square + 1);
+  else
+    return std::nullopt;
+}
+
 } // namespace blunder
