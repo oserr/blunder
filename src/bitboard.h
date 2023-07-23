@@ -48,7 +48,7 @@ public:
   }
 
   // Returns true if bit at index |index| is set.
-  BitBoard&
+  bool
   has_bit(unsigned index) noexcept
   { return bits & (1ull << index); }
 
