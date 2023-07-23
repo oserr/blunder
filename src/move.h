@@ -188,11 +188,16 @@ public:
   { return type() == MoveType::EnPassant; }
 
   bool
+  is_kcastling() const noexcept
+  { return type() == MoveType::KingCastle; }
+
+  bool
+  is_qcastling() const noexcept
+  { return type() == MoveType::QueenCastle; }
+
+  bool
   is_castling() const noexcept
-  {
-    return type() == MoveType::KingCastle
-        or type() == MoveType::QueenCastle;
-  }
+  { return is_kcastling() or is_qcastling(); }
 
   bool
   is_capture() const noexcept
