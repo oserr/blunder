@@ -218,6 +218,25 @@ struct Move {
   // Returns true if both moves are equal.
   bool
   eq(Move mv) const noexcept;
+
+  // TODO: Make all members and private and define getters. Rename member
+  // variables and functions.
+
+  Piece
+  fromp() const noexcept
+  { return Piece::from_int(from_piece); }
+
+  unsigned
+  froms() const noexcept
+  { return from_square; }
+
+  Piece
+  top() const noexcept
+  { return Piece::from_int(from_piece); }
+
+  unsigned
+  tos() const noexcept
+  { return to_square; }
 };
 
 inline bool
