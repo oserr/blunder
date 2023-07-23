@@ -70,6 +70,18 @@ public:
   set_bit(Piece piece, unsigned index) noexcept
   { return set_bit(piece.type(), index); }
 
+  PieceSet&
+  clear_bit(Type type, unsigned index) noexcept
+  {
+    get_mut(type).clear_bit(index);
+    all_bits.clear_bit(index);
+    return *this;
+  }
+
+  PieceSet&
+  clear_bit(Piece piece, unsigned index) noexcept
+  { return clear_bit(piece.type(), index); }
+
   //----------
   // Iterators
   //----------
