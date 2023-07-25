@@ -456,7 +456,10 @@ Board::update(Move mv) noexcept
     bb_mine.update_bit(Piece::rook(), rk_from, rk_to);
   }
 
-  // TODO: update half move and full move counts.
+  if (mv.is_capture() or from_piece.type() == Piece::Pawn())
+    half_move = 0;
+  else
+    ++half_move;
 
   // TODO: after setting and clearing bits, check that we have not reached a
   // terminal state. For example, if one or more pieces are attacking the king,
