@@ -457,7 +457,7 @@ Board::update(Move mv) noexcept
   }
 
   // Half move is reset on capture or pawn move, and incremented otherwise.
-  if (mv.is_capture() or from_piece.type() == Piece::Pawn())
+  if (mv.is_capture() or from_piece.type() == Type::Pawn)
     half_move = 0;
   else
     ++half_move;
@@ -465,6 +465,9 @@ Board::update(Move mv) noexcept
   // Full move is incremented after black moves.
   if (not is_white_next())
     ++full_move;
+
+  bb_mine.swap(bb_other);
+  next_to_move = is_white_next() ? Color::Black : Color::White;
 
   // TODO: after setting and clearing bits, check that we have not reached a
   // terminal state. For example, if one or more pieces are attacking the king,
