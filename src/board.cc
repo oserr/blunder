@@ -427,6 +427,28 @@ Board::pawn_moves(MoveVec& moves) const
   move_enpassant(moves);
 }
 
+std::optional<unsigned>
+Board::compute_passant_file(Move mv) const noexcept
+{
+  assert(mv.piece().type() == Type::Pawn);
+
+  // Convert to int here to avoid issues below where we do subtraction.
+  auto fs = static_cast<int>(mv.from());
+  auto ts = static_cast<int>(mv.to());
+
+  // En passant is only possible when the pawn moves two squares forward.
+  if (std::labs(ts - fs) != 16)
+    return std::nullopt;
+
+  auto bb = BitBoard::from_index(ts);
+  auto neighbors = (move_east(bb) | move_west(bb)) & bb_other.pawn();
+
+  if (neighbors)
+    return ts % 8;
+
+  return std::nullopt;
+}
+
 Board&
 Board::update(Move mv) noexcept
 {
@@ -465,6 +487,37 @@ Board::update(Move mv) noexcept
   // Full move is incremented after black moves.
   if (not is_white_next())
     ++full_move;
+
+  // Reset en passant files.
+  en_passant = false;
+  en_passant_file = 0;
+
+  if (from_piece.type() == Type::Pawn) {
+    auto passant = compute_passant_file(mv);
+    if (passant) {
+      en_passant = true;
+      en_passant_file = *passant;
+    }
+  } else if (from_piece.type() == Type::Rook) {
+    if (is_white_next()) {
+      if (from_square == 0)
+        wq_castle = false;
+      else if (from_square == 7)
+        wk_castle = false;
+    }
+    else if (from_square == 56)
+      bq_castle = false;
+    else if (from_square == 63)
+      bk_castle = false;
+  } else if (from_piece.type() == Type::King) {
+    if (is_white_next()) {
+      wk_castle = false;
+      wq_castle = false;
+    } else {
+      bk_castle = false;
+      bq_castle = false;
+    }
+  }
 
   bb_mine.swap(bb_other);
   next_to_move = is_white_next() ? Color::Black : Color::White;

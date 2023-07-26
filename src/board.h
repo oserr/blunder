@@ -294,6 +294,12 @@ private:
   void
   pawn_moves(MoveVec& moves) const;
 
+  // If there is an opportunity for capture by en passant, then it returns the
+  // file where the pawn can be captured. This is computed when we are updating
+  // the state of the game after a move is made.
+  std::optional<unsigned>
+  compute_passant_file(Move mv) const noexcept;
+
   // Updates this board with move |mv|.
   Board&
   update(Move mv) noexcept;
@@ -371,7 +377,7 @@ private:
   bool en_passant = false;
 
   // Indicates the file where en passant is possible.
-  bool en_passant_file = false;
+  bool en_passant_file = 0;
 
   // Indicates if white can castle on kingside.
   bool wk_castle = false;
