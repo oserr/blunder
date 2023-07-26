@@ -261,6 +261,13 @@ public:
   square_iter() const noexcept
   { return SquareIter(raw()); }
 
+  BitBoard&
+  swap(BitBoard& other) noexcept
+  {
+    std::swap(bits, other.bits);
+    return *this;
+  }
+
 private:
   std::uint64_t bits;
 };
