@@ -13,11 +13,19 @@ move_south(BitBoard bb) noexcept
 { return bb >> 8; }
 
 constexpr BitBoard
+move_west(BitBoard bb) noexcept
+{ return (bb & ~kFileA) >> 1; }
+
+constexpr BitBoard
+move_east(BitBoard bb) noexcept
+{ return (bb & ~kFileH) << 1; }
+
+constexpr BitBoard
 move_king(BitBoard king) noexcept
 {
   auto k = king;
-  const auto left = (k & ~kFileA) >> 1;
-  const auto right = (k & ~kFileH) << 1;
+  const auto left = move_west(k);
+  const auto right = move_east(k);
   k |= left | right;
   const auto down = (k & ~kRank1) >> 8;
   const auto up = (k & ~kRank8) << 8;
