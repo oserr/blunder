@@ -138,6 +138,14 @@ public:
   bool
   is_valid() const noexcept;
 
+  PieceSet&
+  swap(PieceSet& other) noexcept
+  {
+    std::swap(pieces, other.pieces);
+    all_bits.swap(other.all_bits);
+    return *this;
+  }
+
 private:
 
   BitBoard&
