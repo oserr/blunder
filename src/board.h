@@ -311,6 +311,10 @@ private:
   void
   compute_game_state(bool is_king_captured) noexcept;
 
+  // Updates this board with move |mv| without updating the game state.
+  Board&
+  quick_update(Move mv) noexcept;
+
   // Updates this board with move |mv|.
   Board&
   update(Move mv) noexcept;

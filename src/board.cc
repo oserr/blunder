@@ -473,7 +473,7 @@ Board::compute_game_state() noexcept
 }
 
 Board&
-Board::update(Move mv) noexcept
+Board::quick_update(Move mv) noexcept
 {
   auto from_piece = mv.piece();
   assert(from_piece.type() != Type::None);
@@ -547,14 +547,15 @@ Board::update(Move mv) noexcept
 
   set_attacked_by_mine();
   set_attacked_by_other();
+
+  return *this;
+}
+
+Board&
+Board::update(Move mv) noexcept
+{
+  quick_update(mv;
   compute_game_state(mv.capture().is_king());
-
-  // TODO: after setting and clearing bits, check that we have not reached a
-  // terminal state. For example, if one or more pieces are attacking the king,
-  // we need to determine if we are in check, or if its check mate. We also need
-  // to check that it's not a draw, e.g. stalemate or draw by insufficient
-  // material.
-
   return *this;
 }
 
