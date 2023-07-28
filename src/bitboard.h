@@ -203,23 +203,18 @@ public:
 
   // Returns the complement of bits set.
   BitBoard
-  bit_not() noexcept
+  bit_not() const noexcept
   { return BitBoard(~bits); }
 
   // Returns the insersection of bits with other.
   BitBoard
-  bit_and(BitBoard other) noexcept
+  bit_and(BitBoard other) const noexcept
   { return BitBoard(bits & other.bits); }
 
   // Returns the union of bits with other.
   BitBoard
-  bit_or(BitBoard other) noexcept
+  bit_or(BitBoard other) const noexcept
   { return BitBoard(bits | other.bits); }
-
-  // Order operator.
-  auto
-  operator<=>(BitBoard other) noexcept
-  { return bits <=> other.bits; }
 
   // String with 0s and 1s representing bit pattern.
   std::string

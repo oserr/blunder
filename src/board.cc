@@ -324,7 +324,7 @@ Board::king_moves(MoveVec& moves) const
 {
   auto move_king_fn = [&](auto bb) -> BitBoard {
     // Make sure that none of the squares where the king is moving are attacked.
-    return move_king(bb) & get_attacked().bit_not();
+    return move_king(bb) & bb_empty_attacks.bit_not();
   };
   get_simple_moves(Piece::king(), move_king_fn, moves);
 
@@ -653,37 +653,7 @@ Board::get_attacks_other() const noexcept
 Board&
 Board::set_attacked() noexcept
 {
-  assert(bmagics and rmagics);
-
-  bb_attacked.clear();
-
-  auto no_pieces = none();
-  bb_attacked |= move_king(other().king()) & no_pieces;
-  bb_attacked |= move_knight(other().knight()) & no_pieces;
-
-  auto pawns = other().pawn();
-  if (is_white_next()) {
-    bb_attacked |= move_bp_left(pawns, no_pieces);
-    bb_attacked |= move_bp_right(pawns, no_pieces);
-  } else {
-    bb_attacked |= move_wp_left(pawns, no_pieces);
-    bb_attacked |= move_wp_right(pawns, no_pieces);
-  }
-
-  auto blockers = all_bits();
-
-  for (auto s : other().bishop().square_iter())
-    bb_attacked |= bmagics->get_attacks(s, blockers) & no_pieces;
-
-  for (auto s : other().rook().square_iter())
-    bb_attacked |= rmagics->get_attacks(s, blockers) & no_pieces;
-
-  for (auto s : other().queen().square_iter()) {
-    auto qattacks = bmagics->get_attacks(s, blockers)
-                  | rmagics->get_attacks(s, blockers);
-    bb_attacked |= qattacks & no_pieces;
-  }
-
+  std::tie(bb_empty_attacks, bb_piece_attacks) = get_attacks_other();
   return *this;
 }
 

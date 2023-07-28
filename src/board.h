@@ -115,11 +115,6 @@ public:
   enpassant_file() const noexcept
   { return en_passant_file; }
 
-  // Returns a BitBoard with all of the squares attacked by other set.
-  BitBoard
-  get_attacked() const noexcept
-  { return bb_attacked; }
-
   // Returns true if we have reached a terminal state, i.e. we have a checkmate
   // or the game has been drawn.
   bool
@@ -178,7 +173,7 @@ private:
     }
 
     // Here we treat attacked squares as if they were occupied.
-    auto all_pieces = all_bits() | get_attacked();
+    auto all_pieces = all_bits() | bb_empty_attacks;
 
     if constexpr (color == Color::Black)
       all_pieces >>= 56;
@@ -375,11 +370,13 @@ private:
   PieceSet bb_mine;
   PieceSet bb_other;
 
-  // A bitboard mask to indicate which squares are attacked by the oppentent,
-  // i.e. the other player not moving next. The purpose of this is to help
-  // detect checks and move legality, e.g. king cannot castle if it has to go
-  // through a check.
-  BitBoard bb_attacked;
+  // Bitboard masks to indicate which squares are attacked by the other player.
+  // |bb_empty_attackes| are empty squares attacked by the other player, and
+  // |bb_piece_attacks| represent attacks on the pieces. These are set right
+  // after we update a board with a move, or when a board is created from a
+  // position.
+  BitBoard bb_empty_attacks;
+  BitBoard bb_piece_attacks;
 
   std::uint16_t half_move = 0;
   std::uint16_t full_move = 0;
