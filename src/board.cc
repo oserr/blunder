@@ -223,7 +223,8 @@ Board::new_board() noexcept
   board.bk_castle = true;
   board.bq_castle = true;
 
-  board.set_attacked();
+  board.set_attacked_by_mine();
+  board.set_attacked_by_other();
 
   return board;
 }
@@ -461,6 +462,13 @@ Board::compute_game_state(bool is_king_captured) noexcept
 void
 Board::compute_game_state() noexcept
 {
+  bool is_check = mine().king() & bb_piece_attacks;
+  game_state = GameState::Check;
+
+  if (is_check) {
+    // Is this check mate? We need to figure out if we have any moves that get
+    // us out of check.
+  }
   game_state = GameState::Playing;
 }
 
@@ -537,7 +545,8 @@ Board::update(Move mv) noexcept
   bb_mine.swap(bb_other);
   next_to_move = is_white_next() ? Color::Black : Color::White;
 
-  set_attacked();
+  set_attacked_by_mine();
+  set_attacked_by_other();
   compute_game_state(mv.capture().is_king());
 
   // TODO: after setting and clearing bits, check that we have not reached a
@@ -623,16 +632,16 @@ Board::move_enpassant(MoveVec& moves) const
 }
 
 BitBoard
-Board::get_attacks(BitBoard bb) const noexcept
+Board::get_attacks(const PieceSet& pieces, BitBoard bb) const noexcept
 {
   assert(bmagics and rmagics);
 
   BitBoard attacked;
 
-  attacked |= move_king(other().king()) & bb;
-  attacked |= move_knight(other().knight()) & bb;
+  attacked |= move_king(pieces.king()) & bb;
+  attacked |= move_knight(pieces.knight()) & bb;
 
-  auto pawns = other().pawn();
+  auto pawns = pieces.pawn();
   if (is_white_next()) {
     attacked |= move_bp_left(pawns, bb);
     attacked |= move_bp_right(pawns, bb);
@@ -641,15 +650,15 @@ Board::get_attacks(BitBoard bb) const noexcept
     attacked |= move_wp_right(pawns, bb);
   }
 
-  auto blockers = all_bits();
+  auto blockers = pieces.full_set();
 
-  for (auto s : other().bishop().square_iter())
+  for (auto s : pieces.bishop().square_iter())
     attacked |= bmagics->get_attacks(s, blockers) & bb;
 
-  for (auto s : other().rook().square_iter())
+  for (auto s : pieces.rook().square_iter())
     attacked |= rmagics->get_attacks(s, blockers) & bb;
 
-  for (auto s : other().queen().square_iter()) {
+  for (auto s : pieces.queen().square_iter()) {
     auto qattacks = bmagics->get_attacks(s, blockers)
                   | rmagics->get_attacks(s, blockers);
     attacked |= qattacks & bb;
@@ -658,20 +667,39 @@ Board::get_attacks(BitBoard bb) const noexcept
   return attacked;
 }
 
-std::pair<BitBoard, BitBoard>
+AttackSquares
 Board::get_attacks_other() const noexcept
 {
   assert(bmagics and rmagics);
 
-  BitBoard no_piece_attacks = get_attacks(none());
-  BitBoard piece_attacks = get_attacks(all_mine());
-  return {no_piece_attacks, piece_attacks};
+  AttackSquares attacks;
+  attacks.pieces = get_attacks(other(), all_mine());
+  attacks.no_pieces = get_attacks(other(), none());
+  return attacks;
 }
 
 Board&
-Board::set_attacked() noexcept
+Board::set_attacked_by_other() noexcept
 {
-  std::tie(bb_empty_attacks, bb_piece_attacks) = get_attacks_other();
+  other_attacks = get_attacks_other();
+  return *this;
+}
+
+AttackSquares
+Board::get_attacks_mine() const noexcept
+{
+  assert(bmagics and rmagics);
+
+  AttackSquares attacks;
+  attacks.pieces = get_attacks(mine(), all_other());
+  attacks.no_pieces = get_attacks(mine(), none());
+  return attacks;
+}
+
+Board&
+Board::set_attacked_by_mine() noexcept
+{
+  mine_attacks = get_attacks_mine();
   return *this;
 }
 

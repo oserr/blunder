@@ -25,6 +25,13 @@ namespace blunder {
 // make it easier to build Board while preserving invariants.
 class BoardBuilder;
 
+// A structure to represent all squares that are attacked, including squres with
+// and without pieces.
+struct AttackSquares {
+  BitBoard pieces;
+  BitBoard no_pieces;
+};
+
 // Board represents the current state of the board. Some of the fields are
 // written from the perspective of the player moving next to simplify move
 // generation.
@@ -264,7 +271,6 @@ public:
     return moves;
   }
 
-
 private:
   //-------------------------------------
   // Private helpers for move generation.
@@ -331,26 +337,35 @@ private:
     return moves;
   }
 
+  //------------------------------------------------------------------------
+  // Utilities to compute BitBoards of all squares attacked by both players.
+  //------------------------------------------------------------------------
+
   // Given a BitBoard |bb|, returns a BitBoard representing the set of bits in
   // |bb| that are attacked by other all other pieces. For example, |bb| can be
   // the set of empty squares, or the set of all pieces for player moving next.
   BitBoard
-  get_attacks(BitBoard bb) const noexcept;
+  get_attacks(const PieceSet& pieces, BitBoard bb) const noexcept;
 
-  // Returns a pair of (EMPTY_SQUARE_ATTACKS, PIECE_ATTACKS), where
-  // EMPTY_SQUARE_ATTACKS represents the set of all empty squares that are
-  // attacked, and PIECE_ATTACKS represents squares where a piece is attacked by
-  // the other player. This can be used to determine if a piece is under
-  // currently under attack, or would be attacked if moved there.
-  std::pair<BitBoard, BitBoard>
+  // Returns the set of all squares attacked by other.
+  AttackSquares
   get_attacks_other() const noexcept;
+
+  // Computes all the empty squares that are attacked by other.
+  Board&
+  set_attacked_by_other() noexcept;
+
+  // Returns the set of all squares attacked by mine.
+  AttackSquares
+  get_attacks_mine() const noexcept;
+
+  // Computes all the empty squares that are attacked by other.
+  Board&
+  set_attacked_by_mine() noexcept;
 
   // Helper function to compute en passant moves.
   void
   move_enpassant(MoveVec& moves) const;
-
-  // Computes all the empty squares that are attacked by other.
-  Board& set_attacked() noexcept;
 
   friend BoardBuilder;
 
@@ -380,11 +395,12 @@ private:
   PieceSet bb_mine;
   PieceSet bb_other;
 
-  // Bitboard masks to indicate which squares are attacked by the other player.
-  // |bb_empty_attackes| are empty squares attacked by the other player, and
-  // |bb_piece_attacks| represent attacks on the pieces. These are set right
-  // after we update a board with a move, or when a board is created from a
-  // position.
+  // Members to hold all of the squares that are attacked by each player.
+  // |mine_attacks| are squares attacked by the player moving next, and
+  // |other_attacks| are squares attacked by the other player.
+  AttackSquares mine_attacks;
+  AttackSquares other_attacks;
+
   BitBoard bb_empty_attacks;
   BitBoard bb_piece_attacks;
 
