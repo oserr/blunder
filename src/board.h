@@ -295,6 +295,16 @@ private:
   std::optional<unsigned>
   compute_passant_file(Move mv) const noexcept;
 
+  // Computes the game status.
+  void
+  compute_game_state() noexcept;
+
+  // Same as above, but takes parameter |is_king_captured|, which can be used to
+  // quickly check if the game is over when we compute the game status after a
+  // move.
+  void
+  compute_game_state(bool is_king_captured) noexcept;
+
   // Updates this board with move |mv|.
   Board&
   update(Move mv) noexcept;

@@ -449,6 +449,21 @@ Board::compute_passant_file(Move mv) const noexcept
   return std::nullopt;
 }
 
+void
+Board::compute_game_state(bool is_king_captured) noexcept
+{
+  if (is_king_captured)
+    game_state = GameState::Mate;
+  else
+    compute_game_state();
+}
+
+void
+Board::compute_game_state() noexcept
+{
+  game_state = GameState::Playing;
+}
+
 Board&
 Board::update(Move mv) noexcept
 {
@@ -521,6 +536,9 @@ Board::update(Move mv) noexcept
 
   bb_mine.swap(bb_other);
   next_to_move = is_white_next() ? Color::Black : Color::White;
+
+  set_attacked();
+  compute_game_state(mv.capture().is_king());
 
   // TODO: after setting and clearing bits, check that we have not reached a
   // terminal state. For example, if one or more pieces are attacking the king,
