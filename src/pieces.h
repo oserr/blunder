@@ -35,7 +35,7 @@ public:
   //-------------
   // Copy control.
   //-------------
-  
+
   Piece(const Piece& piece) noexcept = default;
   Piece(Piece&& piece) noexcept = default;
   Piece& operator=(const Piece& piece) noexcept = default;
@@ -67,6 +67,42 @@ public:
   bool
   eq(Piece other) const noexcept
   { return ptype == other.ptype; }
+
+  //--------------------------------------------------------
+  // Helpers to check if the piece is a specific piece type.
+  //--------------------------------------------------------
+
+  bool
+  is_type(Type piece_type) const noexcept
+  { return type() == piece_type; }
+
+  bool
+  is_king() const noexcept
+  { return is_type(Type::King); }
+
+  bool
+  is_queen() const noexcept
+  { return is_type(Type::Queen); }
+
+  bool
+  is_rook() const noexcept
+  { return is_type(Type::Rook); }
+
+  bool
+  is_bishop() const noexcept
+  { return is_type(Type::Bishop); }
+
+  bool
+  is_knight() const noexcept
+  { return is_type(Type::Knight); }
+
+  bool
+  is_pawn() const noexcept
+  { return is_type(Type::Pawn); }
+
+  //----------------------------------------------------
+  // Static helpers to create pieces of different types.
+  //----------------------------------------------------
 
   static Piece
   king() noexcept
