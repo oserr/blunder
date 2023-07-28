@@ -604,6 +604,52 @@ Board::move_enpassant(MoveVec& moves) const
   }
 }
 
+BitBoard
+Board::get_attacks(BitBoard bb) const noexcept
+{
+  assert(bmagics and rmagics);
+
+  BitBoard attacked;
+
+  attacked |= move_king(other().king()) & bb;
+  attacked |= move_knight(other().knight()) & bb;
+
+  auto pawns = other().pawn();
+  if (is_white_next()) {
+    attacked |= move_bp_left(pawns, bb);
+    attacked |= move_bp_right(pawns, bb);
+  } else {
+    attacked |= move_wp_left(pawns, bb);
+    attacked |= move_wp_right(pawns, bb);
+  }
+
+  auto blockers = all_bits();
+
+  for (auto s : other().bishop().square_iter())
+    attacked |= bmagics->get_attacks(s, blockers) & bb;
+
+  for (auto s : other().rook().square_iter())
+    attacked |= rmagics->get_attacks(s, blockers) & bb;
+
+  for (auto s : other().queen().square_iter()) {
+    auto qattacks = bmagics->get_attacks(s, blockers)
+                  | rmagics->get_attacks(s, blockers);
+    attacked |= qattacks & bb;
+  }
+
+  return attacked;
+}
+
+std::pair<BitBoard, BitBoard>
+Board::get_attacks_other() const noexcept
+{
+  assert(bmagics and rmagics);
+
+  BitBoard no_piece_attacks = get_attacks(none());
+  BitBoard piece_attacks = get_attacks(all_mine());
+  return {no_piece_attacks, piece_attacks};
+}
+
 Board&
 Board::set_attacked() noexcept
 {

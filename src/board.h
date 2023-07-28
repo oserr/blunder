@@ -326,6 +326,20 @@ private:
     return moves;
   }
 
+  // Given a BitBoard |bb|, returns a BitBoard representing the set of bits in
+  // |bb| that are attacked by other all other pieces. For example, |bb| can be
+  // the set of empty squares, or the set of all pieces for player moving next.
+  BitBoard
+  get_attacks(BitBoard bb) const noexcept;
+
+  // Returns a pair of (EMPTY_SQUARE_ATTACKS, PIECE_ATTACKS), where
+  // EMPTY_SQUARE_ATTACKS represents the set of all empty squares that are
+  // attacked, and PIECE_ATTACKS represents squares where a piece is attacked by
+  // the other player. This can be used to determine if a piece is under
+  // currently under attack, or would be attacked if moved there.
+  std::pair<BitBoard, BitBoard>
+  get_attacks_other() const noexcept;
+
   // Helper function to compute en passant moves.
   void
   move_enpassant(MoveVec& moves) const;
