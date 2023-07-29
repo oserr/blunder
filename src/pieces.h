@@ -56,7 +56,7 @@ public:
   requires std::integral<T>
   static Piece
   from_int(T val) noexcept
-  { return static_cast<Type>(val & 0xb111); }
+  { return Piece(static_cast<Type>(val)); }
 
   // Returns the ascii letter initial of the piece. Upercase for white and lower
   // case for black.
