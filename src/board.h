@@ -225,7 +225,7 @@ public:
   //-----------------
 
   MoveVec
-  moves() const;
+  all_moves() const;
 
   MoveVec
   king_moves() const

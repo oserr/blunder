@@ -300,7 +300,7 @@ Board::str() const
 //-----------------
 
 MoveVec
-Board::moves() const
+Board::all_moves() const
 {
   MoveVec moves;
   pawn_moves(moves);

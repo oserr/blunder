@@ -123,5 +123,5 @@ TEST_F(BoardTest, InitGameAllMoves)
   moves.emplace_back(Piece::knight(), Sq::g1, Sq::h3);
 
   auto board = Board::new_board();
-  EXPECT_THAT(board.moves(), UnorderedElementsAreArray(moves));
+  EXPECT_THAT(board.all_moves(), UnorderedElementsAreArray(moves));
 }
