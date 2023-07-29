@@ -554,7 +554,7 @@ Board::quick_update(Move mv) noexcept
 Board&
 Board::update(Move mv) noexcept
 {
-  quick_update(mv;
+  quick_update(mv);
   compute_game_state(mv.capture().is_king());
   return *this;
 }
