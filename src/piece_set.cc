@@ -1,5 +1,7 @@
 #include "piece_set.h"
 
+#include <iostream>
+
 namespace blunder {
 
 Piece
@@ -8,7 +10,7 @@ PieceSet::find_type(BitBoard bb) const noexcept
   assert(bb.has_single_bit()
         and "BitBoard bb should only have 1 bit set.");
 
-  for (std::uint8_t i = 0; i < pieces.size(); ++i) {
+  for (unsigned i = 0; i < pieces.size(); ++i) {
     if (bb & pieces[i])
       return Piece::from_int(i);
   }
