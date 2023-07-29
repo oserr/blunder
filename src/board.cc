@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <bit>
 #include <format>
+#include <iostream>
 #include <iterator>
 
 #include "bitboard.h"
@@ -182,7 +183,7 @@ attack_with_pawns(
   while (pawn_moves) {
     auto [to_square, to_bb] = pawn_moves.index_bb_and_clear();
     auto to_piece = board.other().find_type(to_bb);
-    assert(to_piece.type() != Type::None);
+    assert(not to_piece.is_none());
     auto from_square = from_fn(to_square);
 
     if (not is_promo_fn(to_square))
@@ -374,7 +375,7 @@ Board::queen_moves(MoveVec& moves) const
     return bmagics->get_attacks(from_square, blockers)
          | rmagics->get_attacks(from_square, blockers);
   };
-  return get_simple_moves(Piece::rook(), moves_fn, moves);
+  return get_simple_moves(Piece::queen(), moves_fn, moves);
 }
 
 void
@@ -596,6 +597,7 @@ Board::update(Move mv) noexcept
   return *this;
 }
 
+// TODO: replace std::function with some something less expensive.
 void
 Board::get_simple_moves(
     Piece piece,
@@ -604,6 +606,7 @@ Board::get_simple_moves(
 {
   auto bb = mine().get(piece);
   auto no_pieces = none();
+
 
   while (bb) {
     auto [from_square, bb_piece] = bb.index_bb_and_clear();
