@@ -50,6 +50,9 @@ public:
       from_square(fs),
       to_square(ts) {}
 
+  Move(Piece fp, Sq fs, Piece tp, Sq ts) noexcept
+    : Move(fp, to_int(fs), tp, to_int(ts)) {}
+
   // Copy control.
   Move(const Move& m) noexcept = default;
   Move& operator=(const Move& m) noexcept = default;
