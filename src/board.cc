@@ -459,6 +459,13 @@ Board::compute_game_state(bool is_king_captured) noexcept
     compute_game_state();
 }
 
+// TODO: need to figure out how to check for 3 move repetition. To check for
+// 3-move repetation, it's not actually checking the move, but that the position
+// of the board is not repeated three times after both players move. One way of
+// doing this would be to keep a history of every position leading up to the
+// current position, or enough state to be able to reconstruct it. We could also
+// compute a hash from the position to speed up comparison, and only do a full
+// state comparison when the hash values are equal.
 void
 Board::compute_game_state() noexcept
 {
