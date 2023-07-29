@@ -371,6 +371,29 @@ private:
   void
   move_enpassant(MoveVec& moves) const;
 
+  // Checks if there is enough material for a win from either player. Returns false for one of the following scenarios:
+  // - king vs king
+  // - king + knight vs king
+  // - king + bishop vs king
+  bool
+  enough_material() const noexcept;
+
+  // Returns true if the player moving next is in check.
+  bool
+  is_check() const noexcept
+  {
+    assert(mine().king().count() == 1);
+    return mine().king() & other_attacks.pieces;
+  }
+
+  // Returns true if the other player is in check.
+  bool
+  is_check_other() const noexcept
+  {
+    assert(other().king().count() == 1);
+    return other().king() & mine_attacks.pieces;
+  }
+
   friend BoardBuilder;
 
   // Note that we use static members for bmagics and rmagics below to avoid

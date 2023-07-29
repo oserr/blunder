@@ -462,14 +462,44 @@ Board::compute_game_state(bool is_king_captured) noexcept
 void
 Board::compute_game_state() noexcept
 {
-  bool is_check = mine().king() & bb_piece_attacks;
-  game_state = GameState::Check;
-
-  if (is_check) {
-    // Is this check mate? We need to figure out if we have any moves that get
-    // us out of check.
+  // Draw by 50 move rule.
+  if (half_move == 100) {
+    game_state = GameState::Draw;
+    return;
   }
-  game_state = GameState::Playing;
+
+  // Draw by insufficient material.
+  if (not enough_material()) {
+    game_state = GameState::Draw;
+    return;
+  }
+
+  // We compute the moves and next states to check for stalemate, draw, and
+  // check mate.
+  auto moves = all_moves();
+  if (moves.empty()) {
+    // For now, we'll assume this means stalemate.
+    game_state = GameState::Draw;
+    return;
+  }
+
+  if (not is_check()) {
+    // We continue playing, i.e. GameState::Playing.
+    return;
+  }
+
+  for (auto mv : moves) {
+    Board board(*this);
+    board.quick_update(mv);
+    // Found a way to get out of check.
+    if (not board.is_check_other()) {
+      game_state = GameState::Playing;
+      return;
+    }
+  }
+
+  // Didn't find a move to get out of check.
+  game_state = GameState::Mate;
 }
 
 Board&
@@ -702,6 +732,33 @@ Board::set_attacked_by_mine() noexcept
 {
   mine_attacks = get_attacks_mine();
   return *this;
+}
+
+bool
+Board::enough_material() const noexcept
+{
+  assert(mine().king().count() == 1);
+  assert(other().king().count() == 1);
+
+  auto my_count = all_mine().count();
+  auto other_count = all_other().count();
+
+  // We expect this to be the common case for most of the game.
+  if (my_count > 2 or other_count > 2)
+    return true;
+
+  if (my_count == 1 and other_count == 1)
+    return false;
+
+  if (my_count == 2 and other_count == 1)
+    return mine().bishop().count() == 1
+        or mine().knight().count() == 1;
+
+  if (other_count == 2 and my_count == 1)
+    return other().bishop().count() == 1
+        or other().knight().count() == 1;
+
+  return true;
 }
 
 } // namespace blunder
