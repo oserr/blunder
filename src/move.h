@@ -108,6 +108,16 @@ public:
     return mv;
   }
 
+  // Returns a move for pawn promotion without capture.
+  static Move
+  promo(Sq fs, Sq ts, Piece promo) noexcept
+  {
+    Move mv(Piece::pawn(), to_int(fs), to_int(ts));
+    mv.move_type = MoveType::Promo;
+    mv.promo_piece = promo;
+    return mv;
+  }
+
   // Returns a move for pawn promotion with capture.
   static Move
   promo(std::uint8_t fs, Piece tp, std::uint8_t ts, Piece promo) noexcept
