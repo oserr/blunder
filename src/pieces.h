@@ -100,6 +100,10 @@ public:
   is_pawn() const noexcept
   { return is_type(Type::Pawn); }
 
+  bool
+  is_none() const noexcept
+  { return is_type(Type::None); }
+
   //----------------------------------------------------
   // Static helpers to create pieces of different types.
   //----------------------------------------------------
