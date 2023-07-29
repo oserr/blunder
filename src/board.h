@@ -180,7 +180,7 @@ private:
     }
 
     // Here we treat attacked squares as if they were occupied.
-    auto all_pieces = all_bits() | bb_empty_attacks;
+    auto all_pieces = all_bits() | other_attacks.no_pieces;
 
     if constexpr (color == Color::Black)
       all_pieces >>= 56;
@@ -428,9 +428,6 @@ private:
   AttackSquares mine_attacks;
   AttackSquares other_attacks;
 
-  BitBoard bb_empty_attacks;
-  BitBoard bb_piece_attacks;
-
   std::uint16_t half_move = 0;
   std::uint16_t full_move = 0;
 
@@ -485,7 +482,7 @@ enum class BoardBuilderErr {
 class BoardBuilder {
 public:
   std::expected<Board, BoardBuilderErr>
-  build() const noexcept
+  build() noexcept
   {
     if (!board.white().is_valid())
       return std::unexpected(BoardBuilderErr::White);
@@ -498,6 +495,10 @@ public:
 
     if (half_move_err)
       return std::unexpected(BoardBuilderErr::HalfMove);
+
+    board.set_attacked_by_mine()
+         .set_attacked_by_other()
+         .compute_game_state();
 
     return board;
   }
