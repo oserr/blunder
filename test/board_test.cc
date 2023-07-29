@@ -4,6 +4,7 @@
 #include <mutex>
 #include <vector>
 
+#include "fen.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "pre_computed_magics.h"
@@ -124,4 +125,33 @@ TEST_F(BoardTest, InitGameAllMoves)
 
   auto board = Board::new_board();
   EXPECT_THAT(board.all_moves(), UnorderedElementsAreArray(moves));
+}
+
+TEST_F(BoardTest, WithFen1)
+{
+  auto board = read_fen("8/1P6/8/1K2n3/6Pp/8/5P2/2k5 w - - 0 1");
+
+  MoveVec moves;
+
+  // Pawn moves with promotion
+  moves.emplace_back(Move::promo(Sq::b7, Sq::b8, Piece::knight()));
+  moves.emplace_back(Move::promo(Sq::b7, Sq::b8, Piece::bishop()));
+  moves.emplace_back(Move::promo(Sq::b7, Sq::b8, Piece::rook()));
+  moves.emplace_back(Move::promo(Sq::b7, Sq::b8, Piece::queen()));
+
+  // Regular pawn moves
+  moves.emplace_back(Piece::pawn(), Sq::f2, Sq::f3);
+  moves.emplace_back(Piece::pawn(), Sq::f2, Sq::f4);
+  moves.emplace_back(Piece::pawn(), Sq::g4, Sq::g5);
+
+  // King moves
+  moves.emplace_back(Piece::king(), Sq::b5, Sq::a4);
+  moves.emplace_back(Piece::king(), Sq::b5, Sq::a5);
+  moves.emplace_back(Piece::king(), Sq::b5, Sq::a6);
+  moves.emplace_back(Piece::king(), Sq::b5, Sq::b4);
+  moves.emplace_back(Piece::king(), Sq::b5, Sq::b6);
+  moves.emplace_back(Piece::king(), Sq::b5, Sq::c5);
+
+  ASSERT_TRUE(board);
+  EXPECT_THAT(board->all_moves(), UnorderedElementsAreArray(moves));
 }
