@@ -155,3 +155,36 @@ TEST_F(BoardTest, WithFen1)
   ASSERT_TRUE(board);
   EXPECT_THAT(board->all_moves(), UnorderedElementsAreArray(moves));
 }
+
+TEST_F(BoardTest, WithFen2)
+{
+  auto board = read_fen("8/8/7k/1K6/3b4/R1PP2n1/8/8 w - - 0 1");
+
+  MoveVec moves;
+
+  // Pawn moves
+  moves.emplace_back(Piece::pawn(), Sq::c3, Sq::c4);
+  moves.emplace_back(Piece::pawn(), Sq::c3, Piece::bishop(), Sq::d4);
+
+  // Rook moves
+  moves.emplace_back(Piece::rook(), Sq::a3, Sq::a1);
+  moves.emplace_back(Piece::rook(), Sq::a3, Sq::a2);
+  moves.emplace_back(Piece::rook(), Sq::a3, Sq::b3);
+  moves.emplace_back(Piece::rook(), Sq::a3, Sq::a4);
+  moves.emplace_back(Piece::rook(), Sq::a3, Sq::a5);
+  moves.emplace_back(Piece::rook(), Sq::a3, Sq::a6);
+  moves.emplace_back(Piece::rook(), Sq::a3, Sq::a7);
+  moves.emplace_back(Piece::rook(), Sq::a3, Sq::a8);
+
+  // King moves
+  moves.emplace_back(Piece::king(), Sq::b5, Sq::a4);
+  moves.emplace_back(Piece::king(), Sq::b5, Sq::b4);
+  moves.emplace_back(Piece::king(), Sq::b5, Sq::c4);
+  moves.emplace_back(Piece::king(), Sq::b5, Sq::a5);
+  moves.emplace_back(Piece::king(), Sq::b5, Sq::a6);
+  moves.emplace_back(Piece::king(), Sq::b5, Sq::c6);
+
+  ASSERT_TRUE(board);
+  EXPECT_THAT(board->all_moves(), UnorderedElementsAreArray(moves))
+    << '\n' << *board;
+}
