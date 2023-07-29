@@ -132,7 +132,7 @@ public:
 
   // Returns true if any bit is set, false otherwise.
   operator bool() const noexcept
-  { return static_cast<bool>(bits); }
+  { return bits > 0; }
 
   // Returns true if bit at index is set.
   bool
