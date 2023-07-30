@@ -1,11 +1,13 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include <optional>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "hash.h"
 #include "pieces.h"
 #include "square.h"
 
@@ -223,6 +225,20 @@ public:
   std::optional<std::pair<unsigned, unsigned>>
   get_rook_from_to() const noexcept;
 
+  // Computes the hash of this move.
+  size_t
+  hsh() const noexcept
+  {
+    return combine_hash(
+      from_piece,
+      to_piece,
+      from_square,
+      to_square,
+      static_cast<unsigned>(move_type),
+      passant_square,
+      promo_piece);
+  }
+
 private:
   // The color of the piece moving is not encoded as a member because moves are
   // done in the context of a Board and a game, and the color can be determined
@@ -263,3 +279,11 @@ operator<<(std::ostream& os, Move mv)
 using MoveVec = std::vector<Move>;
 
 } // namespace blunder
+
+// Note that this needs to be defined outside of the blunder namespace.
+template<>
+struct std::hash<blunder::Move> {
+  std::size_t
+  operator()(blunder::Move mv) const noexcept
+  { return mv.hsh(); }
+};
