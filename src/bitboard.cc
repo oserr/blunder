@@ -84,28 +84,28 @@ get_battacks(std::uint32_t sq, BitBoard blocking) noexcept
   const int fl = sq % 8;
 
   // Bitscan northeast.
-  for (int r = rk+1, f = fl+1; r < 7 and f < 7; ++r, ++f) {
+  for (int r = rk+1, f = fl+1; r <= 7 and f <= 7; ++r, ++f) {
     auto index = r*8 + f;
     attacks.set_bit(index);
     if (blocking.is_set(index)) break;
   }
 
   // Bitscan northwest.
-  for (int r = rk+1, f = fl-1; r < 7 and f > 0; ++r, --f) {
+  for (int r = rk+1, f = fl-1; r <= 7 and f >= 0; ++r, --f) {
     auto index = r*8 + f;
     attacks.set_bit(index);
     if (blocking.is_set(index)) break;
   }
 
   // Bitscan southeast.
-  for (int r = rk-1, f = fl+1; r > 0 and f < 7; --r, ++f) {
+  for (int r = rk-1, f = fl+1; r >= 0 and f <= 7; --r, ++f) {
     auto index = r*8 + f;
     attacks.set_bit(index);
     if (blocking.is_set(index)) break;
   }
 
   // Bitscan southwest.
-  for (int r = rk-1, f = fl-1; r > 0 and f > 0; --r, --f) {
+  for (int r = rk-1, f = fl-1; r >= 0 and f >= 0; --r, --f) {
     auto index = r*8 + f;
     attacks.set_bit(index);
     if (blocking.is_set(index)) break;
