@@ -303,3 +303,71 @@ TEST_F(BoardTest, WithFen3)
   EXPECT_THAT(board->all_moves(), MovesAre(moves))
     << '\n' << *board;
 }
+
+// See position on lichess:
+// https://lichess.org/editor/r3k2r/1ppqbppp/p1np1n2/4p3/2B1PPb1/2NP1N2/PPPBQ1PP/R3K2R_w_KQkq_-_0_1?color=white
+TEST_F(BoardTest, WithFen4)
+{
+  auto board = read_fen(
+      "r3k2r/1ppqbppp/p1np1n2/4p3/2B1PPb1/2NP1N2/PPPBQ1PP/R3K2R w KQkq - 0 1");
+
+  MoveVec moves;
+
+  // Pawn moves
+  moves.emplace_back(Piece::pawn(), Sq::a2, Sq::a3);
+  moves.emplace_back(Piece::pawn(), Sq::a2, Sq::a4);
+  moves.emplace_back(Piece::pawn(), Sq::b2, Sq::b3);
+  moves.emplace_back(Piece::pawn(), Sq::b2, Sq::b4);
+  moves.emplace_back(Piece::pawn(), Sq::d3, Sq::d4);
+  moves.emplace_back(Piece::pawn(), Sq::f4, Sq::f5);
+  moves.emplace_back(Piece::pawn(), Sq::f4, Piece::pawn(), Sq::e5);
+  moves.emplace_back(Piece::pawn(), Sq::g2, Sq::g3);
+  moves.emplace_back(Piece::pawn(), Sq::h2, Sq::h3);
+  moves.emplace_back(Piece::pawn(), Sq::h2, Sq::h4);
+
+  // Knight moves
+  moves.emplace_back(Piece::knight(), Sq::c3, Sq::b1);
+  moves.emplace_back(Piece::knight(), Sq::c3, Sq::a4);
+  moves.emplace_back(Piece::knight(), Sq::c3, Sq::b5);
+  moves.emplace_back(Piece::knight(), Sq::c3, Sq::d5);
+  moves.emplace_back(Piece::knight(), Sq::c3, Sq::d1);
+  moves.emplace_back(Piece::knight(), Sq::f3, Sq::d4);
+  moves.emplace_back(Piece::knight(), Sq::f3, Piece::pawn(), Sq::e5);
+  moves.emplace_back(Piece::knight(), Sq::f3, Sq::g5);
+  moves.emplace_back(Piece::knight(), Sq::f3, Sq::h4);
+  moves.emplace_back(Piece::knight(), Sq::f3, Sq::g1);
+
+  // Bishop moves
+  moves.emplace_back(Piece::bishop(), Sq::c4, Sq::b3);
+  moves.emplace_back(Piece::bishop(), Sq::c4, Sq::b5);
+  moves.emplace_back(Piece::bishop(), Sq::c4, Piece::pawn(), Sq::a6);
+  moves.emplace_back(Piece::bishop(), Sq::c4, Sq::d5);
+  moves.emplace_back(Piece::bishop(), Sq::c4, Sq::e6);
+  moves.emplace_back(Piece::bishop(), Sq::c4, Piece::pawn(), Sq::f7);
+  moves.emplace_back(Piece::bishop(), Sq::d2, Sq::c1);
+  moves.emplace_back(Piece::bishop(), Sq::d2, Sq::e3);
+
+  // Rook moves
+  moves.emplace_back(Piece::rook(), Sq::a1, Sq::b1);
+  moves.emplace_back(Piece::rook(), Sq::a1, Sq::c1);
+  moves.emplace_back(Piece::rook(), Sq::a1, Sq::d1);
+  moves.emplace_back(Piece::rook(), Sq::h1, Sq::f1);
+  moves.emplace_back(Piece::rook(), Sq::h1, Sq::g1);
+
+  // Queen moves
+  moves.emplace_back(Piece::queen(), Sq::e2, Sq::d1);
+  moves.emplace_back(Piece::queen(), Sq::e2, Sq::e3);
+  moves.emplace_back(Piece::queen(), Sq::e2, Sq::f2);
+  moves.emplace_back(Piece::queen(), Sq::e2, Sq::f1);
+
+  // King moves
+  moves.emplace_back(Piece::king(), Sq::e1, Sq::d1);
+  moves.emplace_back(Piece::king(), Sq::e1, Sq::f1);
+  moves.emplace_back(Piece::king(), Sq::e1, Sq::f2);
+  moves.emplace_back(Move::wk_castle());
+  moves.emplace_back(Move::wq_castle());
+
+  ASSERT_TRUE(board);
+  EXPECT_THAT(board->all_moves(), MovesAre(moves))
+    << '\n' << *board;
+}
