@@ -165,6 +165,7 @@ letter(Type type, Color color = Color::White) noexcept
 
 } // namespace blunder
 
+// Note that this needs to be defined outside of the blunder namespace.
 template<>
 struct std::hash<blunder::Piece> {
   std::size_t
