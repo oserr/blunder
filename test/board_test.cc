@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <mutex>
+#include <unordered_set>
 #include <vector>
 
 #include "fen.h"
@@ -15,7 +16,69 @@ using namespace blunder;
 using testing::IsEmpty;
 using testing::UnorderedElementsAreArray;
 
-// Only init MoveGen once because it's expensive to init the magics.
+template<typename Collection>
+std::string
+to_move_list(const Collection& moves)
+{
+  auto first = moves.begin();
+  auto last = moves.end();
+
+  std::string buff;
+  buff.reserve(20 * moves.size() + 3);
+  buff += '[';
+
+  if (first != last) {
+    buff += first->str();
+    first++;
+  }
+
+  while (first != last) {
+    buff += ", ";
+    buff += first->str();
+    first++;
+  }
+
+  buff += ']';
+
+  return buff;
+}
+
+MATCHER_P(MovesAre, expected_moves, "the moves are: "
+    + to_move_list(expected_moves))
+{
+  std::unordered_set<Move> actual_mvs(arg.begin(), arg.end());
+  std::unordered_set<Move> expected_mvs(
+      expected_moves.begin(), expected_moves.end());
+
+  if (actual_mvs == expected_mvs) return true;
+
+  for (auto iter = actual_mvs.begin(); iter != actual_mvs.end();) {
+    if (not expected_mvs.contains(*iter))
+      ++iter;
+    else {
+      expected_mvs.erase(*iter);
+      iter = actual_mvs.erase(iter);
+    }
+  }
+
+  if (not expected_mvs.empty()) {
+    *result_listener
+      << '\n'
+      << "ACTUAL result is missing the following entries: "
+      << to_move_list(expected_mvs);
+  }
+
+  if (not actual_mvs.empty()) {
+    *result_listener
+      << '\n'
+      << "ACTUAL result has the following unexpected entries: "
+      << to_move_list(actual_mvs);
+  }
+
+  return false;
+}
+
+// Only init magic bitboards once because it's expensive to init the magics.
 std::once_flag init_flag;
 
 class BoardTest : public testing::Test
@@ -186,5 +249,60 @@ TEST_F(BoardTest, WithFen2)
 
   ASSERT_TRUE(board);
   EXPECT_THAT(board->all_moves(), UnorderedElementsAreArray(moves))
+    << '\n' << *board;
+}
+
+// TODO: fix this unit test. Actual result is missing a few moves for queen and
+// bishop moves.
+// https://lichess.org/editor/2B2b1K/p7/8/n2Q1p2/8/8/3P4/5k2_w_-_-_0_1?color=white
+TEST_F(BoardTest, WithFen3)
+{
+  auto board = read_fen("2B2b1K/p7/8/n2Q1p2/8/8/3P4/5k2 w - - 0 1");
+
+  MoveVec moves;
+
+  // Pawn moves
+  moves.emplace_back(Piece::pawn(), Sq::d2, Sq::d3);
+  moves.emplace_back(Piece::pawn(), Sq::d2, Sq::d4);
+
+  // Bishop moves
+  moves.emplace_back(Piece::bishop(), Sq::c8, Sq::b7);
+  moves.emplace_back(Piece::bishop(), Sq::c8, Sq::a6);
+  moves.emplace_back(Piece::bishop(), Sq::c8, Sq::d7);
+  moves.emplace_back(Piece::bishop(), Sq::c8, Sq::e6);
+  moves.emplace_back(Piece::bishop(), Sq::c8, Piece::pawn(), Sq::f5);
+
+  // King moves
+  moves.emplace_back(Piece::king(), Sq::h8, Sq::g8);
+  moves.emplace_back(Piece::king(), Sq::h8, Sq::h7);
+
+  // Queen moves
+  moves.emplace_back(Piece::queen(), Sq::d5, Sq::a2);
+  moves.emplace_back(Piece::queen(), Sq::d5, Sq::b3);
+  moves.emplace_back(Piece::queen(), Sq::d5, Sq::c4);
+  moves.emplace_back(Piece::queen(), Sq::d5, Sq::e4);
+  moves.emplace_back(Piece::queen(), Sq::d5, Sq::f3);
+  moves.emplace_back(Piece::queen(), Sq::d5, Sq::g2);
+  moves.emplace_back(Piece::queen(), Sq::d5, Sq::h1);
+  moves.emplace_back(Piece::queen(), Sq::d5, Sq::d4);
+  moves.emplace_back(Piece::queen(), Sq::d5, Sq::d3);
+  moves.emplace_back(Piece::queen(), Sq::d5, Sq::d6);
+  moves.emplace_back(Piece::queen(), Sq::d5, Sq::d7);
+  moves.emplace_back(Piece::queen(), Sq::d5, Sq::d8);
+  moves.emplace_back(Piece::queen(), Sq::d5, Sq::c5);
+  moves.emplace_back(Piece::queen(), Sq::d5, Sq::b5);
+  moves.emplace_back(Piece::queen(), Sq::d5, Piece::knight(), Sq::a5);
+  moves.emplace_back(Piece::queen(), Sq::d5, Sq::e5);
+  moves.emplace_back(Piece::queen(), Sq::d5, Piece::pawn(), Sq::f5);
+  moves.emplace_back(Piece::queen(), Sq::d5, Sq::g8);
+  moves.emplace_back(Piece::queen(), Sq::d5, Sq::c6);
+  moves.emplace_back(Piece::queen(), Sq::d5, Sq::b7);
+  moves.emplace_back(Piece::queen(), Sq::d5, Sq::a8);
+  moves.emplace_back(Piece::queen(), Sq::d5, Sq::e6);
+  moves.emplace_back(Piece::queen(), Sq::d5, Sq::f7);
+  moves.emplace_back(Piece::queen(), Sq::d5, Sq::g8);
+
+  ASSERT_TRUE(board);
+  EXPECT_THAT(board->all_moves(), MovesAre(moves))
     << '\n' << *board;
 }
