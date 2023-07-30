@@ -376,3 +376,68 @@ TEST_F(BoardTest, WithFen4)
   EXPECT_THAT(board->all_moves(), MovesAre(moves))
     << '\n' << *board;
 }
+
+
+TEST_F(BoardTest, WithFen5)
+{
+  auto board = read_fen(
+      "r3k2r/1ppqbppp/p1np1n2/4p3/2B1PPb1/2NP1N2/PPPBQ1PP/2KR3R b Kkq - 0 1");
+
+  MoveVec moves;
+
+  // Pawn moves
+  moves.emplace_back(Piece::pawn(), Sq::a6, Sq::a5);
+  moves.emplace_back(Piece::pawn(), Sq::b7, Sq::b6);
+  moves.emplace_back(Piece::pawn(), Sq::b7, Sq::b5);
+  moves.emplace_back(Piece::pawn(), Sq::d6, Sq::d5);
+  moves.emplace_back(Piece::pawn(), Sq::e5, Piece::pawn(), Sq::f4);
+  moves.emplace_back(Piece::pawn(), Sq::g7, Sq::g6);
+  moves.emplace_back(Piece::pawn(), Sq::g7, Sq::g5);
+  moves.emplace_back(Piece::pawn(), Sq::h7, Sq::h6);
+  moves.emplace_back(Piece::pawn(), Sq::h7, Sq::h5);
+
+  // Knight moves
+  moves.emplace_back(Piece::knight(), Sq::c6, Sq::d8);
+  moves.emplace_back(Piece::knight(), Sq::c6, Sq::b8);
+  moves.emplace_back(Piece::knight(), Sq::c6, Sq::a7);
+  moves.emplace_back(Piece::knight(), Sq::c6, Sq::a5);
+  moves.emplace_back(Piece::knight(), Sq::c6, Sq::b4);
+  moves.emplace_back(Piece::knight(), Sq::c6, Sq::d4);
+  moves.emplace_back(Piece::knight(), Sq::f6, Sq::d5);
+  moves.emplace_back(Piece::knight(), Sq::f6, Piece::pawn(), Sq::e4);
+  moves.emplace_back(Piece::knight(), Sq::f6, Sq::h5);
+  moves.emplace_back(Piece::knight(), Sq::f6, Sq::g8);
+
+  // Bishop moves
+  moves.emplace_back(Piece::bishop(), Sq::e7, Sq::d8);
+  moves.emplace_back(Piece::bishop(), Sq::e7, Sq::f8);
+  moves.emplace_back(Piece::bishop(), Sq::g4, Piece::knight(), Sq::f3);
+  moves.emplace_back(Piece::bishop(), Sq::g4, Sq::h3);
+  moves.emplace_back(Piece::bishop(), Sq::g4, Sq::h5);
+  moves.emplace_back(Piece::bishop(), Sq::g4, Sq::f5);
+  moves.emplace_back(Piece::bishop(), Sq::g4, Sq::e6);
+
+  // Rook moves
+  moves.emplace_back(Piece::rook(), Sq::a8, Sq::a7);
+  moves.emplace_back(Piece::rook(), Sq::a8, Sq::b8);
+  moves.emplace_back(Piece::rook(), Sq::a8, Sq::c8);
+  moves.emplace_back(Piece::rook(), Sq::a8, Sq::d8);
+  moves.emplace_back(Piece::rook(), Sq::h8, Sq::f8);
+  moves.emplace_back(Piece::rook(), Sq::h8, Sq::g8);
+
+  // Queen moves
+  moves.emplace_back(Piece::queen(), Sq::d7, Sq::c8);
+  moves.emplace_back(Piece::queen(), Sq::d7, Sq::d8);
+  moves.emplace_back(Piece::queen(), Sq::d7, Sq::e6);
+  moves.emplace_back(Piece::queen(), Sq::d7, Sq::f5);
+
+  // King moves
+  moves.emplace_back(Piece::king(), Sq::e8, Sq::d8);
+  moves.emplace_back(Piece::king(), Sq::e8, Sq::f8);
+  moves.emplace_back(Move::bk_castle());
+  moves.emplace_back(Move::bq_castle());
+
+  ASSERT_TRUE(board);
+  EXPECT_THAT(board->all_moves(), MovesAre(moves))
+    << '\n' << *board;
+}
