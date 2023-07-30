@@ -49,7 +49,7 @@ TEST_F(BishopMagicsTest, FromB1)
   auto blockers = to_bitboard({Sq::e4, Sq::f5});
   EXPECT_THAT(
       bmagics->get_attacks(square, blockers),
-      EqualToSq(SqList{Sq::c2, Sq::d3, Sq::e4}));
+      EqualToSq(SqList{Sq::a2, Sq::c2, Sq::d3, Sq::e4}));
 }
 
 TEST_F(BishopMagicsTest, FromC4)
@@ -58,7 +58,8 @@ TEST_F(BishopMagicsTest, FromC4)
   auto blockers = to_bitboard({Sq::b3, Sq::e6, Sq::f7, Sq::g8});
   EXPECT_THAT(
       bmagics->get_attacks(square, blockers),
-      EqualToSq(SqList{Sq::b3, Sq::d3, Sq::e2, Sq::b5, Sq::d5, Sq::e6}));
+      EqualToSq(SqList{Sq::f1, Sq::b3, Sq::d3, Sq::e2,
+                       Sq::b5, Sq::d5, Sq::a6, Sq::e6}));
 }
 
 class RookMagicsTest : public testing::Test {
