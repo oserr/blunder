@@ -3,10 +3,12 @@
 #include <array>
 #include <concepts>
 #include <cstdint>
+#include <functional>
 #include <ostream>
 
 #include "bitboard.h"
 #include "color.h"
+#include "hash.h"
 
 namespace blunder {
 
@@ -104,6 +106,11 @@ public:
   is_none() const noexcept
   { return is_type(Type::None); }
 
+  // Computes the hash of this piece.
+  size_t
+  hsh() const noexcept
+  { return combine_hash(to_int(ptype)); }
+
   //----------------------------------------------------
   // Static helpers to create pieces of different types.
   //----------------------------------------------------
@@ -157,3 +164,10 @@ letter(Type type, Color color = Color::White) noexcept
 { return Piece(type).letter(color); }
 
 } // namespace blunder
+
+template<>
+struct std::hash<blunder::Piece> {
+  std::size_t
+  operator()(blunder::Piece piece) const noexcept
+  { return piece.hsh(); }
+};
