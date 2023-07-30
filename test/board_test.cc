@@ -252,9 +252,6 @@ TEST_F(BoardTest, WithFen2)
     << '\n' << *board;
 }
 
-// TODO: fix this unit test. Actual result is missing a few moves for queen and
-// bishop moves.
-// https://lichess.org/editor/2B2b1K/p7/8/n2Q1p2/8/8/3P4/5k2_w_-_-_0_1?color=white
 TEST_F(BoardTest, WithFen3)
 {
   auto board = read_fen("2B2b1K/p7/8/n2Q1p2/8/8/3P4/5k2 w - - 0 1");
