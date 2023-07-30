@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <expected>
 #include <functional>
+#include <iostream>
 #include <memory>
 #include <ostream>
 #include <string>
@@ -172,11 +173,11 @@ private:
     BitBoard mask;
 
     if constexpr (side == BoardSide::King) {
-      bits.set_bits(0b00001001ull);
-      mask.set_bits(0b00001111ull);
+      bits.set_bits(0b10010000ull);
+      mask.set_bits(0b11110000ull);
     } else {
-      bits.set_bits(0b10001000ull);
-      mask.set_bits(0b11111000ull);
+      bits.set_bits(0b00010001ull);
+      mask.set_bits(0b00011111ull);
     }
 
     // Here we treat attacked squares as if they were occupied.
@@ -185,7 +186,6 @@ private:
     if constexpr (color == Color::Black)
       all_pieces >>= 56;
 
-    all_pieces &= 0xffull;
     all_pieces &= mask;
 
     return bits == all_pieces;
@@ -346,10 +346,14 @@ private:
   //------------------------------------------------------------------------
 
   // Given a BitBoard |bb|, returns a BitBoard representing the set of bits in
-  // |bb| that are attacked by other all other pieces. For example, |bb| can be
-  // the set of empty squares, or the set of all pieces for player moving next.
+  // |bb| that are attacked by all other pieces. For example, |bb| can be
+  // the set of empty squares, or the set of all pieces for either current
+  // player to move or the other player.
   BitBoard
-  get_attacks(const PieceSet& pieces, BitBoard bb) const noexcept;
+  get_attacks(
+      const PieceSet& pieces,
+      BitBoard bb,
+      bool is_white) const noexcept;
 
   // Returns the set of all squares attacked by other.
   AttackSquares
@@ -371,7 +375,8 @@ private:
   void
   move_enpassant(MoveVec& moves) const;
 
-  // Checks if there is enough material for a win from either player. Returns false for one of the following scenarios:
+  // Checks if there is enough material for a win from either player. Returns
+  // false for one of the following scenarios:
   // - king vs king
   // - king + knight vs king
   // - king + bishop vs king

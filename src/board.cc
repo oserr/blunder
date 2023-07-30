@@ -673,7 +673,10 @@ Board::move_enpassant(MoveVec& moves) const
 }
 
 BitBoard
-Board::get_attacks(const PieceSet& pieces, BitBoard bb) const noexcept
+Board::get_attacks(
+    const PieceSet& pieces,
+    BitBoard bb,
+    bool is_white) const noexcept
 {
   assert(bmagics and rmagics);
 
@@ -683,7 +686,7 @@ Board::get_attacks(const PieceSet& pieces, BitBoard bb) const noexcept
   attacked |= move_knight(pieces.knight()) & bb;
 
   auto pawns = pieces.pawn();
-  if (is_white_next()) {
+  if (is_white) {
     attacked |= move_bp_left(pawns, bb);
     attacked |= move_bp_right(pawns, bb);
   } else {
@@ -691,7 +694,7 @@ Board::get_attacks(const PieceSet& pieces, BitBoard bb) const noexcept
     attacked |= move_wp_right(pawns, bb);
   }
 
-  auto blockers = pieces.full_set();
+  auto blockers = all_bits();
 
   for (auto s : pieces.bishop().square_iter())
     attacked |= bmagics->get_attacks(s, blockers) & bb;
@@ -712,10 +715,10 @@ AttackSquares
 Board::get_attacks_other() const noexcept
 {
   assert(bmagics and rmagics);
-
+  auto is_white = not is_white_next();
   AttackSquares attacks;
-  attacks.pieces = get_attacks(other(), all_mine());
-  attacks.no_pieces = get_attacks(other(), none());
+  attacks.pieces = get_attacks(other(), all_mine(), is_white);
+  attacks.no_pieces = get_attacks(other(), none(), is_white);
   return attacks;
 }
 
@@ -730,10 +733,10 @@ AttackSquares
 Board::get_attacks_mine() const noexcept
 {
   assert(bmagics and rmagics);
-
+  auto is_white = is_white_next();
   AttackSquares attacks;
-  attacks.pieces = get_attacks(mine(), all_other());
-  attacks.no_pieces = get_attacks(mine(), none());
+  attacks.pieces = get_attacks(mine(), all_other(), is_white);
+  attacks.no_pieces = get_attacks(mine(), none(), is_white);
   return attacks;
 }
 
