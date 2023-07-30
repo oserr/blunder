@@ -78,6 +78,13 @@ MATCHER_P(MovesAre, expected_moves, "the moves are: "
   return false;
 }
 
+//-----------------------------------------------------------------------------
+// https://lichess.org/editor
+//
+// Note: in tests below, one can use the lichess editor to construct the boards
+// from the FEN strings to make it easier to see what the boar and moves are.
+//-----------------------------------------------------------------------------
+
 // Only init magic bitboards once because it's expensive to init the magics.
 std::once_flag init_flag;
 
@@ -304,8 +311,6 @@ TEST_F(BoardTest, WithFen3)
     << '\n' << *board;
 }
 
-// See position on lichess:
-// https://lichess.org/editor/r3k2r/1ppqbppp/p1np1n2/4p3/2B1PPb1/2NP1N2/PPPBQ1PP/R3K2R_w_KQkq_-_0_1?color=white
 TEST_F(BoardTest, WithFen4)
 {
   auto board = read_fen(
