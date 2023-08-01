@@ -137,7 +137,7 @@ public:
   //
   // @param fs The source square where piece is moving from.
   // @param ts The destination square, where piece is moving to.
-  // @param ts The en-passant squaure, where pawn is being captured.
+  // @param ps The en-passant square, where pawn is being captured.
   static Move
   by_enpassant(std::uint8_t fs, std::uint8_t ts, std::uint8_t ps) noexcept
   {
@@ -149,6 +149,11 @@ public:
     mv.move_type = MoveType::EnPassant;
     return mv;
   }
+
+  // Overload with input Sq to represent the squares.
+  static Move
+  by_enpassant(Sq fs, Sq ts, Sq ps) noexcept
+  { return by_enpassant(to_int(fs), to_int(ts), to_int(ps)); }
 
   // Cretes a printable debug string for Move in the form
   //
