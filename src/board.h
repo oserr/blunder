@@ -439,11 +439,11 @@ private:
   // The next color to move.
   Color next_to_move;
 
+  // Indicates the file where en passant is possible.
+  std::uint8_t en_passant_file = 0;
+
   // If set, indicates that en passant is possible.
   bool en_passant = false;
-
-  // Indicates the file where en passant is possible.
-  bool en_passant_file = 0;
 
   // Indicates if white can castle on kingside.
   bool wk_castle = false;
