@@ -339,7 +339,7 @@ Board::king_moves(MoveVec& moves) const
     if (bk_can_castle())
       moves.push_back(Move::bk_castle());
     if (bq_can_castle())
-      moves.push_back(Move::wq_castle());
+      moves.push_back(Move::bq_castle());
   }
 }
 
