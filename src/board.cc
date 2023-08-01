@@ -687,11 +687,11 @@ Board::get_attacks(
 
   auto pawns = pieces.pawn();
   if (is_white) {
-    attacked |= move_bp_left(pawns, bb);
-    attacked |= move_bp_right(pawns, bb);
-  } else {
     attacked |= move_wp_left(pawns, bb);
     attacked |= move_wp_right(pawns, bb);
+  } else {
+    attacked |= move_bp_left(pawns, bb);
+    attacked |= move_bp_right(pawns, bb);
   }
 
   auto blockers = all_bits();
