@@ -492,3 +492,25 @@ TEST_F(BoardTest, WithFen7)
   EXPECT_THAT(board->all_moves(), MovesAre(moves))
     << '\n' << *board;
 }
+
+TEST_F(BoardTest, WithFen8)
+{
+  auto board = read_fen("8/8/8/3k4/2pP4/8/2P5/2K5 b - d3 0 1");
+
+  MoveVec moves;
+
+  // Pawn moves
+  moves.emplace_back(Piece::pawn(), Sq::c4, Sq::c3);
+  moves.emplace_back(Move::by_enpassant(Sq::c4, Sq::d3, Sq::d4));
+
+  // King moves
+  moves.emplace_back(Piece::king(), Sq::d5, Sq::c6);
+  moves.emplace_back(Piece::king(), Sq::d5, Sq::d6);
+  moves.emplace_back(Piece::king(), Sq::d5, Sq::e6);
+  moves.emplace_back(Piece::king(), Sq::d5, Sq::e4);
+  moves.emplace_back(Piece::king(), Sq::d5, Piece::pawn(), Sq::d4);
+
+  ASSERT_TRUE(board);
+  EXPECT_THAT(board->all_moves(), MovesAre(moves))
+    << '\n' << *board;
+}
