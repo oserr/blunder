@@ -237,12 +237,12 @@ parse_enpassant(std::string_view field) noexcept
       if (letter < 'a' or letter > 'h')
         break;
 
-      auto col = letter - 'a';
+      unsigned col = letter - 'a';
       letter = field[1];
       if (letter < '1' or letter > '8')
         break;
 
-      auto row = letter - '1';
+      unsigned row = letter - '1';
       return row * 8 + col;
     }
     default:
