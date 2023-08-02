@@ -1,117 +1,143 @@
 #include "fen.h"
 
+#include <memory>
+#include <mutex>
+
 #include "gmock/gmock.h"
+#include "magic_attacks.h"
+#include "pre_computed_magics.h"
 #include "square.h"
 #include "utils.h"
 
 using namespace blunder;
 
-TEST(ReadFen, NoPieces)
+// Only init magic bitboards once because it's expensive to init the magics.
+std::once_flag init_flag;
+
+class ReadFenTest : public testing::Test
+{
+protected:
+  void
+  SetUp() override
+  {
+    std::call_once(init_flag, []{
+      auto bmagics = from_bmagics(kBishopMagics);
+      auto rmagics = from_rmagics(kRookMagics);
+      ASSERT_TRUE(bmagics) << "Unable to init bishop magics for MoveGen.";
+      ASSERT_TRUE(rmagics) << "Unable to init rook magics for MoveGen.";
+      Board::register_magics(
+          std::make_unique<MagicAttacks>(std::move(*bmagics)),
+          std::make_unique<MagicAttacks>(std::move(*rmagics)));
+    });
+  }
+};
+
+TEST_F(ReadFenTest, NoPieces)
 {
   auto board = read_fen("");
   ASSERT_FALSE(board);
   EXPECT_EQ(board.error(), FenErr::NoPieces);
 }
 
-TEST(ReadFen, InvalidRow)
+TEST_F(ReadFenTest, InvalidRow)
 {
   auto board = read_fen("///////");
   ASSERT_FALSE(board);
   EXPECT_EQ(board.error(), FenErr::InvalidRow);
 }
 
-TEST(ReadFen, MissingRows)
+TEST_F(ReadFenTest, MissingRows)
 {
   auto board = read_fen("x");
   ASSERT_FALSE(board);
   EXPECT_EQ(board.error(), FenErr::MissingRows);
 }
 
-TEST(ReadFen, WhiteAreNotLogical)
+TEST_F(ReadFenTest, WhiteAreNotLogical)
 {
   auto board = read_fen("8/8/8/8/8/8/8/8");
   ASSERT_FALSE(board);
   EXPECT_EQ(board.error(), FenErr::WhiteNotLogical);
 }
 
-TEST(ReadFen, BlackAreNotLogical)
+TEST_F(ReadFenTest, BlackAreNotLogical)
 {
   auto board = read_fen("8/8/8/8/8/8/P7/K7");
   ASSERT_FALSE(board);
   EXPECT_EQ(board.error(), FenErr::BlackNotLogical);
 }
 
-TEST(ReadFen, NoColor)
+TEST_F(ReadFenTest, NoColor)
 {
   auto board = read_fen("k7/p7/8/8/8/8/P7/K7");
   ASSERT_FALSE(board);
   EXPECT_EQ(board.error(), FenErr::NoColor);
 }
 
-TEST(ReadFen, InvalidColor)
+TEST_F(ReadFenTest, InvalidColor)
 {
   auto board = read_fen("k7/p7/8/8/8/8/P7/K7 y");
   ASSERT_FALSE(board);
   EXPECT_EQ(board.error(), FenErr::InvalidColor);
 }
 
-TEST(ReadFen, NoCastling)
+TEST_F(ReadFenTest, NoCastling)
 {
   auto board = read_fen("k7/p7/8/8/8/8/P7/K7 w");
   ASSERT_FALSE(board);
   EXPECT_EQ(board.error(), FenErr::NoCastling);
 }
 
-TEST(ReadFen, InvalidCastling)
+TEST_F(ReadFenTest, InvalidCastling)
 {
   auto board = read_fen("k7/p7/8/8/8/8/P7/K7 w j");
   ASSERT_FALSE(board);
   EXPECT_EQ(board.error(), FenErr::InvalidCastling);
 }
 
-TEST(ReadFen, NoEnPassant)
+TEST_F(ReadFenTest, NoEnPassant)
 {
   auto board = read_fen("k7/p7/8/8/8/8/P7/K7 w Kk");
   ASSERT_FALSE(board);
   EXPECT_EQ(board.error(), FenErr::NoEnPassant);
 }
 
-TEST(ReadFen, InvalidEnPassant)
+TEST_F(ReadFenTest, InvalidEnPassant)
 {
   auto board = read_fen("k7/p7/8/8/8/8/P7/K7 w Kk z3");
   ASSERT_FALSE(board);
   EXPECT_EQ(board.error(), FenErr::InvalidEnPassant);
 }
 
-TEST(ReadFen, NoHalfMoveMissing)
+TEST_F(ReadFenTest, NoHalfMoveMissing)
 {
   auto board = read_fen("k7/p7/8/8/8/8/P7/K7 w Kk -");
   ASSERT_FALSE(board);
   EXPECT_EQ(board.error(), FenErr::NoHalfMove);
 }
 
-TEST(ReadFen, InvalidHalfMove)
+TEST_F(ReadFenTest, InvalidHalfMove)
 {
   auto board = read_fen("k7/p7/8/8/8/8/P7/K7 w Kk - lox");
   ASSERT_FALSE(board);
   EXPECT_EQ(board.error(), FenErr::InvalidHalfMove);
 }
 
-TEST(ReadFen, NoFullMove)
+TEST_F(ReadFenTest, NoFullMove)
 {
   auto board = read_fen("k7/p7/8/8/8/8/P7/K7 w Kk - 0");
   ASSERT_FALSE(board);
   EXPECT_EQ(board.error(), FenErr::NoFullMove);
 }
 
-TEST(ReadFen, InvalidFullMove)
+TEST_F(ReadFenTest, InvalidFullMove)
 {
   auto board = read_fen("k7/p7/8/8/8/8/P7/K7 w Kk - 0 lox");
   ASSERT_FALSE(board);
   EXPECT_EQ(board.error(), FenErr::InvalidFullMove);
 }
 
-TEST(ReadFen, InitNewGame)
+TEST_F(ReadFenTest, InitNewGame)
 {
   auto board = read_fen(
       "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
@@ -119,7 +145,7 @@ TEST(ReadFen, InitNewGame)
   EXPECT_EQ(*board, Board::new_board());
 }
 
-TEST(ReadFen, PawnsAndKing)
+TEST_F(ReadFenTest, PawnsAndKing)
 {
   auto board = read_fen("8/5k2/3p4/1p1Pp2p/pP2Pp1P/P4P1K/8/8 b - - 99 50");
   ASSERT_TRUE(board);
