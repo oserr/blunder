@@ -224,6 +224,10 @@ public:
   // Move generation.
   //-----------------
 
+  // Returns the next board states for all possible legal moves.
+  std::vector<Board>
+  next() const;
+
   MoveVec
   all_moves() const;
 

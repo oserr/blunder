@@ -300,6 +300,29 @@ Board::str() const
 // Move generation.
 //-----------------
 
+std::vector<Board>
+Board::next() const
+{
+  if (is_terminal())
+    return std::vector<Board>();
+
+  // Create a board for every move.
+  auto moves = all_moves();
+  std::vector<Board> boards(moves.size(), *this);
+
+  // Apply the moves.
+  for (size_t i = 0; i < boards.size(); ++i)
+    boards[i].update(moves[i]);
+
+  // Remove moves that put yourself in check.
+  auto iter = std::remove_if(boards.begin(), boards.end(),
+      [](const Board& board) { return board.is_check_other(); });
+
+  boards.erase(iter, boards.end());
+
+  return boards;
+}
+
 MoveVec
 Board::all_moves() const
 {
