@@ -27,9 +27,10 @@ struct SearchResult {
 
 // An interface for searching a chess game tree.
 class Search {
+  virtual ~Seach() = default;
 
   // Runs a game search.
-  SearchResult
+  virtual SearchResult
   run(const Board& board) const;
 };
 
