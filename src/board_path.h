@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <cassert>
 
 #include "board.h"
 
@@ -18,6 +19,7 @@ namespace blunder {
 //   timesteps are used for evaluation, but this can be adjusted later if there
 //   is a need.
 class BoardPath {
+public:
   BoardPath() noexcept
   { boards.fill(nullptr); }
 
@@ -45,6 +47,11 @@ class BoardPath {
     }
   }
 
+  // Returns the number of boards in the path.
+  unsigned
+  size() const noexcept
+  { return n; }
+
 private:
   using BoardPathArr = std::array<const Board*, 8>;
 
@@ -59,7 +66,10 @@ private:
 
     const Board&
     operator*() const noexcept
-    { return **iter; }
+    {
+      assert(*iter != nullptr);
+      return **iter;
+    }
 
     // Prefix ++.
     Iter&
