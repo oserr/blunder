@@ -54,6 +54,7 @@ add_library(blunder STATIC
   src/magic_attacks.cc
   src/magic_attacks.h
   src/magics.h
+  src/mcts.cc
   src/mcts.h
   src/move.cc
   src/move.h

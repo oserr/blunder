@@ -23,7 +23,7 @@ public:
   virtual
   ~Evaluator() = default;
 
-  Prediction
+  virtual Prediction
   predict(const Board& board) const = 0;
 };
 
