@@ -91,7 +91,6 @@ private:
     iterator iter;
   };
 
-
 public:
   // Returns an iterator to the first board if one is available.
   Iter
