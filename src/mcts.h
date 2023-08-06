@@ -13,9 +13,10 @@ struct Node {
   std::vector<Node> children;
   MoveProb prob;
   Node* parent = nullptr;
-  unsigned visit_cnt;
-  unsigned total_val;
-  unsigned mean_val;
+  unsigned visit_cnt = 1;
+  unsigned total_val = 0;
+  unsigned mean_val = 0;
+  bool is_leaf = false;
 };
 
 // Monte Carlo Tree Search.
