@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "board.h"
+#include "board_path.h"
 #include "move.h"
 
 namespace blunder {
@@ -32,7 +33,7 @@ public:
 
   // Runs a game search.
   virtual SearchResult
-  run(const Board& board) const = 0;
+  run(const BoardPath& board) const = 0;
 };
 
 } // namespace blunder

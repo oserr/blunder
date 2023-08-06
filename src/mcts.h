@@ -3,6 +3,7 @@
 #include <memory>
 #include <utility>
 
+#include "board_path.h"
 #include "evaluator.h"
 #include "search.h"
 
@@ -16,7 +17,7 @@ public:
       simuls(simulations) {}
 
   SearchResult
-  run(const Board& board) const override;
+  run(const BoardPath& board) const override;
 
 private:
   std::shared_ptr<Evaluator> evaluator;

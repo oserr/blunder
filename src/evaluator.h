@@ -1,10 +1,10 @@
 #pragma once
 
-#include <span>
 #include <utility>
 #include <vector>
 
 #include "board.h"
+#include "board_path.h"
 
 namespace blunder {
 
@@ -25,7 +25,7 @@ public:
   ~Evaluator() = default;
 
   virtual Prediction
-  predict(std::span<const Board> boards) const = 0;
+  predict(const BoardPath board_path) const = 0;
 };
 
 } // namespace blunder

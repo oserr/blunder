@@ -41,9 +41,10 @@ FetchContent_MakeAvailable(googletest)
 add_library(blunder STATIC
   src/bitboard.cc
   src/bitboard.h
-  src/board_side.h
   src/board.cc
   src/board.h
+  src/board_path.h
+  src/board_side.h
   src/color.h
   src/err.h
   src/evaluator.h

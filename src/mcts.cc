@@ -28,7 +28,7 @@ private:
 };
 
 SearchResult
-Mcts::run(const Board& board) const
+Mcts::run(const BoardPath& board) const
 {
   (void)board;
   // High level algo:
