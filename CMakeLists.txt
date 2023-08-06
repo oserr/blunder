@@ -46,6 +46,7 @@ add_library(blunder STATIC
   src/board.h
   src/color.h
   src/err.h
+  src/evaluator.h
   src/fen.cc
   src/fen.h
   src/game_state.h
