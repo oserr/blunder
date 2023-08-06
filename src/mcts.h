@@ -9,6 +9,10 @@
 namespace blunder {
 
 struct Node {
+  explicit
+  Node(const Board& board) noexcept
+    : board(board) {}
+
   Board board;
   std::vector<Node> children;
   MoveProb prob;
@@ -19,10 +23,20 @@ struct Node {
   bool is_leaf = false;
 };
 
+class GameTree {
+public:
+  explicit
+  GameTree(const Board& board) noexcept
+    : root(board) {}
+
+private:
+  Node root;
+};
+
 // Monte Carlo Tree Search.
 class Mcts : public Search {
 public:
-  Mcts(std::shared_ptr<Evaluator> evaluator, unsigned simulations)
+  Mcts(std::shared_ptr<Evaluator> evaluator, unsigned simulations) noexcept
     : evaluator(std::move(evaluator)),
       simuls(simulations) {}
 
