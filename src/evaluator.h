@@ -1,5 +1,6 @@
 #pragma once
 
+#include <span>
 #include <utility>
 #include <vector>
 
@@ -24,7 +25,7 @@ public:
   ~Evaluator() = default;
 
   virtual Prediction
-  predict(const Board& board) const = 0;
+  predict(std::span<const Board> boards) const = 0;
 };
 
 } // namespace blunder
