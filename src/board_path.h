@@ -18,7 +18,8 @@ namespace blunder {
 //   timesteps are used for evaluation, but this can be adjusted later if there
 //   is a need.
 class BoardPath {
-  BoardPath() noexcept = default;
+  BoardPath() noexcept
+  { boards.fill(nullptr); }
 
   bool
   is_full() const noexcept
