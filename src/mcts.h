@@ -8,6 +8,16 @@
 
 namespace blunder {
 
+struct Node {
+  Board board;
+  std::vector<Node> children;
+  MoveProb prob;
+  Node* parent = nullptr;
+  unsigned visit_cnt;
+  unsigned total_val;
+  unsigned mean_val;
+};
+
 // Monte Carlo Tree Search.
 class Mcts : public Search {
 public:
