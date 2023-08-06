@@ -32,7 +32,7 @@ public:
 
   // Runs a game search.
   virtual SearchResult
-  run(const Board& board) const;
+  run(const Board& board) const = 0;
 };
 
 } // namespace blunder
