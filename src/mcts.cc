@@ -1,5 +1,7 @@
 #include "mcts.h"
 
+#include <cassert>
+
 namespace blunder {
 
 struct Node {
@@ -14,23 +16,32 @@ struct Node {
   unsigned visit_cnt = 1;
   unsigned total_val = 0;
   unsigned mean_val = 0;
-  bool is_leaf = false;
+  bool is_leaf = true;
 };
 
 class GameTree {
 public:
   explicit
-  GameTree(const Board& board) noexcept
-    : root(board) {}
+  GameTree(const Board& board, const BoardPath& bp)
+    : root(board),
+      board_path(&bp)
+  { assert(bp.size() > 0); }
 
 private:
   Node root;
+  // Guaranteed to non-null.
+  const BoardPath* board_path;
 };
 
 SearchResult
-Mcts::run(const BoardPath& board) const
+Mcts::run(const BoardPath& board_path) const
 {
-  (void)board;
+  auto root = board_path.root();
+  if (not root)
+    throw std::invalid_argument("BoardPath should have a root.");
+
+  GameTree game_tree(root->get(), board_path);
+
   // High level algo:
   // - Make root node for board.
   // - for simulation in simulations

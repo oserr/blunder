@@ -17,7 +17,7 @@ public:
       simuls(simulations) {}
 
   SearchResult
-  run(const BoardPath& board) const override;
+  run(const BoardPath& board_path) const override;
 
 private:
   std::shared_ptr<Evaluator> evaluator;

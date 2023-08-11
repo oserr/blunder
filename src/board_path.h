@@ -2,6 +2,8 @@
 
 #include <array>
 #include <cassert>
+#include <functional>
+#include <optional>
 
 #include "board.h"
 
@@ -51,6 +53,15 @@ public:
   unsigned
   size() const noexcept
   { return n; }
+
+  // Returns the root of the BoardPath, i.e. the first board.
+  std::optional<std::reference_wrapper<const Board>>
+  root() const noexcept
+  {
+    return size() == 0
+      ? std::nullopt
+      : std::make_optional(std::cref(*boards[0]));
+  }
 
 private:
   using BoardPathArr = std::array<const Board*, 8>;
