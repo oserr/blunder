@@ -4,6 +4,8 @@
 
 namespace blunder {
 
+// TODO: make this into a proper class to protext invariants when I settle down
+// on its API.
 struct Node {
   explicit
   Node(const Board& board) noexcept
@@ -17,6 +19,20 @@ struct Node {
   unsigned total_val = 0;
   unsigned mean_val = 0;
   bool is_leaf = true;
+
+  Node*
+  choose_next() noexcept
+  { return is_leaf ? nullptr : choose_action(); }
+
+  // TODO: implement action=argmax(Q(st, a) + U(st,a)).
+  Node*
+  choose_action() noexcept
+  { return nullptr; }
+
+  // TODO: implement expand.
+  void
+  expand(const Prediction& pred) noexcept
+  { (void)pred; }
 };
 
 class GameTree {
@@ -27,6 +43,24 @@ public:
       board_path(&bp)
   { assert(bp.size() > 0); }
 
+  // Guaranteed to be non-null.
+  Node*
+  get_root() noexcept
+  { return &root; }
+
+  // TODO: implement get_path.
+  BoardPath
+  get_path(Node* node) const noexcept
+  {
+    (void)node;
+    return BoardPath();
+  }
+
+  // TODO: implement update_stats.
+  void
+  update_stats(Node* node)
+  { (void)node; }
+
 private:
   Node root;
   // Guaranteed to non-null.
@@ -36,11 +70,32 @@ private:
 SearchResult
 Mcts::run(const BoardPath& board_path) const
 {
-  auto root = board_path.root();
-  if (not root)
+  auto board = board_path.root();
+  if (not board)
     throw std::invalid_argument("BoardPath should have a root.");
 
-  GameTree game_tree(root->get(), board_path);
+  GameTree game_tree(board->get(), board_path);
+
+  for (unsigned i = 0; i < simuls; ++i) {
+    auto* node = game_tree.get_root();
+
+    while (not node->is_leaf) {
+      node = node->choose_next();
+      assert(node);
+    }
+
+    // Reached a leaf node.
+    auto bp = game_tree.get_path(node);
+
+    // Evaluate leaf node.
+    auto pred = evaluator->predict(bp);
+
+    // Expand leaf node.
+    node->expand(pred);
+
+    // Update stats.
+    game_tree.update_stats(node);
+  }
 
   // High level algo:
   // - Make root node for board.
