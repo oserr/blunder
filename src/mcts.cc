@@ -113,6 +113,8 @@ Mcts::run(const BoardPath& board_path) const
   if (not board)
     throw std::invalid_argument("BoardPath should have a root.");
 
+  // TODO: when the root node is expanded, we need to add Dir noise to the prior
+  // probabilities.
   GameTree game_tree(board->get(), board_path);
 
   for (unsigned i = 0; i < simuls; ++i) {
