@@ -47,7 +47,7 @@ struct Node {
   // expanded node.
   void
   expand(const Node& other) noexcept
-  { (void)node; }
+  { (void)other; }
 
   // TODO: implement is_terminal.
   bool
@@ -61,13 +61,11 @@ struct Node {
 
   // Computes the upper confidence bound. Asserts that parent is not null.
   float
-  uct() const noexcept
-  { return 0.0; }
+  uct() const noexcept;
 
   // TODO: implement exploration rate.
   float
-  explore_rate() const noexcept
-  { return 0.0; }
+  explore_rate() const noexcept;
 };
 
 float
@@ -75,14 +73,14 @@ Node::explore_rate() const noexcept
 {
   assert(parent != nullptr);
   float num = 1 + parent->visit_count + EXPLORE_BASE;
-  return std::logf(num / EXPLORE_BASE) + EXPLORE_INIT;
+  return std::log(num / EXPLORE_BASE) + EXPLORE_INIT;
 }
 
 float
 Node::uct() const noexcept
 {
   assert(parent != nullptr);
-  float term1 = explore_rate() * prior;
+  float term1 = explore_rate() * prob.prior;
   float term2 = std::sqrt(parent->visit_count) / (1 + visit_count);
   return term1 * term2;
 }
@@ -117,7 +115,7 @@ public:
   // that has already been expanded.
   const Node*
   find_expanded(Node* node)
-  { return &root; }
+  { return node; }
 
 private:
   Node root;
