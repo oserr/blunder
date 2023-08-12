@@ -72,6 +72,11 @@ struct Node {
   float
   mean_uct() const noexcept
   { return mean_value + uct(); }
+
+  // Define less than operator to make it more ergonomic to select the best node.
+  bool
+  operator<(const Node& right) const noexcept
+  { return mean_uct() < right.mean_uct(); }
 };
 
 float
