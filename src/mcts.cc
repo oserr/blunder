@@ -4,7 +4,7 @@
 
 namespace blunder {
 
-// TODO: make this into a proper class to protext invariants when I settle down
+// TODO: make this into a proper class to protect invariants when I settle down
 // on its API.
 struct Node {
   explicit
@@ -33,6 +33,16 @@ struct Node {
   void
   expand(const Prediction& pred) noexcept
   { (void)pred; }
+
+  // TODO: implement is_terminal.
+  bool
+  is_terminal() const noexcept
+  { return false; }
+
+  // TODO: implement terminate.
+  void
+  terminate() noexcept
+  { return; }
 };
 
 class GameTree {
@@ -79,9 +89,16 @@ Mcts::run(const BoardPath& board_path) const
   for (unsigned i = 0; i < simuls; ++i) {
     auto* node = game_tree.get_root();
 
-    while (not node->is_leaf) {
+    while (not node->is_leaf and not node->is_terminal()) {
       node = node->choose_next();
       assert(node);
+    }
+
+    // We reached a terminal state so there is no need to call evaluator.
+    if (node->is_terminal()) {
+      node->terminate();
+      game_tree.update_stats(node);
+      continue;
     }
 
     // Reached a leaf node.
