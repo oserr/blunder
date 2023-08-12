@@ -50,9 +50,14 @@ struct Node {
   terminate() noexcept
   { return; }
 
-  // TODO: implement compute_puct.
+  // TODO: implement puct.
   float
-  compute_puct() const noexcept
+  puct() const noexcept
+  { return 0.0; }
+
+  // TODO: implement exploration rate.
+  float
+  exploration_rate() const noexcept
   { return 0.0; }
 };
 
