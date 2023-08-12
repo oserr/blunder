@@ -49,10 +49,10 @@ struct Node {
   expand(const Node& other) noexcept
   { (void)other; }
 
-  // TODO: implement is_terminal.
+  // Returns true if the board reached a terminal state.
   bool
   is_terminal() const noexcept
-  { return false; }
+  { return board.is_terminal(); }
 
   // Computes the upper confidence bound. Asserts that parent is not null.
   float
