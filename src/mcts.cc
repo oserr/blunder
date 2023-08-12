@@ -6,8 +6,11 @@ namespace blunder {
 namespace {
 
 // TODO: figure out the values for these constants.
-constexpr float EXPLORE_BASE = 0.01;
-constexpr float EXPLORE_INIT = 0.02;
+constexpr float EXPLORE_BASE = 19652;
+constexpr float EXPLORE_INIT = 1.25;
+
+constexpr float DIR_ALPHA = 0.3;
+constexpr float DIR_EXPLORE_FRAC = 0.25;
 
 // TODO: make this into a proper class to protect invariants when I settle down
 // on its API.
