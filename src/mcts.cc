@@ -59,9 +59,9 @@ struct Node {
   terminate() noexcept
   { return; }
 
-  // TODO: implement puct.
+  // Computes the upper confidence bound. Asserts that parent is not null.
   float
-  puct() const noexcept
+  uct() const noexcept
   { return 0.0; }
 
   // TODO: implement exploration rate.
@@ -76,6 +76,15 @@ Node::explore_rate() const noexcept
   assert(parent != nullptr);
   float num = 1 + parent->visit_count + EXPLORE_BASE;
   return std::logf(num / EXPLORE_BASE) + EXPLORE_INIT;
+}
+
+float
+Node::uct() const noexcept
+{
+  assert(parent != nullptr);
+  float term1 = explore_rate() * prior;
+  float term2 = std::sqrt(parent->visit_count) / (1 + visit_count);
+  return term1 * term2;
 }
 
 class GameTree {
@@ -147,7 +156,7 @@ Mcts::run(const BoardPath& board_path) const
     auto other_node = game_tree.find_expanded(node);
     if (other_node) {
       // Copy priors and value to avoid calling evaluator.
-      node->expand(other_node);
+      node->expand(*other_node);
       game_tree.update_stats(node);
       continue;
     }
