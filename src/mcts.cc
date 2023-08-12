@@ -1,6 +1,7 @@
 #include "mcts.h"
 
 #include <cassert>
+#include <cmath>
 
 namespace blunder {
 namespace {
@@ -23,9 +24,9 @@ struct Node {
   std::vector<Node> children;
   MoveProb prob;
   Node* parent = nullptr;
-  unsigned visit_cnt = 1;
-  unsigned total_val = 0;
-  unsigned mean_val = 0;
+  unsigned visit_count = 1;
+  unsigned total_value = 0;
+  unsigned mean_value = 0;
   bool is_leaf = true;
 
   Node*
@@ -65,9 +66,17 @@ struct Node {
 
   // TODO: implement exploration rate.
   float
-  exploration_rate() const noexcept
+  explore_rate() const noexcept
   { return 0.0; }
 };
+
+float
+Node::explore_rate() const noexcept
+{
+  assert(parent != nullptr);
+  float num = 1 + parent->visit_count + EXPLORE_BASE;
+  return std::logf(num / EXPLORE_BASE) + EXPLORE_INIT;
+}
 
 class GameTree {
 public:
