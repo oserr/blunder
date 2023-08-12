@@ -1,5 +1,6 @@
 #include "mcts.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 
@@ -33,10 +34,9 @@ struct Node {
   choose_next() noexcept
   { return is_leaf ? nullptr : choose_action(); }
 
-  // TODO: implement action=argmax(Q(st, a) + U(st,a)).
+  // Chooses the next child based on max{Q(s, a) + U(s, a)}.
   Node*
-  choose_action() noexcept
-  { return nullptr; }
+  choose_action() noexcept;
 
   // TODO: implement expand.
   void
@@ -78,6 +78,14 @@ struct Node {
   operator<(const Node& right) const noexcept
   { return mean_uct() < right.mean_uct(); }
 };
+
+Node*
+Node::choose_action() noexcept
+{
+  assert(not children.empty());
+  auto iter = std::max_element(children.begin(), children.end());
+  return iter == children.end() ? nullptr : &*iter;
+}
 
 float
 Node::explore_rate() const noexcept
