@@ -34,6 +34,12 @@ struct Node {
   expand(const Prediction& pred) noexcept
   { (void)pred; }
 
+  // TODO: implement expand. Here we take the priors and value from a previously
+  // expanded node.
+  void
+  expand(const Node& other) noexcept
+  { (void)node; }
+
   // TODO: implement is_terminal.
   bool
   is_terminal() const noexcept
@@ -71,6 +77,12 @@ public:
   update_stats(Node* node)
   { (void)node; }
 
+  // TODO: implement find_expaned. It will find a node with the board state
+  // that has already been expanded.
+  const Node*
+  find_expanded(Node* node)
+  { return &root; }
+
 private:
   Node root;
   // Guaranteed to non-null.
@@ -97,6 +109,14 @@ Mcts::run(const BoardPath& board_path) const
     // We reached a terminal state so there is no need to call evaluator.
     if (node->is_terminal()) {
       node->terminate();
+      game_tree.update_stats(node);
+      continue;
+    }
+
+    auto other_node = game_tree.find_expanded(node);
+    if (other_node) {
+      // Copy priors and value to avoid calling evaluator.
+      node->expand(other_node);
       game_tree.update_stats(node);
       continue;
     }
