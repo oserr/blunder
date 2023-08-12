@@ -49,6 +49,11 @@ struct Node {
   void
   terminate() noexcept
   { return; }
+
+  // TODO: implement compute_puct.
+  float
+  compute_puct() const noexcept
+  { return 0.0; }
 };
 
 class GameTree {
