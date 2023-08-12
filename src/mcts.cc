@@ -54,11 +54,6 @@ struct Node {
   is_terminal() const noexcept
   { return false; }
 
-  // TODO: implement terminate.
-  void
-  terminate() noexcept
-  { return; }
-
   // Computes the upper confidence bound. Asserts that parent is not null.
   float
   uct() const noexcept;
@@ -165,7 +160,6 @@ Mcts::run(const BoardPath& board_path) const
 
     // We reached a terminal state so there is no need to call evaluator.
     if (node->is_terminal()) {
-      node->terminate();
       game_tree.update_stats(node);
       continue;
     }
