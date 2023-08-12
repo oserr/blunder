@@ -3,6 +3,11 @@
 #include <cassert>
 
 namespace blunder {
+namespace {
+
+// TODO: figure out the values for these constants.
+constexpr float EXPLORE_BASE = 0.01;
+constexpr float EXPLORE_INIT = 0.02;
 
 // TODO: make this into a proper class to protect invariants when I settle down
 // on its API.
@@ -98,6 +103,8 @@ private:
   // Guaranteed to non-null.
   const BoardPath* board_path;
 };
+
+} // namespace
 
 SearchResult
 Mcts::run(const BoardPath& board_path) const
