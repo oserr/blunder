@@ -63,9 +63,15 @@ struct Node {
   float
   uct() const noexcept;
 
-  // TODO: implement exploration rate.
+  // Returns the exploration term to compute UCT.
   float
   explore_rate() const noexcept;
+
+  // Returns {Q(s, a) + U(s, a)}, where Q(s, a) is the mean action value and
+  // U(s, a) is the upper confidence bound.
+  float
+  mean_uct() const noexcept
+  { return mean_value + uct(); }
 };
 
 float
