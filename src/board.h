@@ -139,6 +139,11 @@ public:
     return true;
   }
 
+  // Returns true if game state is mate.
+  bool
+  is_mate() const noexcept
+  { return game_state == GameState::Mate; }
+
   //---------------------------
   // Check for castling rights.
   //---------------------------
