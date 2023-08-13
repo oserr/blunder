@@ -219,31 +219,6 @@ Node::uct() const noexcept
   return term1 * term2;
 }
 
-class GameTree {
-public:
-  explicit
-  GameTree(const Board& board, const BoardPath& bp)
-    : root(board),
-      board_path(&bp)
-  { assert(bp.size() > 0); }
-
-  // Guaranteed to be non-null.
-  Node*
-  get_root() noexcept
-  { return &root; }
-
-  // TODO: implement find_expaned. It will find a node with the board state
-  // that has already been expanded.
-  const Node*
-  find_expanded(Node* node)
-  { return node; }
-
-private:
-  Node root;
-  // Guaranteed to non-null.
-  const BoardPath* board_path;
-};
-
 } // namespace
 
 SearchResult
