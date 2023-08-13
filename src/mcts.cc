@@ -232,14 +232,6 @@ public:
   get_root() noexcept
   { return &root; }
 
-  // TODO: implement get_path.
-  BoardPath
-  get_path(Node* node) const noexcept
-  {
-    (void)node;
-    return BoardPath();
-  }
-
   // TODO: implement find_expaned. It will find a node with the board state
   // that has already been expanded.
   const Node*
