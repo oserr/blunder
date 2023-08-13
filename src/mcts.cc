@@ -49,7 +49,7 @@ struct Node {
   float prior;
   unsigned visits = 1;
   float value = 0.0;
-  // The initial value from the network or from a termina state.
+  // The initial value from the network or from a terminal state.
   float init_value = 0.0;
   bool is_leaf = true;
 
