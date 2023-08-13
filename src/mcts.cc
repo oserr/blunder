@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <iterator>
+#include <utility>
 
 namespace blunder {
 namespace {
@@ -17,14 +19,29 @@ constexpr float DIR_EXPLORE_FRAC = 0.25;
 // TODO: make this into a proper class to protect invariants when I settle down
 // on its API.
 struct Node {
+  // Initializes the Node with the Board.
   explicit
-  Node(const Board& board) noexcept
+  Node(const Board& board)
     : board(board) {}
+
+  // Initializes the node with the board and the prior.
+  Node(const Board& board, float prior)
+    : board(board), prior(prior) {}
+
+  // Initializes the node with the board and the prior.
+  Node(Board&& board, float prior)
+    : board(std::move(board)), prior(prior) {}
+
+  // Initializes the node with the board and the prior.
+  Node(Board&& board, Node& parent, float prior)
+    : board(std::move(board)),
+      parent(&parent),
+      prior(prior) {}
 
   Board board;
   std::vector<Node> children;
-  MoveProb prob;
   Node* parent = nullptr;
+  float prior;
   unsigned visits = 1;
   float value = 0.0;
   // The initial value from the network or from a termina state.
@@ -39,16 +56,19 @@ struct Node {
   Node*
   choose_action() noexcept;
 
-  // TODO: implement expand.
-  void
-  expand(const Prediction& pred) noexcept
-  { (void)pred; }
+  // Expands the node with the move probabilities and the value from the
+  // prediction.
+  Node&
+  expand(Prediction pred);
 
   // TODO: implement expand. Here we take the priors and value from a previously
   // expanded node.
-  void
-  expand(const Node& other) noexcept
-  { (void)other; }
+  Node&
+  expand(const Node& other)
+  {
+    (void)other;
+    return *this;
+  }
 
   // Returns true if the board reached a terminal state.
   bool
@@ -81,6 +101,29 @@ struct Node {
   void
   update_stats() noexcept;
 };
+
+Node&
+Node::expand(Prediction pred)
+{
+  assert(not is_leaf and not is_terminal());
+
+  if (pred.move_probs.empty())
+    throw std::logic_error("No moves found, but expecting some.");
+
+  is_leaf = false;
+  value = pred.value;
+  children.reserve(pred.move_probs.size());
+
+  std::transform(
+      pred.move_probs.begin(),
+      pred.move_probs.end(),
+      std::back_inserter(children),
+      [this](auto& move_prob) {
+        return Node(std::move(move_prob.first), *this, move_prob.second);
+      });
+
+  return *this;
+}
 
 void
 Node::update_stats() noexcept
@@ -128,7 +171,7 @@ float
 Node::uct() const noexcept
 {
   assert(parent != nullptr);
-  float term1 = explore_rate() * prob.prior;
+  float term1 = explore_rate() * prior;
   float term2 = std::sqrt(parent->visits) / (1 + visits);
   return term1 * term2;
 }
@@ -209,7 +252,7 @@ Mcts::run(const BoardPath& board_path) const
     auto pred = evaluator->predict(bp);
 
     // Expand leaf node.
-    node->expand(pred);
+    node->expand(std::move(pred));
 
     // Update stats.
     node->update_stats();
