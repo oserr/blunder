@@ -72,6 +72,11 @@ struct Node {
   expand(const Node& other);
 #endif
 
+  // Returns a board path from the current node, with current node the root
+  // node of the board path.
+  BoardPath
+  get_path(const BoardPath& from_root) const noexcept;
+
   // Returns true if the board reached a terminal state.
   bool
   is_terminal() const noexcept
@@ -107,6 +112,24 @@ struct Node {
   void
   update_stats() noexcept;
 };
+
+BoardPath
+Node::get_path(const BoardPath& from_root) const noexcept
+{
+  auto node = this;
+  BoardPath board_path;
+
+  // Check for parent to avoid adding the root node here, since push(from_root)
+  // takes care of adding the root.
+  while (node and node->parent and not board_path.is_full()) {
+    board_path.push(node->board);
+    node = node->parent;
+  }
+
+  board_path.push(from_root);
+
+  return board_path;
+}
 
 Node&
 Node::expand(Prediction pred)
