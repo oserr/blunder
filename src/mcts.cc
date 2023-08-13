@@ -268,11 +268,7 @@ Mcts::run(const BoardPath& board_path) const
     node->expand(std::move(pred)).update_stats();
   }
 
-  // High level algo:
-  // - Make root node for board.
-  // - for simulation in simulations
-  //   - traverse tree
-  //   - if reach a leaf node expand and score
+  // TODO: collect results.
   return SearchResult();
 }
 
