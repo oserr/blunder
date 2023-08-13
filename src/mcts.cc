@@ -134,7 +134,7 @@ Node::get_path(const BoardPath& from_root) const noexcept
 Node&
 Node::expand(Prediction pred)
 {
-  assert(not is_leaf and not is_terminal());
+  assert(is_leaf and not is_terminal());
 
   if (pred.move_probs.empty())
     throw std::logic_error("No moves found, but expecting some.");
@@ -253,12 +253,14 @@ Mcts::run(const BoardPath& board_path) const
   if (not board)
     throw std::invalid_argument("BoardPath should have a root.");
 
-  // TODO: when the root node is expanded, we need to add Dir noise to the prior
-  // probabilities.
-  GameTree game_tree(board->get(), board_path);
+  auto pred = evaluator->predict(board_path);
+  add_noise(pred.move_probs);
+
+  Node root(board->get());
+  root.expand(pred);
 
   for (unsigned i = 0; i < simuls; ++i) {
-    auto* node = game_tree.get_root();
+    auto* node = &root;
 
     while (not node->is_leaf and not node->is_terminal()) {
       node = node->choose_next();
@@ -297,6 +299,13 @@ Mcts::run(const BoardPath& board_path) const
   //   - traverse tree
   //   - if reach a leaf node expand and score
   return SearchResult();
+}
+
+// TODO: implement add_noise.
+void
+Mcts::add_noise(std::span<std::pair<Board, float>> priors) const
+{
+  (void)priors;
 }
 
 } // namespace blunder
