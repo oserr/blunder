@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
-#include <iterator>
 #include <utility>
 
 namespace blunder {
@@ -114,13 +113,8 @@ Node::expand(Prediction pred)
   value = pred.value;
   children.reserve(pred.move_probs.size());
 
-  std::transform(
-      pred.move_probs.begin(),
-      pred.move_probs.end(),
-      std::back_inserter(children),
-      [this](auto& move_prob) {
-        return Node(std::move(move_prob.first), *this, move_prob.second);
-      });
+  for (auto& [board, prior] : pred.move_probs)
+    children.emplace_back(std::move(board), *this, prior);
 
   return *this;
 }
