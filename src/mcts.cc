@@ -25,9 +25,8 @@ struct Node {
   std::vector<Node> children;
   MoveProb prob;
   Node* parent = nullptr;
-  unsigned visit_count = 1;
-  unsigned total_value = 0;
-  unsigned mean_value = 0;
+  unsigned visits = 1;
+  float value = 0.0;
   bool is_leaf = true;
 
   Node*
@@ -54,6 +53,9 @@ struct Node {
   is_terminal() const noexcept
   { return board.is_terminal(); }
 
+  void
+  terminate() noexcept;
+
   // Computes the upper confidence bound. Asserts that parent is not null.
   float
   uct() const noexcept;
@@ -66,13 +68,24 @@ struct Node {
   // U(s, a) is the upper confidence bound.
   float
   mean_uct() const noexcept
-  { return mean_value + uct(); }
+  { return value / visits + uct(); }
 
   // Define less than operator to make it more ergonomic to select the best node.
   bool
   operator<(const Node& right) const noexcept
   { return mean_uct() < right.mean_uct(); }
 };
+
+void
+Node::terminate() noexcept
+{
+  // Don't do anything if the board is not actually in a terminal state.
+  if (not board.is_terminal())
+    return;
+
+  // The value of 1 here is for the move leading up to the check.
+  value = board.is_mate() ? 1 : 0;
+}
 
 Node*
 Node::choose_action() noexcept
@@ -86,7 +99,7 @@ float
 Node::explore_rate() const noexcept
 {
   assert(parent != nullptr);
-  float num = 1 + parent->visit_count + EXPLORE_BASE;
+  float num = 1 + parent->visits + EXPLORE_BASE;
   return std::log(num / EXPLORE_BASE) + EXPLORE_INIT;
 }
 
@@ -95,7 +108,7 @@ Node::uct() const noexcept
 {
   assert(parent != nullptr);
   float term1 = explore_rate() * prob.prior;
-  float term2 = std::sqrt(parent->visit_count) / (1 + visit_count);
+  float term2 = std::sqrt(parent->visits) / (1 + visits);
   return term1 * term2;
 }
 
@@ -160,6 +173,7 @@ Mcts::run(const BoardPath& board_path) const
 
     // We reached a terminal state so there is no need to call evaluator.
     if (node->is_terminal()) {
+      node->terminate();
       game_tree.update_stats(node);
       continue;
     }
