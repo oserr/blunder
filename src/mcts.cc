@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <random>
 #include <utility>
 
 namespace blunder {
@@ -220,6 +221,18 @@ Node::uct() const noexcept
 }
 
 } // namespace
+
+Mcts::Mcts(
+    std::shared_ptr<Evaluator> evaluator,
+    unsigned simulations,
+    unsigned seed)
+    : evaluator(std::move(evaluator)),
+      simuls(simulations)
+{
+  std::mt19937 gen(seed);
+  std::gamma_distribution<float> dir(DIR_ALPHA);
+  dir_fn = std::bind_front(std::move(dir), std::move(gen));
+}
 
 SearchResult
 Mcts::run(const BoardPath& board_path) const
