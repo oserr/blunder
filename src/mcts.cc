@@ -154,11 +154,6 @@ public:
     return BoardPath();
   }
 
-  // TODO: implement update_stats.
-  void
-  update_stats(Node* node)
-  { (void)node; }
-
   // TODO: implement find_expaned. It will find a node with the board state
   // that has already been expanded.
   const Node*
