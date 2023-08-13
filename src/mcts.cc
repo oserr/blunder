@@ -27,6 +27,8 @@ struct Node {
   Node* parent = nullptr;
   unsigned visits = 1;
   float value = 0.0;
+  // The initial value from the network or from a termina state.
+  float init_value = 0.0;
   bool is_leaf = true;
 
   Node*
@@ -74,7 +76,25 @@ struct Node {
   bool
   operator<(const Node& right) const noexcept
   { return mean_uct() < right.mean_uct(); }
+
+  // Propagates search statistics back up the search tree.
+  void
+  update_stats() noexcept;
 };
+
+void
+Node::update_stats() noexcept
+{
+  auto node = parent;
+  auto val = value;
+
+  while (node) {
+    val *= -1;
+    ++node->visits;
+    node->value += val;
+    node = node->parent;
+  }
+}
 
 void
 Node::terminate() noexcept
@@ -85,6 +105,7 @@ Node::terminate() noexcept
 
   // The value of 1 here is for the move leading up to the check.
   value = board.is_mate() ? 1 : 0;
+  init_value = value;
 }
 
 Node*
@@ -174,7 +195,7 @@ Mcts::run(const BoardPath& board_path) const
     // We reached a terminal state so there is no need to call evaluator.
     if (node->is_terminal()) {
       node->terminate();
-      game_tree.update_stats(node);
+      node->update_stats();
       continue;
     }
 
@@ -182,7 +203,7 @@ Mcts::run(const BoardPath& board_path) const
     if (other_node) {
       // Copy priors and value to avoid calling evaluator.
       node->expand(*other_node);
-      game_tree.update_stats(node);
+      node->update_stats();
       continue;
     }
 
@@ -196,7 +217,7 @@ Mcts::run(const BoardPath& board_path) const
     node->expand(pred);
 
     // Update stats.
-    game_tree.update_stats(node);
+    node->update_stats();
   }
 
   // High level algo:
