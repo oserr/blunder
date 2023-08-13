@@ -31,9 +31,15 @@ struct Node {
   Node(Board&& board, float prior)
     : board(std::move(board)), prior(prior) {}
 
-  // Initializes the node with the board and the prior.
+  // Initializes the node with the board, parent, and prior.
   Node(Board&& board, Node& parent, float prior)
     : board(std::move(board)),
+      parent(&parent),
+      prior(prior) {}
+
+  // Initializes the node with the board, parent, and prior.
+  Node(const Board& board, Node& parent, float prior)
+    : board(board),
       parent(&parent),
       prior(prior) {}
 
@@ -60,14 +66,9 @@ struct Node {
   Node&
   expand(Prediction pred);
 
-  // TODO: implement expand. Here we take the priors and value from a previously
-  // expanded node.
+  // Expands the node using priors and value from node with same board state.
   Node&
-  expand(const Node& other)
-  {
-    (void)other;
-    return *this;
-  }
+  expand(const Node& other);
 
   // Returns true if the board reached a terminal state.
   bool
@@ -111,10 +112,27 @@ Node::expand(Prediction pred)
 
   is_leaf = false;
   value = pred.value;
+  init_value = value;
   children.reserve(pred.move_probs.size());
 
-  for (auto& [board, prior] : pred.move_probs)
-    children.emplace_back(std::move(board), *this, prior);
+  for (auto& [child_board, child_prior] : pred.move_probs)
+    children.emplace_back(std::move(child_board), *this, child_prior);
+
+  return *this;
+}
+
+Node&
+Node::expand(const Node& other)
+{
+  assert(not other.children.empty());
+
+  is_leaf = false;
+  init_value = other.init_value;
+  value = init_value;
+  children.reserve(other.children.size());
+
+  for (const auto& node : other.children)
+    children.emplace_back(node.board, *this, node.prior);
 
   return *this;
 }
