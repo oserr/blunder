@@ -11,7 +11,7 @@ namespace blunder {
 // Represents the evaluation result of a given chess position.
 struct Prediction {
   // Vector of move probabilities.
-  std::vector<std::pair<Move, float>> move_probs;
+  std::vector<std::pair<Board, float>> move_probs;
 
   // A value between [-1, 1] to represent likelihood of winning, drawing, or
   // losing.
