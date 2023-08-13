@@ -75,8 +75,11 @@ struct Node {
   is_terminal() const noexcept
   { return board.is_terminal(); }
 
-  void
-  terminate() noexcept;
+  // Terminates the node by setting a value based on whether player making the
+  // move is winning or not, like expand, but without computing subsequent
+  // actions.
+  Node&
+  terminate();
 
   // Computes the upper confidence bound. Asserts that parent is not null.
   float
@@ -152,16 +155,16 @@ Node::update_stats() noexcept
   }
 }
 
-void
-Node::terminate() noexcept
+Node&
+Node::terminate()
 {
-  // Don't do anything if the board is not actually in a terminal state.
   if (not board.is_terminal())
-    return;
+    throw std::logic_error("Node is not in a terminal state.");
 
   // The value of 1 here is for the move leading up to the check.
-  value = board.is_mate() ? 1 : 0;
-  init_value = value;
+  init_value = board.is_mate() ? 1.0 : 0.0;
+  value = value;
+  return *this;
 }
 
 Node*
