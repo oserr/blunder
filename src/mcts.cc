@@ -66,9 +66,11 @@ struct Node {
   Node&
   expand(Prediction pred);
 
+#if 0
   // Expands the node using priors and value from node with same board state.
   Node&
   expand(const Node& other);
+#endif
 
   // Returns true if the board reached a terminal state.
   bool
@@ -125,6 +127,7 @@ Node::expand(Prediction pred)
   return *this;
 }
 
+#if 0
 Node&
 Node::expand(const Node& other)
 {
@@ -140,6 +143,7 @@ Node::expand(const Node& other)
 
   return *this;
 }
+#endif
 
 void
 Node::update_stats() noexcept
@@ -248,18 +252,19 @@ Mcts::run(const BoardPath& board_path) const
 
     // We reached a terminal state so there is no need to call evaluator.
     if (node->is_terminal()) {
-      node->terminate();
-      node->update_stats();
+      node->terminate().update_stats();
       continue;
     }
 
+#if 0
+    // Add this later after benchmarking MTCS without caching.
     auto other_node = game_tree.find_expanded(node);
     if (other_node) {
       // Copy priors and value to avoid calling evaluator.
-      node->expand(*other_node);
-      node->update_stats();
+      node->expand(*other_node).update_stats();
       continue;
     }
+#endif
 
     // Reached a leaf node.
     auto bp = game_tree.get_path(node);
@@ -268,10 +273,7 @@ Mcts::run(const BoardPath& board_path) const
     auto pred = evaluator->predict(bp);
 
     // Expand leaf node.
-    node->expand(std::move(pred));
-
-    // Update stats.
-    node->update_stats();
+    node->expand(std::move(pred)).update_stats();
   }
 
   // High level algo:
