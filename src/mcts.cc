@@ -290,7 +290,7 @@ Mcts::run(const BoardPath& board_path) const
 #endif
 
     // Reached a leaf node.
-    auto bp = game_tree.get_path(node);
+    auto bp = node->get_path(board_path);
 
     // Evaluate leaf node.
     auto pred = evaluator->predict(bp);
