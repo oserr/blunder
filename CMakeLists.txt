@@ -67,6 +67,8 @@ add_library(blunder STATIC
   src/piece_set.cc
   src/piece_set.h
   src/pre_computed_magics.h
+  src/random_search.cc
+  src/random_search.h
   src/search.h
   src/square.cc
   src/square.h
