@@ -285,11 +285,16 @@ Mcts::run(const BoardPath& board_path) const
   return SearchResult();
 }
 
-// TODO: implement add_noise.
+// Adds noise to the root node's priors to encourage exploration.
 void
 Mcts::add_noise(std::span<std::pair<Board, float>> priors) const
 {
-  (void)priors;
+  for (auto& [ignored, prior] : priors) {
+    auto noise = dir_fn();
+    auto term1 = prior * (1 - DIR_EXPLORE_FRAC);
+    auto term2 = noise * DIR_EXPLORE_FRAC;
+    prior = term1 + term2;
+  }
 }
 
 } // namespace blunder
