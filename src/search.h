@@ -23,11 +23,11 @@ operator<(const MoveProb& left, const MoveProb& right) noexcept
 // figure out a way to avoid the copy, e.g. have a pointer but make this into a
 // class.
 struct SearchResult {
-  // Vector of moves with prior and posterior probabilities probabilities.
-  std::vector<MoveProb> moves;
-
   // The best move.
   MoveProb best;
+
+  // Vector of moves with prior and posterior probabilities probabilities.
+  std::vector<MoveProb> moves;
 
   // The expected value of winning from this position for the current player.
   float value;
