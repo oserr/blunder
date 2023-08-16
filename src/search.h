@@ -8,19 +8,22 @@
 
 namespace blunder {
 
-// Packages together a move with a prior and posterior probabilities.
+// Packages together a move with a prior probability from the evaluator and the visit count from the MCTS.
 struct MoveProb {
-  Move mv;
+  Board board;
   float prior;
-  float prob;
+  unsigned visits;
 };
 
+// TODO: Don't want to have two copies of the board in best and moves, so
+// figure out a way to avoid the copy, e.g. have a pointer but make this into a
+// class.
 struct SearchResult {
   // Vector of moves with prior and posterior probabilities probabilities.
   std::vector<MoveProb> moves;
 
   // The best move.
-  Move best_move;
+  MoveProb best;
 
   // The expected value of winning from this position for the current player.
   float value;
