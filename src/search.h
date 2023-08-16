@@ -15,6 +15,10 @@ struct MoveProb {
   unsigned visits;
 };
 
+inline bool
+operator<(const MoveProb& left, const MoveProb& right) noexcept
+{ return left.visits < right.visits; }
+
 // TODO: Don't want to have two copies of the board in best and moves, so
 // figure out a way to avoid the copy, e.g. have a pointer but make this into a
 // class.
