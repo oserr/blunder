@@ -9,6 +9,9 @@ namespace blunder {
 
 class Player {
 public:
+  // Default dtor for Player.
+  virtual ~Player() = default;
+
   virtual Board
   make_move(std::span<const Board> boards) = 0;
 
