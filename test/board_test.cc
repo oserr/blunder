@@ -6,8 +6,6 @@
 #include "fen.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "pre_computed_magics.h"
-#include "magic_attacks.h"
 
 using namespace blunder;
 
