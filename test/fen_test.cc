@@ -1,8 +1,6 @@
 #include "fen.h"
 
-#include <memory>
-#include <mutex>
-
+#include "board.h"
 #include "gmock/gmock.h"
 #include "magic_attacks.h"
 #include "pre_computed_magics.h"
@@ -11,25 +9,12 @@
 
 using namespace blunder;
 
-// Only init magic bitboards once because it's expensive to init the magics.
-std::once_flag init_flag;
-
 class ReadFenTest : public testing::Test
 {
 protected:
   void
   SetUp() override
-  {
-    std::call_once(init_flag, []{
-      auto bmagics = from_bmagics(kBishopMagics);
-      auto rmagics = from_rmagics(kRookMagics);
-      ASSERT_TRUE(bmagics) << "Unable to init bishop magics for MoveGen.";
-      ASSERT_TRUE(rmagics) << "Unable to init rook magics for MoveGen.";
-      Board::register_magics(
-          std::make_unique<MagicAttacks>(std::move(*bmagics)),
-          std::make_unique<MagicAttacks>(std::move(*rmagics)));
-    });
-  }
+  { Board::register_magics(); }
 };
 
 TEST_F(ReadFenTest, NoPieces)
