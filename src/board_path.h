@@ -4,6 +4,7 @@
 #include <cassert>
 #include <functional>
 #include <optional>
+#include <span>
 
 #include "board.h"
 
@@ -24,6 +25,21 @@ class BoardPath {
 public:
   BoardPath() noexcept
   { boards.fill(nullptr); }
+
+  // Initializes a BoardPath from boards, but starts from the last board
+  // and proceeds in reverse order.
+  static BoardPath
+  rev(std::span<const Board> boards) noexcept
+  {
+    BoardPath bp;
+    auto iter = boards.rbegin();
+    auto last = boards.rend();
+
+    while (iter != last and not bp.is_full())
+      bp.push(*iter++);
+
+    return bp;
+  }
 
   bool
   is_full() const noexcept
