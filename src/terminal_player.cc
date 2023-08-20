@@ -10,7 +10,6 @@
 
 namespace blunder {
 
-// TODO: implement make_move.
 Board
 TerminalPlayer::make_move(std::span<const Board> boards)
 {
