@@ -1,7 +1,5 @@
 #include "board.h"
 
-#include <memory>
-#include <mutex>
 #include <unordered_set>
 #include <vector>
 
@@ -85,25 +83,12 @@ MATCHER_P(MovesAre, expected_moves, "the moves are: "
 // from the FEN strings to make it easier to see what the boar and moves are.
 //-----------------------------------------------------------------------------
 
-// Only init magic bitboards once because it's expensive to init the magics.
-std::once_flag init_flag;
-
 class BoardTest : public testing::Test
 {
 protected:
   void
   SetUp() override
-  {
-    std::call_once(init_flag, []{
-      auto bmagics = from_bmagics(kBishopMagics);
-      auto rmagics = from_rmagics(kRookMagics);
-      ASSERT_TRUE(bmagics) << "Unable to init bishop magics for MoveGen.";
-      ASSERT_TRUE(rmagics) << "Unable to init rook magics for MoveGen.";
-      Board::register_magics(
-          std::make_unique<MagicAttacks>(std::move(*bmagics)),
-          std::make_unique<MagicAttacks>(std::move(*rmagics)));
-    });
-  }
+  { Board::register_magics(); }
 };
 
 TEST_F(BoardTest, InitGamePawnMoves)
