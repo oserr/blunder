@@ -226,6 +226,10 @@ public:
     Board::rmagics = std::move(rmagics);
   }
 
+  // Registers the precomputed Magics.
+  static void
+  register_magics();
+
   //-----------------
   // Move generation.
   //-----------------

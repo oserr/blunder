@@ -5,10 +5,15 @@
 #include <format>
 #include <iostream>
 #include <iterator>
+#include <memory>
+#include <mutex>
+#include <stdexcept>
 
 #include "bitboard.h"
+#include "magic_attacks.h"
 #include "pieces.h"
 #include "piece_set.h"
+#include "pre_computed_magics.h"
 #include "square.h"
 
 namespace blunder {
@@ -364,6 +369,23 @@ Board::king_moves(MoveVec& moves) const
     if (bq_can_castle())
       moves.push_back(Move::bq_castle());
   }
+}
+
+void
+Board::register_magics()
+{
+  static std::once_flag init_flag;
+  std::call_once(init_flag, []{
+    auto bmagics = from_bmagics(kBishopMagics);
+    auto rmagics = from_rmagics(kRookMagics);
+    if (not bmagics)
+      throw std::runtime_error("Unable to initialize the bishop magics.");
+    if (not rmagics)
+      throw std::runtime_error("Unable to initialize the rook magics.");
+    register_magics(
+        std::make_unique<MagicAttacks>(std::move(*bmagics)),
+        std::make_unique<MagicAttacks>(std::move(*rmagics)));
+  });
 }
 
 void
