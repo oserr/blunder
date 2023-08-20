@@ -72,7 +72,9 @@ add_library(blunder STATIC
   src/search.h
   src/square.cc
   src/square.h
-  src/square_iter.h)
+  src/square_iter.h
+  src/terminal_player.h
+  src/terminal_player.cc)
 set_target_properties(blunder PROPERTIES CXX_STANDARD 23)
 target_compile_options(blunder PUBLIC ${TORCH_CXX_FLAGS})
 target_include_directories(blunder PUBLIC ${TORCH_INCLUDE_DIRS})
