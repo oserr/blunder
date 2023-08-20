@@ -6,6 +6,7 @@
 #include <functional>
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <ostream>
 #include <string>
 #include <utility>
@@ -280,6 +281,18 @@ public:
     return moves;
   }
 
+  // Returns the last move leading up to the current position, of one is
+  // present. The scenarios where one might not be present are at the beginning
+  // of a brand new game, or if we start a game mid way, such as from a FEN
+  // string, which do not contain the game history.
+  std::optional<Move>
+  last_move() const noexcept
+  {
+    return prev_moves.empty()
+      ? std::nullopt
+      : std::make_optional(prev_moves.back());
+  }
+
 private:
   //-------------------------------------
   // Private helpers for move generation.
@@ -435,6 +448,11 @@ private:
   // the pieces for the player who just moved.
   PieceSet bb_mine;
   PieceSet bb_other;
+
+  // Previous moves. Most recent move is last move leading up to current position.
+  // TODO: consider creating a short ring buffer to only hold a few moves, e.g.
+  // enough to be able to detect 3 repetitions.
+  MoveVec prev_moves;
 
   // Members to hold all of the squares that are attacked by each player.
   // |mine_attacks| are squares attacked by the player moving next, and

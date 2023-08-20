@@ -617,6 +617,7 @@ Board::update(Move mv) noexcept
 {
   quick_update(mv);
   compute_game_state(mv.capture().is_king());
+  prev_moves.push_back(mv);
   return *this;
 }
 
