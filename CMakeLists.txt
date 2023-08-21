@@ -101,6 +101,11 @@ set_target_properties(train_net PROPERTIES CXX_STANDARD 23)
 target_compile_features(train_net PRIVATE)
 target_link_libraries(train_net blunder)
 
+add_executable(game src/terminal_game.cc)
+set_target_properties(game PROPERTIES CXX_STANDARD 23)
+target_compile_features(game PRIVATE)
+target_link_libraries(game blunder)
+
 # Simple function to create a test target.
 function(create_test target)
   add_executable(${target}_test test/${target}_test.cc)
