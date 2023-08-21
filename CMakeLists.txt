@@ -50,6 +50,7 @@ add_library(blunder STATIC
   src/evaluator.h
   src/fen.cc
   src/fen.h
+  src/game.h
   src/game_state.h
   src/hash.h
   src/magic_attacks.cc
@@ -66,11 +67,14 @@ add_library(blunder STATIC
   src/pieces.h
   src/piece_set.cc
   src/piece_set.h
+  src/player.h
   src/pre_computed_magics.h
   src/random_player.h
   src/random_search.cc
   src/random_search.h
   src/search.h
+  src/simple_game.cc
+  src/simple_game.h
   src/square.cc
   src/square.h
   src/square_iter.h
