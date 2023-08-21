@@ -6,6 +6,7 @@
 
 #include "board.h"
 #include "board_path.h"
+#include "player.h"
 #include "random_search.h"
 
 namespace blunder {
@@ -14,7 +15,7 @@ namespace blunder {
 class RandomPlayer : public Player {
 public:
   RandomPlayer(unsigned seed)
-     : rand_search(seed);
+     : rand_search(seed) {}
 
   Board
   make_move(std::span<const Board> boards) override
