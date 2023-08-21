@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <optional>
 
 #include "board.h"
 #include "color.h"
@@ -9,7 +10,7 @@ namespace blunder {
 
 struct GameResult {
   std::vector<Board> moves;
-  Color winner;
+  std::optional<Color> winner;
 };
 
 // An interface for a chess game.
