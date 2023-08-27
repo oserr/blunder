@@ -297,6 +297,11 @@ public:
       : std::make_optional(prev_moves.back());
   }
 
+  // Updates this board with move |mv| if the move is pseudo-legal. Returns
+  // true if the update succeeds, false otherwise.
+  bool
+  update_with_move(Move mv) noexcept;
+
 private:
   //-------------------------------------
   // Private helpers for move generation.

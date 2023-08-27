@@ -643,6 +643,16 @@ Board::update(Move mv) noexcept
   return *this;
 }
 
+bool
+Board::update_with_move(Move mv) noexcept
+{
+  auto moves = all_moves();
+  if (std::ranges::find(moves, mv) == moves.end())
+    return false;
+  update(mv);
+  return true;
+}
+
 // TODO: replace std::function with some something less expensive.
 void
 Board::get_simple_moves(
