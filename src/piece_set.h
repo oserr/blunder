@@ -86,6 +86,7 @@ public:
   update_bit(Type type, unsigned from, unsigned to) noexcept
   {
     get_mut(type).update_bit(from, to);
+    all_bits.update_bit(from, to);
     return *this;
   }
 
