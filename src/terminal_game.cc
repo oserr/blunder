@@ -83,11 +83,11 @@ main(int argc, char** argv)
     is_white = dist(gen);
   }
 
+  Board::register_magics();
+
   auto game = is_white
      ? SimpleGame(std::move(terminal_player), std::move(rand_player))
      : SimpleGame(std::move(rand_player), std::move(terminal_player));
-
-  Board::register_magics();
 
   auto results = game.play();
 

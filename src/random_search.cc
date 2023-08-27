@@ -24,7 +24,7 @@ RandomSearch::run(const BoardPath& board_path) const
   std::vector<MoveProb> moves;
   moves.reserve(children.size());
   for (unsigned i = 0; i < children.size(); ++i)
-    moves[i].board = std::move(children[i]);
+    moves.emplace_back().board = std::move(children[i]);
 
   std::uniform_int_distribution<unsigned> rand_gen(0, moves.size()-1);
   for (unsigned i = 0; i < 100; ++i) {
