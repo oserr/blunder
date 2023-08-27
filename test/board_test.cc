@@ -1,5 +1,6 @@
 #include "board.h"
 
+#include <iostream>
 #include <unordered_set>
 #include <vector>
 
@@ -518,4 +519,23 @@ TEST_F(BoardTest, WithFen9)
   ASSERT_TRUE(board);
   EXPECT_THAT(board->all_moves(), MovesAre(moves))
     << '\n' << *board;
+}
+
+TEST_F(BoardTest, TwoUpdatesFromBeginning)
+{
+  auto board = Board::new_board();
+
+  EXPECT_TRUE(board.is_white_next());
+
+  Move e4(Piece::pawn(), Sq::e2, Sq::e4);
+  EXPECT_TRUE(board.update_with_move(e4));
+
+  EXPECT_FALSE(board.is_white_next());
+
+  Move e5(Piece::pawn(), Sq::e7, Sq::e5);
+  EXPECT_TRUE(board.update_with_move(e5));
+
+  EXPECT_TRUE(board.is_white_next());
+
+  // TODO: Add more testing around update logic.
 }
