@@ -34,8 +34,8 @@ namespace blunder {
 // TODO: implement logic to encode the input feature for the network, which is 6
 // planes for each of the pieces for each player, i.e. 12 total planes, and 2
 // planes for repetition count in current position for each player. These are
-// repeated for 8 time steps up to the current position. There are an additional
-// 7 layers for
+// repeated for 8 time steps starting from the current position. There are an
+// additional 7 layers for
 //
 // - 1 for piece color
 // - 1 for total move count
