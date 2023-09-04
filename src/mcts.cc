@@ -67,12 +67,6 @@ struct Node {
   Node&
   expand(Prediction pred);
 
-#if 0
-  // Expands the node using priors and value from node with same board state.
-  Node&
-  expand(const Node& other);
-#endif
-
   // Returns a board path from the current node, with current node the root
   // node of the board path.
   BoardPath
@@ -155,24 +149,6 @@ Node::expand(Prediction pred)
   return *this;
 }
 
-#if 0
-Node&
-Node::expand(const Node& other)
-{
-  assert(not other.children.empty());
-
-  is_leaf = false;
-  init_value = other.init_value;
-  value = init_value;
-  children.reserve(other.children.size());
-
-  for (const auto& node : other.children)
-    children.emplace_back(node.board, *this, node.prior);
-
-  return *this;
-}
-#endif
-
 void
 Node::update_stats() noexcept
 {
@@ -238,6 +214,7 @@ Mcts::Mcts(
   dir_fn = std::bind_front(std::move(dir), std::move(gen));
 }
 
+// TODO: Determine if adding some sort of caching improves performance.
 SearchResult
 Mcts::run(const BoardPath& board_path) const
 {
@@ -271,16 +248,6 @@ Mcts::run(const BoardPath& board_path) const
       node->terminate().update_stats();
       continue;
     }
-
-#if 0
-    // Add this later after benchmarking MTCS without caching.
-    auto other_node = game_tree.find_expanded(node);
-    if (other_node) {
-      // Copy priors and value to avoid calling evaluator.
-      node->expand(*other_node).update_stats();
-      continue;
-    }
-#endif
 
     // Reached a leaf node.
     auto bp = node->get_path(board_path);
