@@ -152,6 +152,12 @@ public:
   shift_left(unsigned shift) const noexcept
   { return BitBoard(bits << shift); }
 
+  // Rotates the bits 180 degrees, e.g. for flipping the colors.
+  // Square a1 is mapped to h8, and a8 is mapped to h1. See
+  // https://www.chessprogramming.org/Flipping_Mirroring_and_Rotating#By_180_degrees_-_Bit-Reversal
+  BitBoard
+  rotate_180() const noexcept;
+
   // Same as sl, but operator overload.
   BitBoard&
   operator<<=(unsigned shift) noexcept
