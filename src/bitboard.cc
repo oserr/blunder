@@ -11,22 +11,21 @@
 namespace blunder {
 
 // TODO: Determine if we can improve this by using SIMD instructions.
-BitBoard
-BitBoard::rotate_180() const noexcept
+BitBoard&
+BitBoard::flip_this() noexcept
 {
   constexpr auto h1 = 0x5555555555555555ull;
   constexpr auto h2 = 0x3333333333333333ull;
   constexpr auto h4 = 0x0F0F0F0F0F0F0F0Full;
   constexpr auto v1 = 0x00FF00FF00FF00FFull;
   constexpr auto v2 = 0x0000FFFF0000FFFFull;
-  auto rot_bits = bits;
-  rot_bits = ((rot_bits >> 1) & h1) | ((rot_bits & h1) << 1);
-  rot_bits = ((rot_bits >> 2) & h2) | ((rot_bits & h2) << 2);
-  rot_bits = ((rot_bits >> 4) & h4) | ((rot_bits & h4) << 4);
-  rot_bits = ((rot_bits >> 8) & v1) | ((rot_bits & v1) << 8);
-  rot_bits = ((rot_bits >> 16) & v2) | ((rot_bits & v2) << 16);
-  rot_bits = (rot_bits >> 32) | (rot_bits << 32);
-  return BitBoard(rot_bits);
+  bits = ((bits >> 1) & h1) | ((bits & h1) << 1);
+  bits = ((bits >> 2) & h2) | ((bits & h2) << 2);
+  bits = ((bits >> 4) & h4) | ((bits & h4) << 4);
+  bits = ((bits >> 8) & v1) | ((bits & v1) << 8);
+  bits = ((bits >> 16) & v2) | ((bits & v2) << 16);
+  bits = (bits >> 32) | (bits << 32);
+  return *this;
 }
 
 std::string
