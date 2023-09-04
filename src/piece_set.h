@@ -94,6 +94,11 @@ public:
   update_bit(Piece piece, unsigned from, unsigned to) noexcept
   { return update_bit(piece.type(), from, to); }
 
+  // Flips all the pieces horizontally across the board to switch between
+  // perspective for white or black.
+  PieceSet
+  flip() const noexcept;
+
   //----------
   // Iterators
   //----------

@@ -61,4 +61,14 @@ PieceSet::is_valid() const noexcept
      and full_set().count() <= 16;
 }
 
+PieceSet
+PieceSet::flip() const noexcept
+{
+  auto flipped = *this;
+  for (auto& piece : flipped.pieces)
+    piece.flip_this();
+  flipped.all_bits.flip_this();
+  return flipped;
+}
+
 } // namespace blunder
