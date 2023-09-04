@@ -248,10 +248,10 @@ Mcts::run(const BoardPath& board_path) const
   auto pred = evaluator->predict(board_path);
 
   // Copy the priors before adding noise to them.
-  SearchResults results;
-  results.moves.reserve(pred.move_probs.size());
+  SearchResult result;
+  result.moves.reserve(pred.move_probs.size());
   for (const auto& [board, prior] : pred.move_probs)
-    results.moves.emplace_back(MoveProb{.board=board, .prior=prior});
+    result.moves.emplace_back(MoveProb{.board=board, .prior=prior});
 
   add_noise(pred.move_probs);
 
@@ -297,7 +297,7 @@ Mcts::run(const BoardPath& board_path) const
   unsigned i = 0;
   for (const auto& child : root.children) {
     auto visits = child.visits;
-    results.moves[i++].visits = visits;
+    result.moves[i++].visits = visits;
     if (visits > max_visits) {
       max_visits = visits;
       max_node = &child;
@@ -308,13 +308,13 @@ Mcts::run(const BoardPath& board_path) const
     throw std::runtime_error(
         "The MCTS should only run for boards with a non-terminal state.");
 
-  results.best.board = max_node->board;
-  results.best.prior = max_node->prior;
-  results.best.visits = max_node->visits;
+  result.best.board = max_node->board;
+  result.best.prior = max_node->prior;
+  result.best.visits = max_node->visits;
 
-  results.value = max_node->init_value;
+  result.value = max_node->init_value;
 
-  return results;
+  return result;
 }
 
 // Adds noise to the root node's priors to encourage exploration.
