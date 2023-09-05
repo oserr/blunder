@@ -516,7 +516,7 @@ void
 Board::compute_game_state() noexcept
 {
   // Draw by 50 move rule.
-  if (half_move >= 100) {
+  if (half_move >= 50) {
     game_state = GameState::Draw;
     return;
   }

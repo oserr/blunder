@@ -68,6 +68,15 @@ public:
   is_white_next() const noexcept
   { return next_to_move == Color::White; }
 
+  // Returns a pair of pointers to (white pieces, black pieces).
+  std::pair<const PieceSet*, const PieceSet*>
+  white_black() const noexcept
+  {
+    return is_white_next()
+      ? std::make_pair(&bb_mine, &bb_other)
+      : std::make_pair(&bb_other, &bb_mine);
+  }
+
   // Returns a bitboard with all the pieces for the player moving next.
   BitBoard
   all_mine() const noexcept
