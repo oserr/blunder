@@ -1,5 +1,6 @@
 #include "alpha_zero_encoder.h"
 
+#include <cassert>
 #include <initializer_list>
 #include <stdexcept>
 
@@ -17,6 +18,21 @@ namespace {
 inline std::pair<int, int>
 row_col(unsigned square) noexcept
 { return {square / 8, square % 8}; }
+
+// Encodes the bitboard pieces in the planes of the tensor.
+void
+encode_pieces(int plane, const PieceSet& pieces, torch::Tensor& tensor) {
+  [[maybe_unused]] auto dims = tensor.sizes();
+  assert(dims.size() == 3);
+  assert(dims[1] == dims[2] and dims[2] == 8);
+  assert(plane >= 0 and plane < dims[0]);
+  for (auto piece : pieces) {
+    for (auto square : piece.square_iter()) {
+      auto [row, col] = row_col(square);
+      tensor.index_put_({plane++, row, col}, 1.0);
+    }
+  }
+}
 
 } // namespace
 
@@ -41,42 +57,27 @@ AlphaZeroEncoder::encode(const BoardPath& board_path) const
     for (const auto& board : board_path) {
       auto [white, black] = board.white_black();
 
-      for (auto piece : *white) {
-        for (auto square : piece.square_iter()) {
-          auto [row, col] = row_col(square);
-          tensor.index_put_({plane++, row, col}, 1.0);
-        }
-      }
+      encode_pieces(plane, *white, tensor);
+      plane += 6;
 
-      for (auto piece : *black) {
-        for (auto square : piece.square_iter()) {
-          auto [row, col] = row_col(square);
-          tensor.index_put_({plane++, row, col}, 1.0);
-        }
-      }
+      encode_pieces(plane, *black, tensor);
+      plane += 6;
+
       // TODO: Set repetition planes for each board.
       plane += 2;
     }
-  }
-  // Here we need to flip the boards to orient them from the perspective of
-  // black.
-  else {
+  } else {
+    // Here we need to flip the boards to orient them from the perspective of
+    // black.
     for (const auto& board : board_path) {
       auto [white, black] = board.white_black();
 
-      for (auto piece : white->flip()) {
-        for (auto square : piece.square_iter()) {
-          auto [row, col] = row_col(square);
-          tensor.index_put_({plane++, row, col}, 1.0);
-        }
-      }
+      encode_pieces(plane, white->flip(), tensor);
+      plane += 6;
 
-      for (auto piece : black->flip()) {
-        for (auto square : piece.square_iter()) {
-          auto [row, col] = row_col(square);
-          tensor.index_put_({plane++, row, col}, 1.0);
-        }
-      }
+      encode_pieces(plane, black->flip(), tensor);
+      plane += 6;
+
       // TODO: Set repetition planes for each board.
       plane += 2;
     }
