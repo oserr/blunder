@@ -12,6 +12,7 @@ public:
   // Converts |board_path| into a Tensor.
   DecodedMoves
   decode(
+      const Board& board,
       const torch::Tensor& mv_tensor,
       const torch::Tensor& eval_tensor) const override;
 };

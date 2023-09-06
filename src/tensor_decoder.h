@@ -22,9 +22,12 @@ class TensorDecoder {
 public:
   virtual ~TensorDecoder() = default;
 
-  // Converts |board_path| into a Tensor.
+  // Decodes |mv_tensor|, a tensor of dimension (8, 8, 73) encoding the
+  // probabilities for all legal moves from |board|, and decodes |eval_tensor|,
+  // which represents the value of the position of in |board|.
   virtual DecodedMoves
   decode(
+      const Board& board,
       const torch::Tensor& mv_tensor,
       const torch::Tensor& eval_tensor) const = 0;
 };
