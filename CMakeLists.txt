@@ -39,6 +39,8 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 add_library(blunder STATIC
+  src/alpha_zero_decoder.cc
+  src/alpha_zero_decoder.h
   src/alpha_zero_encoder.cc
   src/alpha_zero_encoder.h
   src/bitboard.cc
