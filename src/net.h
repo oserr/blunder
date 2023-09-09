@@ -26,9 +26,9 @@ namespace blunder {
 //
 // This can be represented by an (8, 8, 73) tensor, where the the first
 // dimension represents a column, the second the row, and the third is one of 73
-// numbers representing a type of move. For example, the, for the first 56
-// moves, to represent possible queen moves for any piece, we can do something
-// like the following:
+// numbers representing a type of move. For example, for the first 56 moves, to
+// represent possible queen moves for any piece, we can do something like the
+// following:
 // - 1N, 1NE, 1E,..., 2N, 2NE, 2E, ..., 7N, 7NE, 7E,... and so on.
 
 // TODO: implement logic to encode the input feature for the network, which is 6
