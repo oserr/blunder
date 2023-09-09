@@ -14,23 +14,6 @@ namespace blunder {
 // this to compile. Note that the code is from pytorch documentation:
 // https://pytorch.org/cppdocs/frontend.html.
 
-// TODO: Add logic to decode policy representation for moves given a position,
-// which uses an 8x8x73 stack of planes to encode policy, where the 1st 56
-// planes encode possible queen moves for any piece, the number of squares
-// [1..7] in which the piece will be moved, along one of eight relative compass
-// directions {N, NE, E, SE, S, SW, W, NW}. The next 8 planes encode possible
-// knight moves. The final 9 planes encoded possible underpromotions for pawn
-// moves or captures in two possible diagonals, to knight, bishop, or rook
-// respectively. Other pawn moves or captures from the 7th rank are promoted to
-// a queen.
-//
-// This can be represented by an (8, 8, 73) tensor, where the the first
-// dimension represents a column, the second the row, and the third is one of 73
-// numbers representing a type of move. For example, for the first 56 moves, to
-// represent possible queen moves for any piece, we can do something like the
-// following:
-// - 1N, 1NE, 1E,..., 2N, 2NE, 2E, ..., 7N, 7NE, 7E,... and so on.
-
 // TODO: implement logic to encode the input feature for the network, which is 6
 // planes for each of the pieces for each player, i.e. 12 total planes, and 2
 // planes for repetition count in current position for each player. These are
@@ -44,7 +27,6 @@ namespace blunder {
 // - no progress count (50 move rule)
 //
 // In total, the input feature consists of 119 (8, 8) feature planes.
-
 
 // TODO: implement AlphaZero neural architecture:
 // 1) An initial convolution
