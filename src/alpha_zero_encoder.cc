@@ -25,7 +25,7 @@ encode_pieces(int plane, const PieceSet& pieces, torch::Tensor& tensor) {
   [[maybe_unused]] auto dims = tensor.sizes();
   assert(dims.size() == 3);
   assert(dims[1] == dims[2] and dims[2] == 8);
-  assert(plane >= 0 and plane < dims[0]);
+  assert(plane >= 0 and plane + 5 < dims[0]);
   for (auto piece : pieces) {
     for (auto square : piece.square_iter()) {
       auto [row, col] = row_col(square);
