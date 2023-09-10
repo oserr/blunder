@@ -94,7 +94,7 @@ encode_queen_move(int row_diff, int col_diff)
 
 } // namespace
 
-unsigned
+EncodedMove
 encode_move(Move mv)
 {
   auto piece = mv.piece();
@@ -105,20 +105,27 @@ encode_move(Move mv)
 
   assert(row_diff != 0 or col_diff != 0);
 
+  EncodedMove mv_code(from_row, from_col);
+
   switch (piece.type()) {
     case Type::None:
       throw std::invalid_argument("Move should have a piece.");
     case Type::Knight:
-      return 56 + encode_knight_move(row_diff, col_diff);
+      mv_code.code = 56 + encode_knight_move(row_diff, col_diff);
+      return mv_code;
     case Type::Pawn:
-      if (mv.is_promo() and not mv.capture().is_queen())
-        return 64 + encode_under_promo(col_diff, mv.capture());
+      if (mv.is_promo() and not mv.capture().is_queen()) {
+        mv_code.code = 64 + encode_under_promo(col_diff, mv.capture());
+        return mv_code;
+      }
       [[fallthrough]];
     default:
       break;
   }
 
-  return encode_queen_move(row_diff, col_diff);
+  mv_code.code = encode_queen_move(row_diff, col_diff);
+
+  return mv_code;
 }
 
 } // namespace blunder
