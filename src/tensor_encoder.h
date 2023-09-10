@@ -1,8 +1,12 @@
 #pragma once
 
+#include <span>
+
 #include <torch/torch.h>
 
+#include "board.h"
 #include "board_path.h"
+#include "search_result.h"
 
 namespace blunder {
 
@@ -14,7 +18,11 @@ public:
 
   // Converts |board_path| into a Tensor.
   virtual torch::Tensor
-  encode(const BoardPath& board_path) const = 0;
+  encode_state(const BoardPath& board_path) const = 0;
+
+  // Converts |board_path| into a Tensor.
+  virtual torch::Tensor
+  encode_moves(std::span<const MoveProb> moves) const = 0;
 };
 
 } // namespace blunder

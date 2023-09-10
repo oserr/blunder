@@ -79,6 +79,7 @@ add_library(blunder STATIC
   src/random_search.cc
   src/random_search.h
   src/search.h
+  src/search_result.h
   src/simple_game.cc
   src/simple_game.h
   src/square.cc

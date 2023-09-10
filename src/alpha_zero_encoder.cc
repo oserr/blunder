@@ -2,11 +2,14 @@
 
 #include <cassert>
 #include <initializer_list>
+#include <span>
 #include <stdexcept>
 
 #include "board.h"
 #include "board_path.h"
+#include "coding_util.h"
 #include "piece_set.h"
+#include "search_result.h"
 #include "square.h"
 
 namespace tix = torch::indexing;
@@ -32,7 +35,7 @@ encode_pieces(int plane, const PieceSet& pieces, torch::Tensor& tensor) {
 } // namespace
 
 torch::Tensor
-AlphaZeroEncoder::encode(const BoardPath& board_path) const
+AlphaZeroEncoder::encode_state(const BoardPath& board_path) const
 {
   auto root_board = board_path.root();
   if (not root_board)
@@ -95,6 +98,28 @@ AlphaZeroEncoder::encode(const BoardPath& board_path) const
       tensor.index_put_(index, static_cast<float>(bin_feat));
     }
     ++plane;
+  }
+
+  return tensor;
+}
+
+torch::Tensor
+AlphaZeroEncoder::encode_moves(std::span<const MoveProb> moves) const
+{
+  assert(not moves.empty());
+
+  unsigned total = 0;
+  for (const auto& mv : moves)
+    total += mv.visits;
+
+  auto tensor = torch::zeros({8, 8, 73});
+
+  for (const auto& mv : moves) {
+    auto last_move = mv.board.last_move();
+    assert(last_move.has_value());
+    auto mv_code = encode_move(*last_move);
+    float prob = static_cast<float>(mv.visits) / total;
+    tensor.index_put_({mv_code.row, mv_code.col, mv_code.code}, prob);
   }
 
   return tensor;
