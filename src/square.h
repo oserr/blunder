@@ -3,6 +3,7 @@
 #include <initializer_list>
 #include <set>
 #include <string>
+#include <utility>
 
 #include "bitboard.h"
 
@@ -37,6 +38,11 @@ to_sq(unsigned val) noexcept
 inline BitBoard
 to_bitboard(Sq sq) noexcept
 { return BitBoard::from_index(to_int(sq)); }
+
+// Returns the row and column for a square.
+inline std::pair<int, int>
+row_col(unsigned square) noexcept
+{ return {square / 8, square % 8}; }
 
 std::string
 to_sq_str(unsigned val);

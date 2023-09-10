@@ -7,17 +7,12 @@
 #include "board.h"
 #include "board_path.h"
 #include "piece_set.h"
+#include "square.h"
 
 namespace tix = torch::indexing;
 
 namespace blunder {
 namespace {
-
-// Returns the row and column for a square.
-// TODO: Put this in a more generic place.
-inline std::pair<int, int>
-row_col(unsigned square) noexcept
-{ return {square / 8, square % 8}; }
 
 // Encodes the bitboard pieces in the planes of the tensor.
 void
