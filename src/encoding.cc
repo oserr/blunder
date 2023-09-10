@@ -47,7 +47,7 @@ encode_move(Move mv)
 
   switch (piece.type()) {
     case Type::Knight:
-      return encode_knight_move(row_diff, col_diff);
+      return 56 + encode_knight_move(row_diff, col_diff);
     case Type::King:
     case Type::Queen:
     case Type::Rook:
