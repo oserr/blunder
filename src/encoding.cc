@@ -32,6 +32,35 @@ encode_knight_move(int row_diff, int col_diff)
   }
 }
 
+// Maps an underpromotion move to a number in the range [0, 8].
+unsigned
+encode_under_promo(int col_diff, Piece piece)
+{
+  assert(col_diff >= -1 and col_diff <= 1);
+
+  unsigned code = 0;
+
+  switch (piece.type()) {
+    case Type::Rook:
+      break;
+    case Type::Bishop:
+      code += 3;
+      break;
+    case Type::Knight:
+      code += 6;
+      break;
+    default:
+      throw std::invalid_argument("Invalid piece for under promotion.");
+  }
+
+  if (col_diff == 0)
+    code += 1;
+  else if (col_diff == 1)
+    code += 2;
+
+  return code;
+}
+
 } // namespace
 
 unsigned
@@ -46,16 +75,19 @@ encode_move(Move mv)
   assert(row_diff != 0 or col_diff != 0);
 
   switch (piece.type()) {
-    case Type::Knight:
-      return 56 + encode_knight_move(row_diff, col_diff);
-    case Type::King:
-    case Type::Queen:
-    case Type::Rook:
-    case Type::Bishop:
-    case Type::Pawn:
     case Type::None:
       throw std::invalid_argument("Move should have a piece.");
+    case Type::Knight:
+      return 56 + encode_knight_move(row_diff, col_diff);
+    case Type::Pawn:
+      if (mv.is_promo() and not mv.capture().is_queen())
+        return 64 + encode_under_promo(col_diff, mv.capture());
+      [[fallthrough]];
+    default:
+      break;
   }
+
+  // If we are here then we are simply encoding a queen move.
 
   return 0;
 }
