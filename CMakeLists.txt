@@ -50,6 +50,8 @@ add_library(blunder STATIC
   src/board_path.h
   src/board_side.h
   src/color.h
+  src/encoding.cc
+  src/encoding.h
   src/err.h
   src/evaluator.h
   src/fen.cc
