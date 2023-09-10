@@ -61,6 +61,37 @@ encode_under_promo(int col_diff, Piece piece)
   return code;
 }
 
+// Maps a queen move to a number in the range [0, 55].
+unsigned
+encode_queen_move(int row_diff, int col_diff)
+{
+  assert(row_diff >= -7 and row_diff <= 7);
+  assert(col_diff >= -7 and col_diff <= 7);
+  assert(col_diff != 0 or row_diff != 0);
+
+  if (row_diff < 0) {
+    unsigned nrows = row_diff * -1;
+    if (col_diff == 0)
+      return nrows;
+    else if (col_diff < 0)
+      return 7 + nrows;
+    else
+      return 14 + nrows;
+  }
+  else if (row_diff == 0) {
+    if (col_diff < 0)
+      return 21 + col_diff * -1;
+    else
+      return 28 + col_diff;
+  }
+  else if (col_diff == 0)
+    return 35 + row_diff;
+  else if (col_diff < 0)
+    return 42 + row_diff;
+  else
+    return 49 + row_diff;
+}
+
 } // namespace
 
 unsigned
@@ -87,9 +118,7 @@ encode_move(Move mv)
       break;
   }
 
-  // If we are here then we are simply encoding a queen move.
-
-  return 0;
+  return encode_queen_move(row_diff, col_diff);
 }
 
 } // namespace blunder
