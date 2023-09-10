@@ -1,6 +1,10 @@
 #include "alpha_zero_decoder.h"
 
+#include <cmath>
+#include <stdexcept>
 #include <torch/torch.h>
+
+#include "coding_util.h"
 
 namespace blunder {
 
@@ -27,12 +31,42 @@ AlphaZeroDecoder::decode(
     const torch::Tensor& mv_tensor,
     const torch::Tensor& eval_tensor) const
 {
-  // TODO: add logic to decode the mv tensor into a vector of boards, each
-  // representing the next state after a specific move is applied.
-  (void)board;
-  (void)mv_tensor;
-  (void)eval_tensor;
-  return DecodedMoves();
+  assert(not board.is_terminal());
+  [[maybe_unused]] auto mdims = mv_tensor.sizes();
+  assert(mdims.size() == 3);
+  assert(mdims[0] == mdims[1] and mdims[1] == 8 and mdims[2] == 73);
+
+  [[maybe_unused]] auto edims = eval_tensor.sizes();
+  assert(edims.size() == 2 and edims[0] == edims[1] and edims[0] == 1);
+
+  auto children = board.next();
+  if (children.empty())
+    throw std::runtime_error("Decoding only works with a non-terminal board.");
+
+  std::vector<std::pair<Board, float>> move_probs;
+  move_probs.reserve(children.size());
+  float total = 0;
+
+  for (auto& child : children) {
+    auto last_move = child.last_move();
+    assert(last_move.has_value());
+    auto mv_code = encode_move(*last_move);
+    float logit = mv_tensor.index({mv_code.row, mv_code.col, mv_code.code})
+                           .item<float>();
+    logit = std::exp(logit);
+    total += logit;
+    move_probs.emplace_back(std::make_pair(std::move(child), logit));
+  }
+
+  for (auto& [ignored, logit] : move_probs)
+    logit /= total;
+
+  float value = eval_tensor.index({0, 0}).item<float>();
+
+  return DecodedMoves{
+    .move_probs=std::move(move_probs),
+    .value=value
+  };
 }
 
 } // namespace blunder
