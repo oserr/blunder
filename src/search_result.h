@@ -1,5 +1,10 @@
 #pragma once
 
+#include <cassert>
+#include <vector>
+
+#include "move.h"
+
 namespace blunder {
 
 // Packages together a board move with a prior probability from the evaluator
@@ -8,6 +13,27 @@ struct BoardProb {
   Board board;
   float prior = 0.0;
   unsigned visits = 0;
+};
+
+struct MoveProb {
+  Move mv;
+  float prior = 0.0;
+  unsigned visits = 0;
+
+  // Creates a MoveProb from a BoardProb. It's an error pass in a MoveProb with
+  // a board without a valid last_move.
+  static MoveProb
+  from(const BoardProb& board_prob) noexcept
+  {
+    auto last_move = board_prob.board.last_move();
+    assert(last_move);
+
+    return MoveProb{
+      .mv=*last_move,
+      .prior=board_prob.prior,
+      .visits=board_prob.visits
+    };
+  }
 };
 
 inline bool
@@ -30,6 +56,12 @@ struct SearchResult {
   std::vector<BoardProb> moves;
 
   // The expected value of winning from this position for the current player.
+  float value;
+};
+
+struct PlayResult {
+  BoardProb play_move;
+  std::vector<MoveProb> other_moves;
   float value;
 };
 
