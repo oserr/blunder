@@ -47,6 +47,8 @@ add_library(blunder STATIC
   src/alpha_zero_evaluator.h
   src/bitboard.cc
   src/bitboard.h
+  src/blunder_player.cc
+  src/blunder_player.h
   src/board.cc
   src/board.h
   src/board_path.h
