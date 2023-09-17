@@ -22,7 +22,7 @@ public:
 
   // Converts |board_path| into a Tensor.
   virtual torch::Tensor
-  encode_moves(std::span<const MoveProb> moves) const = 0;
+  encode_moves(std::span<const BoardProb> moves) const = 0;
 };
 
 } // namespace blunder

@@ -228,7 +228,7 @@ Mcts::run(const BoardPath& board_path) const
   SearchResult result;
   result.moves.reserve(pred.move_probs.size());
   for (const auto& [board, prior] : pred.move_probs)
-    result.moves.emplace_back(MoveProb{.board=board, .prior=prior});
+    result.moves.emplace_back(BoardProb{.board=board, .prior=prior});
 
   add_noise(pred.move_probs);
 

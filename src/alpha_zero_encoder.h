@@ -17,7 +17,7 @@ public:
 
   // Encodes the moves for the Board as a tensor for training.
   torch::Tensor
-  encode_moves(std::span<const MoveProb> moves) const override;
+  encode_moves(std::span<const BoardProb> moves) const override;
 };
 
 } // namespace

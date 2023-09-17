@@ -104,7 +104,7 @@ AlphaZeroEncoder::encode_state(const BoardPath& board_path) const
 }
 
 torch::Tensor
-AlphaZeroEncoder::encode_moves(std::span<const MoveProb> moves) const
+AlphaZeroEncoder::encode_moves(std::span<const BoardProb> moves) const
 {
   assert(not moves.empty());
 

@@ -21,7 +21,7 @@ RandomSearch::run(const BoardPath& board_path) const
   if (children.empty())
     throw std::length_error("children should be non-empty.");
 
-  std::vector<MoveProb> moves;
+  std::vector<BoardProb> moves;
   moves.reserve(children.size());
   for (unsigned i = 0; i < children.size(); ++i)
     moves.emplace_back().board = std::move(children[i]);
