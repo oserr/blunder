@@ -43,6 +43,8 @@ add_library(blunder STATIC
   src/alpha_zero_decoder.h
   src/alpha_zero_encoder.cc
   src/alpha_zero_encoder.h
+  src/alpha_zero_evaluator.cc
+  src/alpha_zero_evaluator.h
   src/bitboard.cc
   src/bitboard.h
   src/board.cc
