@@ -18,7 +18,7 @@ public:
 
   // Converts |board_path| into a Tensor.
   virtual torch::Tensor
-  encode_state(const BoardPath& board_path) const = 0;
+  encode_state(const EvalBoardPath& board_path) const = 0;
 
   // Converts |board_path| into a Tensor.
   virtual torch::Tensor

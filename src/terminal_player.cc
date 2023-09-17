@@ -10,19 +10,19 @@
 
 namespace blunder {
 
-Board
-TerminalPlayer::make_move(std::span<const Board> boards)
+PlayResult
+TerminalPlayer::make_move(const GameBoardPath& boards)
 {
-  if (boards.empty())
-    throw std::invalid_argument("Boards should not be empty.");
+  auto board = boards.back();
+  if (not board)
+    throw std::invalid_argument("boards should not be empty.");
 
-  const auto& board = boards.back();
-  auto next_boards = board.next();
+  auto next_boards = board->get().next();
 
   if (next_boards.empty())
     throw std::logic_error("Did not find any moves.");
 
-  std::cout << board << '\n';
+  std::cout << board->get() << '\n';
 
   unsigned i = 0;
   std::cout << "\nChoose a move...\n";
@@ -54,7 +54,9 @@ TerminalPlayer::make_move(std::span<const Board> boards)
               << std::endl;
   }
 
-  return next_boards[index];
+  PlayResult result;
+  result.play_move.board = std::move(next_boards[index]);
+  return result;
 }
 
 } // namespace blunder

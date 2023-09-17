@@ -2,7 +2,9 @@
 
 #include <string>
 
+#include "board_path.h"
 #include "player.h"
+#include "search_result.h"
 
 namespace blunder {
 
@@ -13,8 +15,8 @@ public:
   TerminalPlayer(std::string_view name)
     : player_name(name) {}
 
-  Board
-  make_move(std::span<const Board> boards) override;
+  PlayResult
+  make_move(const GameBoardPath& boards) override;
 
   std::string_view
   name() const noexcept override

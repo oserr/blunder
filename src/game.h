@@ -5,11 +5,13 @@
 
 #include "board.h"
 #include "color.h"
+#include "search_result.h"
 
 namespace blunder {
 
 struct GameResult {
-  std::vector<Board> moves;
+  Board game_start;
+  std::vector<PlayResult> history;
   std::optional<Color> winner;
 };
 

@@ -69,8 +69,8 @@ struct Node {
 
   // Returns a board path from the current node, with current node the root
   // node of the board path.
-  BoardPath
-  get_path(const BoardPath& from_root) const noexcept;
+  EvalBoardPath
+  get_path(const EvalBoardPath& from_root) const noexcept;
 
   // Returns true if the board reached a terminal state.
   bool
@@ -112,11 +112,11 @@ struct Node {
   add_noise() noexcept;
 };
 
-BoardPath
-Node::get_path(const BoardPath& from_root) const noexcept
+EvalBoardPath
+Node::get_path(const EvalBoardPath& from_root) const noexcept
 {
   auto node = this;
-  BoardPath board_path;
+  EvalBoardPath board_path;
 
   // Check for parent to avoid adding the root node here, since push(from_root)
   // takes care of adding the root.
@@ -216,11 +216,11 @@ Mcts::Mcts(
 
 // TODO: Determine if adding some sort of caching improves performance.
 SearchResult
-Mcts::run(const BoardPath& board_path) const
+Mcts::run(const EvalBoardPath& board_path) const
 {
   auto board = board_path.root();
   if (not board)
-    throw std::invalid_argument("BoardPath should have a root.");
+    throw std::invalid_argument("EvalBoardPath should have a root.");
 
   auto pred = evaluator->predict(board_path);
 

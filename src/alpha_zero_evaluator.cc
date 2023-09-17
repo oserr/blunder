@@ -6,7 +6,7 @@
 namespace blunder {
 
 Prediction
-AlphaZeroEvaluator::predict(const BoardPath& board_path) const
+AlphaZeroEvaluator::predict(const EvalBoardPath& board_path) const
 {
   auto root = board_path.root();
   if (not root)

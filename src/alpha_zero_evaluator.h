@@ -28,7 +28,7 @@ public:
   }
 
   Prediction
-  predict(const BoardPath& board_path) const override;
+  predict(const EvalBoardPath& board_path) const override;
 
 private:
   std::shared_ptr<AlphaZeroNet> net;

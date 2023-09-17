@@ -23,7 +23,7 @@ public:
       unsigned seed);
 
   SearchResult
-  run(const BoardPath& board_path) const override;
+  run(const EvalBoardPath& board_path) const override;
 
 private:
   // Adds noise to the priors of the root node before running the simulations.

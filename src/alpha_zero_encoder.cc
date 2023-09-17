@@ -35,7 +35,7 @@ encode_pieces(int plane, const PieceSet& pieces, torch::Tensor& tensor) {
 } // namespace
 
 torch::Tensor
-AlphaZeroEncoder::encode_state(const BoardPath& board_path) const
+AlphaZeroEncoder::encode_state(const EvalBoardPath& board_path) const
 {
   auto root_board = board_path.root();
   if (not root_board)

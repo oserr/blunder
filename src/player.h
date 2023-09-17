@@ -4,6 +4,8 @@
 #include <string_view>
 
 #include "board.h"
+#include "board_path.h"
+#include "search_result.h"
 
 namespace blunder {
 
@@ -12,8 +14,8 @@ public:
   // Default dtor for Player.
   virtual ~Player() = default;
 
-  virtual Board
-  make_move(std::span<const Board> boards) = 0;
+  virtual PlayResult
+  make_move(const GameBoardPath& boards) = 0;
 
   virtual std::string_view
   name() const noexcept = 0;

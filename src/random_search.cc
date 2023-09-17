@@ -7,7 +7,7 @@
 namespace blunder {
 
 SearchResult
-RandomSearch::run(const BoardPath& board_path) const
+RandomSearch::run(const EvalBoardPath& board_path) const
 {
   auto root = board_path.root();
   if (not root)

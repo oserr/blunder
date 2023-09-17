@@ -13,7 +13,7 @@ class AlphaZeroEncoder : public TensorEncoder {
 public:
   // Encodes the input Board as a tensor for evaluation.
   torch::Tensor
-  encode_state(const BoardPath& board_path) const override;
+  encode_state(const EvalBoardPath& board_path) const override;
 
   // Encodes the moves for the Board as a tensor for training.
   torch::Tensor

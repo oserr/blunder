@@ -3,6 +3,7 @@
 #include <cassert>
 #include <vector>
 
+#include "board.h"
 #include "move.h"
 
 namespace blunder {
@@ -63,6 +64,9 @@ struct PlayResult {
   BoardProb play_move;
   std::vector<MoveProb> other_moves;
   float value;
+
+  static PlayResult
+  take_from(SearchResult result);
 };
 
 } // namespace blunder

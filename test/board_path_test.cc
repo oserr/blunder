@@ -14,7 +14,7 @@ protected:
   SetUp() override
   { Board::register_magics(); }
 
-  BoardPath board_path;
+  EvalBoardPath board_path;
 };
 
 TEST_F(BoardPathTest, SizeIsZero)

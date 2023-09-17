@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <functional>
@@ -7,6 +8,7 @@
 #include <span>
 
 #include "board.h"
+#include "search_result.h"
 
 namespace blunder {
 
@@ -21,6 +23,7 @@ namespace blunder {
 // - For now, the max number of boards in the path is 8 since that is how many
 //   timesteps are used for evaluation, but this can be adjusted later if there
 //   is a need.
+template<size_t N>
 class BoardPath {
 public:
   BoardPath() noexcept
@@ -41,9 +44,23 @@ public:
     return bp;
   }
 
+  // Initializes a BoardPath from boards, but starts from the last board
+  // and proceeds in reverse order.
+  template<size_t M>
+  static BoardPath
+  rev(const BoardPath<M> board_path) noexcept
+  {
+    BoardPath bp;
+    bp.push(board_path);
+    auto first = bp.boards.begin();
+    std::reverse(first, first + bp.n);
+
+    return bp;
+  }
+
   bool
   is_full() const noexcept
-  { return n == boards.size(); }
+  { return n == N; }
 
   // Pushes a board onto the board path if not full yet.
   void
@@ -55,8 +72,9 @@ public:
   }
 
   // Pushes as many boards from other as can fit in the array.
+  template<size_t M>
   void
-  push(const BoardPath& other) noexcept
+  push(const BoardPath<M>& other) noexcept
   {
     for (const auto& board : other) {
       if (is_full())
@@ -79,8 +97,22 @@ public:
       : std::make_optional(std::cref(*boards[0]));
   }
 
+  // Returns the last Board in the path.
+  std::optional<std::reference_wrapper<const Board>>
+  back() const noexcept
+  {
+    return size() == 0
+      ? std::nullopt
+      : std::make_optional(std::cref(*boards[n-1]));
+  }
+
+  // Returns the last Board in the path without checking if it's empty.
+  const Board&
+  fast_back() const noexcept
+  { return *boards[n-1]; }
+
 private:
-  using BoardPathArr = std::array<const Board*, 8>;
+  using BoardPathArr = std::array<const Board*, N>;
 
   // An iterator helper class to make it easier to traverse boards in BoardPath.
   class Iter {
@@ -148,5 +180,11 @@ private:
   // The number of boards.
   unsigned n = 0;
 };
+
+// We only use up to 8 boards for evaluation.
+using EvalBoardPath = BoardPath<8>;
+
+// A game can go up to 200 moves, and then it's declared a draw.
+using GameBoardPath = BoardPath<200>;
 
 } // namespace blunder

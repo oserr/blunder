@@ -16,7 +16,7 @@ public:
 
   // Runs a game search.
   virtual SearchResult
-  run(const BoardPath& board) const = 0;
+  run(const EvalBoardPath& board) const = 0;
 };
 
 } // namespace blunder

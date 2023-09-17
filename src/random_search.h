@@ -22,7 +22,7 @@ public:
       rand_value_fn(-1.0, 1.0) {}
 
   SearchResult
-  run(const BoardPath& board_path) const override;
+  run(const EvalBoardPath& board_path) const override;
 
 private:
   mutable std::mt19937 rand_fn;

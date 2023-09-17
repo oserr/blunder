@@ -25,7 +25,7 @@ public:
   ~Evaluator() = default;
 
   virtual Prediction
-  predict(const BoardPath& board_path) const = 0;
+  predict(const EvalBoardPath& board_path) const = 0;
 };
 
 } // namespace blunder

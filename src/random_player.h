@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <span>
 #include <string_view>
 #include <utility>
@@ -17,12 +18,12 @@ public:
   RandomPlayer(unsigned seed)
      : rand_search(seed) {}
 
-  Board
-  make_move(std::span<const Board> boards) override
+  PlayResult
+  make_move(const GameBoardPath& boards) override
   {
-    auto board_path = BoardPath::rev(boards);
+    auto board_path = EvalBoardPath::rev(boards);
     auto result = rand_search.run(board_path);
-    return std::move(result.best.board);
+    return PlayResult::take_from(result);
   }
 
   std::string_view

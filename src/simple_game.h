@@ -8,6 +8,7 @@
 
 namespace blunder {
 
+// TODO: modify or extend interface to play games from random positions.
 // Implements a simple chess game between two players.
 class SimpleGame : public Game {
 public:
