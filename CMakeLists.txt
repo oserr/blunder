@@ -100,25 +100,19 @@ target_include_directories(blunder PUBLIC ${TORCH_INCLUDE_DIRS})
 target_compile_features(blunder PRIVATE)
 target_link_libraries(blunder ${TORCH_LIBRARIES})
 
-add_executable(bbprinter src/bbprinter.cc)
-set_target_properties(bbprinter PROPERTIES CXX_STANDARD 23)
-target_compile_features(bbprinter PRIVATE)
-target_link_libraries(bbprinter blunder)
+# Simple function to create a test target.
+function(create_target target)
+  add_executable(${target} src/${target}.cc)
+  set_target_properties(${target} PROPERTIES CXX_STANDARD 23)
+  target_compile_features(${target} PRIVATE)
+  target_link_libraries(${target} blunder)
+endfunction()
 
-add_executable(genmagic src/genmagic.cc)
-set_target_properties(genmagic PROPERTIES CXX_STANDARD 23)
-target_compile_features(genmagic PRIVATE)
-target_link_libraries(genmagic blunder)
-
-add_executable(train_net src/train_net.cc)
-set_target_properties(train_net PROPERTIES CXX_STANDARD 23)
-target_compile_features(train_net PRIVATE)
-target_link_libraries(train_net blunder)
-
-add_executable(game src/terminal_game.cc)
-set_target_properties(game PROPERTIES CXX_STANDARD 23)
-target_compile_features(game PRIVATE)
-target_link_libraries(game blunder)
+create_target(bbprinter)
+create_target(genmagic)
+create_target(train_net)
+create_target(terminal_game)
+create_target(training)
 
 # Simple function to create a test target.
 function(create_test target)
