@@ -76,6 +76,7 @@ main(int argc, char** argv)
 
   Board::register_magics();
 
+  std::cout << "Playing " << num_games << " of self play ..." << std::endl;
   for (unsigned j = 0; j < num_games; ++j) {
     auto game = SimpleGame(
             std::make_unique<BlunderPlayer>(mcts),
