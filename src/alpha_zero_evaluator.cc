@@ -13,6 +13,7 @@ AlphaZeroEvaluator::predict(const EvalBoardPath& board_path) const
     throw std::invalid_argument("board_path should have at least one board.");
 
   auto input_tensor = tensor_encoder->encode_state(board_path);
+  input_tensor = input_tensor.unsqueeze(0);
   auto [policy_tensor, value_tensor] = net->forward(input_tensor);
 
   auto decoded_moves = tensor_decoder->decode(
