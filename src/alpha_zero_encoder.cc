@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <initializer_list>
+#include <iostream>
 #include <span>
 #include <stdexcept>
 
@@ -27,8 +28,9 @@ encode_pieces(int plane, const PieceSet& pieces, torch::Tensor& tensor) {
   for (auto piece : pieces) {
     for (auto square : piece.square_iter()) {
       auto [row, col] = row_col(square);
-      tensor.index_put_({plane++, row, col}, 1.0);
+      tensor.index_put_({plane, row, col}, 1.0);
     }
+    ++plane;
   }
 }
 

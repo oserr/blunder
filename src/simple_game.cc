@@ -1,5 +1,6 @@
 #include "simple_game.h"
 
+#include <iostream>
 #include <optional>
 #include <utility>
 
@@ -30,6 +31,7 @@ SimpleGame::play()
 
     game_result.history.push_back(std::move(play_result));
     const auto& next_board = game_result.history.back().play_move.board;
+    std::cout << "last_move -> " << *next_board.last_move() << std::endl;
     game_path.push(next_board);
   }
 

@@ -113,7 +113,7 @@ struct ValueNet : torch::nn::Module {
 // TODO: figure out how to enable the network to operate in inference mode to
 // make computations more efficient:
 // https://pytorch.org/cppdocs/notes/inference_mode.html.
-struct AlphaZeroNet : torch::nn::Module {
+struct AlphaZeroNet : public torch::nn::Module {
   AlphaZeroNet();
 
   std::pair<torch::Tensor, torch::Tensor>

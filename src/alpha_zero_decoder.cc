@@ -1,6 +1,7 @@
 #include "alpha_zero_decoder.h"
 
 #include <cmath>
+#include <iostream>
 #include <stdexcept>
 #include <torch/torch.h>
 
@@ -33,11 +34,12 @@ AlphaZeroDecoder::decode(
 {
   assert(not board.is_terminal());
   [[maybe_unused]] auto mdims = mv_tensor.sizes();
-  assert(mdims.size() == 3);
-  assert(mdims[0] == mdims[1] and mdims[1] == 8 and mdims[2] == 73);
+  assert(mdims.size() == 4);
+  assert(mdims[0] == 1 and mdims[1] == 73 and
+         mdims[2] == mdims[3] and mdims[2] == 8);
 
   [[maybe_unused]] auto edims = eval_tensor.sizes();
-  assert(edims.size() == 2 and edims[0] == edims[1] and edims[0] == 1);
+  assert(edims.size() == 1);
 
   auto children = board.next();
   if (children.empty())
@@ -47,11 +49,12 @@ AlphaZeroDecoder::decode(
   move_probs.reserve(children.size());
   float total = 0;
 
+  auto mtensor = mv_tensor.squeeze();
   for (auto& child : children) {
     auto last_move = child.last_move();
     assert(last_move.has_value());
     auto mv_code = encode_move(*last_move);
-    float logit = mv_tensor.index({mv_code.row, mv_code.col, mv_code.code})
+    float logit = mtensor.index({mv_code.code, mv_code.row, mv_code.col})
                            .item<float>();
     logit = std::exp(logit);
     total += logit;
@@ -61,7 +64,7 @@ AlphaZeroDecoder::decode(
   for (auto& [ignored, logit] : move_probs)
     logit /= total;
 
-  float value = eval_tensor.index({0, 0}).item<float>();
+  float value = eval_tensor.index({0}).item<float>();
 
   return DecodedMoves{
     .move_probs=std::move(move_probs),

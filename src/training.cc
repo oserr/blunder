@@ -63,9 +63,11 @@ main(int argc, char** argv)
   }
 
   std::random_device rand_dev;
+  auto net = std::make_shared<AlphaZeroNet>();
+  net->to(torch::kCUDA);
 
   auto evaluator = std::make_shared<AlphaZeroEvaluator>(
-          std::make_shared<AlphaZeroNet>(),
+          std::move(net),
           std::make_shared<AlphaZeroDecoder>(),
           std::make_shared<AlphaZeroEncoder>());
 
