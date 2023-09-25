@@ -62,16 +62,14 @@ main(int argc, char** argv)
     }
   }
 
-  std::random_device rand_dev;
   auto net = std::make_shared<AlphaZeroNet>();
-  net->to(torch::kCUDA);
 
   auto evaluator = std::make_shared<AlphaZeroEvaluator>(
           std::move(net),
           std::make_shared<AlphaZeroDecoder>(),
           std::make_shared<AlphaZeroEncoder>());
 
-  auto mcts = std::make_shared<Mcts>(std::move(evaluator), 300, rand_dev());
+  auto mcts = std::make_shared<Mcts>(std::move(evaluator), 300, 0);
 
   auto white_player = std::make_unique<BlunderPlayer>(mcts);
   auto black_player = std::make_unique<BlunderPlayer>(mcts);

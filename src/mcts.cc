@@ -237,7 +237,6 @@ Mcts::run(const EvalBoardPath& board_path) const
   root.expand(pred);
 
   for (unsigned i = 0; i < simuls; ++i) {
-    std::cout << "Mcts: simulation " << i << std::endl;
     auto* node = &root;
 
     while (not node->is_leaf and not node->is_terminal()) {

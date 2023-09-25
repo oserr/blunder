@@ -74,6 +74,7 @@ ResBlockNet::ResBlockNet(std::string_view name)
   register_module(std::format("{}-conv2", name), conv2);
   register_module(std::format("{}-bnorm1", name), bnorm1);
   register_module(std::format("{}-bnorm2", name), bnorm2);
+  this->to(torch::kCUDA);
 }
 
 Tensor
@@ -97,6 +98,7 @@ PolicyNet::PolicyNet()
   register_module("PolicyNet-conv1", conv1);
   register_module("PolicyNet-bnorm", bnorm);
   register_module("PolicyNet-conv2", conv2);
+  this->to(torch::kCUDA);
 }
 
 Tensor
@@ -117,6 +119,7 @@ ValueNet::ValueNet()
   register_module("ValueNet-bnorm", bnorm);
   register_module("ValueNet-fc1", fc1);
   register_module("ValueNet-fc2", fc2);
+  this->to(torch::kCUDA);
 }
 
 Tensor
@@ -143,6 +146,8 @@ AlphaZeroNet::AlphaZeroNet()
   res_nets.reserve(19);
   for (int i = 0; i < 19; ++i)
     res_nets.emplace_back(std::format("ResNetBlock-{}", i));
+
+  this->to(torch::kCUDA);
 }
 
 std::pair<Tensor, Tensor>

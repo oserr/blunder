@@ -62,7 +62,7 @@ namespace blunder {
 
 // ResBlockNet implements the residual block in the AlphaZero network, which has
 // 19 of these blocks connected together.
-struct ResBlockNet : torch::nn::Module {
+struct ResBlockNet : public torch::nn::Module {
   explicit
   ResBlockNet(std::string_view name);
 
@@ -79,7 +79,7 @@ struct ResBlockNet : torch::nn::Module {
 // Policy head net
 //----------------
 
-struct PolicyNet : torch::nn::Module {
+struct PolicyNet : public torch::nn::Module {
   PolicyNet();
 
   torch::Tensor
@@ -94,7 +94,7 @@ struct PolicyNet : torch::nn::Module {
 // Value head net
 //----------------
 
-struct ValueNet : torch::nn::Module {
+struct ValueNet : public torch::nn::Module {
   ValueNet();
 
   torch::Tensor
