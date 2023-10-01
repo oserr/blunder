@@ -4,6 +4,7 @@
 #include <array>
 #include <cassert>
 #include <functional>
+#include <iostream>
 #include <optional>
 #include <span>
 
@@ -26,6 +27,9 @@ namespace blunder {
 template<size_t N>
 class BoardPath {
 public:
+  // Make specializations friends of this class.
+  template<size_t M> friend class BoardPath;
+
   BoardPath() noexcept
   { boards.fill(nullptr); }
 
@@ -48,14 +52,14 @@ public:
   // and proceeds in reverse order.
   template<size_t M>
   static BoardPath
-  rev(const BoardPath<M> board_path) noexcept
+  rev(const BoardPath<M>& other) noexcept
   {
-    BoardPath bp;
-    bp.push(board_path);
-    auto first = bp.boards.begin();
-    std::reverse(first, first + bp.n);
+    int ncopy = std::min<int>(N, other.n);
+    BoardPath board_path;
+    for (int i = other.n-1, j = 0 ; j < ncopy; --i, j++)
+      board_path.push(*other.boards[i]);
 
-    return bp;
+    return board_path;
   }
 
   bool
@@ -87,6 +91,10 @@ public:
   unsigned
   size() const noexcept
   { return n; }
+
+  bool
+  empty() const noexcept
+  { return n == 0; }
 
   // Returns the root of the BoardPath, i.e. the first board.
   std::optional<std::reference_wrapper<const Board>>
