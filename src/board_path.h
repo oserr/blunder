@@ -192,7 +192,7 @@ private:
 // We only use up to 8 boards for evaluation.
 using EvalBoardPath = BoardPath<8>;
 
-// A game can go up to 200 moves, and then it's declared a draw.
-using GameBoardPath = BoardPath<200>;
+// A game can go up to 300 moves, and then it's declared a draw.
+using GameBoardPath = BoardPath<300>;
 
 } // namespace blunder
