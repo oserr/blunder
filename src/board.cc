@@ -653,6 +653,18 @@ Board::update_with_move(Move mv) noexcept
   return true;
 }
 
+Board&
+Board::update_with_moves(std::span<const Move> moves)
+{
+  auto other_board = *this;
+  for (auto mv : moves) {
+    if (not other_board.update_with_move(mv))
+      throw std::logic_error("Unable to apply move.");
+  }
+  *this = other_board;
+  return *this;
+}
+
 // TODO: replace std::function with some something less expensive.
 void
 Board::get_simple_moves(

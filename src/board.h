@@ -8,6 +8,7 @@
 #include <memory>
 #include <optional>
 #include <ostream>
+#include <span>
 #include <string>
 #include <utility>
 
@@ -310,6 +311,11 @@ public:
   // true if the update succeeds, false otherwise.
   bool
   update_with_move(Move mv) noexcept;
+
+  // Updates this board with a sequence of moves. Returns an exception the full
+  // sequence of moves cannot be applied.
+  Board&
+  update_with_moves(std::span<const Move> moves);
 
 private:
   //-------------------------------------
