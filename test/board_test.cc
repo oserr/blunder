@@ -539,3 +539,83 @@ TEST_F(BoardTest, TwoUpdatesFromBeginning)
 
   // TODO: Add more testing around update logic.
 }
+
+// Test sequence of moves.
+// {P:f2->f3}
+// {N:b8->c6}
+// {P:c2->c4}
+// {P:e7->e5}
+// {P:a2->a3}
+// {N:g8->f6}
+// {P:g2->g3}
+// {N:f6->d5}
+// {B:f1->g2}
+// {P:f7->f6}
+// {P:f3->f4}
+// {N:c6->a5}
+// {P:h2->h3}
+// {Q:d8->e7}
+// {P:b2->b4}
+// {P:d7->d6}
+// {P:f4->e5, !P}
+// {N:d5->c3}
+// {B:g2->e4}
+// {N:c3->b5}
+// {P:d2->d3}
+// {B:c8->f5}
+// {Q:d1->c2}
+// {N:a5->b3}
+// {B:e4->f5, !B}
+// {N:b3->a1, !R}
+// {R:h1->h2}
+// {N:b5->c3}
+// {B:c1->e3}
+// {N:c3->e2, !P}
+// {B:e3->d2}
+// {Q:e7->d7}
+// {P:e5->f6, !P}
+// {P:d6->d5}
+TEST_F(BoardTest, UpdateWithMoves1)
+{
+  MoveVec moves;
+  moves.emplace_back(Piece::pawn(), Sq::f2, Sq::f3);
+  moves.emplace_back(Piece::knight(), Sq::b8, Sq::c6);
+  moves.emplace_back(Piece::pawn(), Sq::c2, Sq::c4);
+  moves.emplace_back(Piece::pawn(), Sq::e7, Sq::e5);
+  moves.emplace_back(Piece::pawn(), Sq::a2, Sq::a3);
+  moves.emplace_back(Piece::knight(), Sq::g8, Sq::f6);
+  moves.emplace_back(Piece::pawn(), Sq::g2, Sq::g3);
+  moves.emplace_back(Piece::knight(), Sq::f6, Sq::d5);
+  moves.emplace_back(Piece::bishop(), Sq::f1, Sq::g2);
+  moves.emplace_back(Piece::pawn(), Sq::f7, Sq::f6);
+  moves.emplace_back(Piece::pawn(), Sq::f3, Sq::f4);
+  moves.emplace_back(Piece::knight(), Sq::c6, Sq::a5);
+  moves.emplace_back(Piece::pawn(), Sq::h2, Sq::h3);
+  moves.emplace_back(Piece::queen(), Sq::d8, Sq::e7);
+  moves.emplace_back(Piece::pawn(), Sq::b2, Sq::b4);
+  moves.emplace_back(Piece::pawn(), Sq::d7, Sq::d6);
+  moves.emplace_back(Piece::pawn(), Sq::f4, Piece::pawn(), Sq::e5);
+  moves.emplace_back(Piece::knight(), Sq::d5, Sq::c3);
+  moves.emplace_back(Piece::bishop(), Sq::g2, Sq::e4);
+  moves.emplace_back(Piece::knight(), Sq::c3, Sq::b5);
+  moves.emplace_back(Piece::pawn(), Sq::d2, Sq::d3);
+  moves.emplace_back(Piece::bishop(), Sq::c8, Sq::f5);
+  moves.emplace_back(Piece::queen(), Sq::d1, Sq::c2);
+  moves.emplace_back(Piece::knight(), Sq::a5, Sq::b3);
+  moves.emplace_back(Piece::bishop(), Sq::e4, Piece::bishop(), Sq::f5);
+  moves.emplace_back(Piece::knight(), Sq::b3, Piece::rook(), Sq::a1);
+  moves.emplace_back(Piece::rook(), Sq::h1, Sq::h2);
+  moves.emplace_back(Piece::knight(), Sq::b5, Sq::c3);
+  moves.emplace_back(Piece::bishop(), Sq::c1, Sq::e3);
+  moves.emplace_back(Piece::knight(), Sq::c3, Piece::pawn(), Sq::e2);
+  moves.emplace_back(Piece::bishop(), Sq::e3, Sq::d2);
+  moves.emplace_back(Piece::queen(), Sq::e7, Sq::d7);
+  moves.emplace_back(Piece::pawn(), Sq::e5, Piece::pawn(), Sq::f6);
+  moves.emplace_back(Piece::pawn(), Sq::d6, Sq::d5);
+
+  auto board = Board::new_board();
+  board.update_with_moves(moves);
+  auto children = board.next();
+
+  EXPECT_TRUE(children.empty());
+}
