@@ -19,6 +19,8 @@ SimpleGame::play()
   GameBoardPath game_path;
   game_path.push(game_result.game_start);
 
+  int move_num = 1;
+
   while (not game_path.fast_back().is_terminal()) {
     if (game_path.is_full())
       break;
@@ -31,7 +33,8 @@ SimpleGame::play()
 
     game_result.history.push_back(std::move(play_result));
     const auto& next_board = game_result.history.back().play_move.board;
-    std::cout << "last_move -> " << *next_board.last_move() << std::endl;
+    std::cout << "Move (" << move_num++ << ") -> "
+              << *next_board.last_move() << std::endl;
     game_path.push(next_board);
   }
 
