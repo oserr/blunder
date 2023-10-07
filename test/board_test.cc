@@ -639,3 +639,60 @@ TEST_F(BoardTest, TerminalStateFen)
   ASSERT_TRUE(board);
   EXPECT_TRUE(board->is_terminal());
 }
+
+// (1) -> {P:h2->h4}
+// (2) -> {P:b7->b5}
+// (3) -> {N:g1->h3}
+// (4) -> {N:g8->f6}
+// (5) -> {N:h3->g1}
+// (6) -> {R:h8->g8}
+// (7) -> {P:d2->d4}
+// (8) -> {P:b5->b4}
+// (9) -> {N:b1->a3}
+// (10) -> {P:b4->a3, !N}
+// (11) -> {N:g1->h3}
+// (12) -> {P:d7->d6}
+// (13) -> {N:h3->g1}
+// (14) -> {B:c8->f5}
+// (15) -> {P:e2->e4}
+// (16) -> {P:e7->e6}
+// (17) -> {B:f1->a6}
+// (18) -> {B:f8->e7}
+// (19) -> {P:e4->e5}
+// (20) -> {R:g8->f8}
+// (21) -> {P:g2->g4}
+// (22) -> {P:g7->g5}
+// (23) -> {B:c1->f4}
+TEST_F(BoardTest, UpdateWithMoves2)
+{
+  MoveVec moves;
+  moves.emplace_back(Piece::pawn(), Sq::h2, Sq::h4);
+  moves.emplace_back(Piece::pawn(), Sq::b7, Sq::b5);
+  moves.emplace_back(Piece::knight(), Sq::g1, Sq::h3);
+  moves.emplace_back(Piece::knight(), Sq::g8, Sq::f6);
+  moves.emplace_back(Piece::knight(), Sq::h3, Sq::g1);
+  moves.emplace_back(Piece::rook(), Sq::h8, Sq::g8);
+  moves.emplace_back(Piece::pawn(), Sq::d2, Sq::d4);
+  moves.emplace_back(Piece::pawn(), Sq::b5, Sq::b4);
+  moves.emplace_back(Piece::knight(), Sq::b1, Sq::a3);
+  moves.emplace_back(Piece::pawn(), Sq::b4, Piece::knight(), Sq::a3);
+  moves.emplace_back(Piece::knight(), Sq::g1, Sq::h3);
+  moves.emplace_back(Piece::pawn(), Sq::d7, Sq::d6);
+  moves.emplace_back(Piece::knight(), Sq::h3, Sq::g1);
+  moves.emplace_back(Piece::bishop(), Sq::c8, Sq::f5);
+  moves.emplace_back(Piece::pawn(), Sq::e2, Sq::e4);
+  moves.emplace_back(Piece::pawn(), Sq::e7, Sq::e6);
+  moves.emplace_back(Piece::bishop(), Sq::f1, Sq::a6);
+  moves.emplace_back(Piece::bishop(), Sq::f8, Sq::e7);
+  moves.emplace_back(Piece::pawn(), Sq::e4, Sq::e5);
+  moves.emplace_back(Piece::rook(), Sq::g8, Sq::f8);
+  moves.emplace_back(Piece::pawn(), Sq::g2, Sq::g4);
+  moves.emplace_back(Piece::pawn(), Sq::g7, Sq::g5);
+  moves.emplace_back(Piece::bishop(), Sq::c1, Sq::f4);
+
+  auto board = Board::new_board();
+  board.update_with_moves(moves);
+  auto children = board.next();
+
+  EXPECT_FALSE(children.empty());
+}
