@@ -34,13 +34,13 @@ encode_knight_move(int row_diff, int col_diff)
 
 // Maps an underpromotion move to a number in the range [0, 8].
 unsigned
-encode_under_promo(int col_diff, Piece piece)
+encode_under_promo(int col_diff, Piece promo)
 {
   assert(col_diff >= -1 and col_diff <= 1);
 
   unsigned code = 0;
 
-  switch (piece.type()) {
+  switch (promo.type()) {
     case Type::Rook:
       break;
     case Type::Bishop:
@@ -114,8 +114,8 @@ encode_move(Move mv)
       mv_code.code = 56 + encode_knight_move(row_diff, col_diff);
       return mv_code;
     case Type::Pawn:
-      if (mv.is_promo() and not mv.capture().is_queen()) {
-        mv_code.code = 64 + encode_under_promo(col_diff, mv.capture());
+      if (mv.is_promo() and not mv.promoted().is_queen()) {
+        mv_code.code = 64 + encode_under_promo(col_diff, mv.promoted());
         return mv_code;
       }
       [[fallthrough]];
