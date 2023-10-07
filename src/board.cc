@@ -536,11 +536,6 @@ Board::compute_game_state() noexcept
     return;
   }
 
-  if (not is_check()) {
-    // We continue playing, i.e. GameState::Playing.
-    return;
-  }
-
   for (auto mv : moves) {
     Board board(*this);
     board.quick_update(mv);
@@ -549,6 +544,13 @@ Board::compute_game_state() noexcept
       game_state = GameState::Playing;
       return;
     }
+  }
+
+  // If we don't have moves without check, but are not currently in check, then
+  // this is stalemate.
+  if (not is_check()) {
+    game_state = GameState::Draw;
+    return;
   }
 
   // Didn't find a move to get out of check.
