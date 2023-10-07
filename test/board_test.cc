@@ -617,5 +617,25 @@ TEST_F(BoardTest, UpdateWithMoves1)
   board.update_with_moves(moves);
   auto children = board.next();
 
-  EXPECT_TRUE(children.empty());
+  EXPECT_FALSE(children.empty());
+}
+
+// --------
+// ----k---
+// ---r----
+// -b-p-p--
+// ---P-P--
+// --n-----
+// -------r
+// --Kn----
+//
+// Color:w
+// Castling:
+// HalfMove: 4
+// FullMove: 74
+TEST_F(BoardTest, TerminalStateFen)
+{
+  auto board = read_fen("2Kn4/7r/2n5/3p1p2/1b1p1p2/3r4/4k3/8 w - - 4 74");
+  ASSERT_TRUE(board);
+  EXPECT_TRUE(board->is_terminal());
 }
