@@ -84,7 +84,9 @@ main(int argc, char** argv)
 
     auto result = game.play();
 
-    if (result.winner) {
+    if (not result.winner)
+        std::cout << "Game " << j << " ended in a draw." << std::endl;
+    else {
         std::cout << "Game " << j << " ended with "
                   << (*result.winner == Color::White ? "WHITE" : "BLACK")
                   << " as winner in " << result.history.size()
