@@ -42,8 +42,11 @@ AlphaZeroDecoder::decode(
   assert(edims.size() == 1);
 
   auto children = board.next();
-  if (children.empty())
-    throw std::runtime_error("Decoding only works with a non-terminal board.");
+  if (children.empty()) {
+    std::string err = "Processing non-terminal board with no moves...\n";
+    err += board.str();
+    throw std::runtime_error(std::move(err));
+  }
 
   std::vector<std::pair<Board, float>> move_probs;
   move_probs.reserve(children.size());
