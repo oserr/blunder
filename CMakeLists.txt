@@ -9,6 +9,8 @@ endif()
 string(TOLOWER "${CMAKE_BUILD_TYPE}" build_type)
 message(STATUS "Building ${CMAKE_PROJECT_NAME} in ${build_type} mode")
 
+set(CAFFE2_USE_CUDNN ON)
+
 if (build_type STREQUAL "debug")
   add_compile_options(-Wall -Wextra -Wpedantic -Og)
 else()
