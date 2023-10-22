@@ -94,6 +94,9 @@ add_library(blunder STATIC
   src/square_iter.h
   src/tensor_decoder.h
   src/tensor_encoder.h
+  src/timer.cc
+  src/timer.h
+  src/time_types.h
   src/terminal_player.h
   src/terminal_player.cc)
 set_target_properties(blunder PROPERTIES CXX_STANDARD 23)
