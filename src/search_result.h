@@ -56,14 +56,14 @@ struct SearchResult {
   // Vector of moves with prior and posterior probabilities probabilities.
   std::vector<BoardProb> moves;
 
+  // The expected value of winning from this position for the current player.
+  float value = 0;
+
   // Total nodes searched, i.e. nodes that are expanded.
   std::uint64_t total_nodes_expanded = 0;
 
   // The maximum depth of a branch explored during search.
   unsigned depth = 0;
-
-  // The expected value of winning from this position for the current player.
-  float value = 0;
 
   // Average number of milliseconds per evaluation of node.
   float millis_per_eval = 0;
@@ -85,9 +85,6 @@ struct PlayResult {
 
   // The maximum depth of a branch explored during search.
   unsigned depth = 0;
-
-  // The expected value of winning from this position for the current player.
-  float value = 0;
 
   // Average number of milliseconds per evaluation of node.
   float millis_per_eval = 0;
