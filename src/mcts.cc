@@ -7,6 +7,8 @@
 #include <random>
 #include <utility>
 
+#include "timer.h"
+
 namespace blunder {
 namespace {
 
@@ -223,7 +225,14 @@ Mcts::run(const EvalBoardPath& board_path) const
   if (not board)
     throw std::invalid_argument("EvalBoardPath should have a root.");
 
+  Timer eval_timer;
+  Timer search_timer;
+
+  search_timer.start();
+
+  eval_timer.start();
   auto pred = evaluator->predict(board_path);
+  eval_timer.end();
 
   // Copy the priors before adding noise to them.
   SearchResult result;
@@ -236,13 +245,19 @@ Mcts::run(const EvalBoardPath& board_path) const
   Node root(board->get());
   root.expand(pred);
 
+  unsigned max_depth = 0;
+
   for (unsigned i = 0; i < simuls; ++i) {
     auto* node = &root;
 
+    unsigned current_depth = 0;
     while (not node->is_leaf and not node->is_terminal()) {
       node = node->choose_next();
+      ++current_depth;
       assert(node);
     }
+
+    max_depth = std::max(max_depth, current_depth);
 
     // We reached a terminal state so there is no need to call evaluator.
     if (node->is_terminal()) {
@@ -254,10 +269,13 @@ Mcts::run(const EvalBoardPath& board_path) const
     auto bp = node->get_path(board_path);
 
     // Evaluate leaf node.
+    eval_timer.start();
     auto pred = evaluator->predict(bp);
+    eval_timer.end();
 
     // Expand leaf node.
     node->expand(std::move(pred)).update_stats();
+    ++result.total_nodes_expanded;
   }
 
   const Node* max_node = nullptr;
@@ -281,6 +299,10 @@ Mcts::run(const EvalBoardPath& board_path) const
   result.best.visits = max_node->visits;
 
   result.value = max_node->init_value;
+  result.depth = max_depth;
+  result.millis_per_eval = eval_timer.avg_millis();
+  result.millis_eval = eval_timer.total_millis();
+  result.millis_search_time = search_timer.total_millis();
 
   return result;
 }
