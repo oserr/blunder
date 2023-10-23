@@ -62,6 +62,7 @@ SimpleGame::play()
   }
 
   unsigned nplays = game_result.history.size();
+  assert(nplays and "nplays cannot be zero.");
   game_result.avg_nodes_expanded = static_cast<float>(total_nodes_expanded) / nplays;
   game_result.avg_depth = static_cast<float>(total_depth) / nplays;
   game_result.millis_per_eval = total_millis_per_eval / nplays;
