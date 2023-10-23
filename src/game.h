@@ -18,13 +18,13 @@ struct GameResult {
   std::uint64_t max_nodes_expanded = 0;
 
   // The average number of nodes expanded per search.
-  std::uint64_t avg_nodes_expanded = 0;
+  float avg_nodes_expanded = 0;
 
   // The maximum depth of a branch explored during search.
   unsigned max_depth = 0;
 
   // The average depth for each search run.
-  unsigned avg_depth = 0;
+  float avg_depth = 0;
 
   // Average number of milliseconds per evaluation of node for the entire game.
   float millis_per_eval = 0;
