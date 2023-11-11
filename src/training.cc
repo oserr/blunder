@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <format>
 #include <getopt.h>
 #include <iostream>
 #include <memory>
@@ -92,6 +93,15 @@ main(int argc, char** argv)
                   << " as winner in " << result.history.size()
                   << '!' << std::endl;
     }
+
+    std::cout << "\tgame statistics are ...\n"
+              << "\t\tmax_nodes_expanded: " << result.max_nodes_expanded << '\n'
+              << "\t\tavg_nodes_expanded: " << std::format("{:10.10f}\n", result.avg_nodes_expanded)
+              << "\t\tmax_depth:          " << result.max_depth << '\n'
+              << "\t\tavg_depth:          " << std::format("{:10.10f}\n", result.avg_depth)
+              << "\t\tmillis_per_eval:    " << std::format("{:10.10f}\n", result.millis_per_eval)
+              << "\t\tmillis_per_search:  " << std::format("{:10.10f}\n", result.millis_per_search)
+              << std::endl;
   }
 
   return EXIT_SUCCESS;
