@@ -278,6 +278,8 @@ Mcts::run(const EvalBoardPath& board_path) const
     ++result.total_nodes_expanded;
   }
 
+  search_timer.end();
+
   const Node* max_node = nullptr;
   unsigned max_visits = 0;
   unsigned i = 0;
