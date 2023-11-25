@@ -227,7 +227,6 @@ Mcts::run(const EvalBoardPath& board_path) const
 
   Timer eval_timer;
   Timer search_timer;
-
   search_timer.start();
 
   eval_timer.start();

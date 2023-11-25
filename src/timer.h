@@ -92,7 +92,7 @@ public:
 
 private:
   std::optional<SteadyTimePoint> time_point = std::nullopt;
-  SteadyDuration total_time;
+  SteadyDuration total_time{0};
   unsigned total_intervals = 0;
 };
 
