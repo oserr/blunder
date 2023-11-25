@@ -87,7 +87,7 @@ find_magic(
   return std::unexpected(Err::MagicNotFound);
 }
 
-std::expected<std::vector<Magic>, Err>
+std::expected<MagicAttacks, Err>
 find_all_magics(
     std::function<BitBoard(std::uint32_t)> mask_fn,
     std::function<BitBoard(std::uint32_t, BitBoard)> attacks_fn,
@@ -100,18 +100,13 @@ find_all_magics(
   for (auto s = 0u; s < 64u; ++s) {
     auto magic_info = find_magic(s, mask_fn, attacks_fn, magic_fn, loops);
 
-    if (not magic_info) {
-      std::cerr << "Unable to find magic for square=" << s << std::endl;
+    if (not magic_info)
       return std::unexpected(magic_info.error());
-    }
-
-    std::cout << std::format("Computed magic={} for square={} in loops={}\n",
-                              magic_info->first.magic, s, magic_info->second);
 
     magics.push_back(std::move(magic_info->first));
   }
 
-  return magics;
+  return MagicAttacks(std::move(magics));
 }
 
 std::function<std::uint64_t()>
@@ -152,20 +147,14 @@ std::expected<MagicAttacks, Err>
 compute_bmagics()
 {
   auto magic_fn = create_rand_fn();
-  auto magics = find_all_magics(get_bmask, get_battacks, magic_fn);
-  if (not magics)
-    return std::unexpected(magics.error());
-  return MagicAttacks(std::move(*magics));
+  return find_all_magics(get_bmask, get_battacks, magic_fn);
 }
 
 std::expected<MagicAttacks, Err>
 compute_rmagics()
 {
   auto magic_fn = create_rand_fn();
-  auto magics = find_all_magics(get_rmask, get_rattacks, magic_fn);
-  if (not magics)
-    return std::unexpected(magics.error());
-  return MagicAttacks(std::move(*magics));
+  return find_all_magics(get_rmask, get_rattacks, magic_fn);
 }
 
 std::expected<MagicAttacks, Err>
@@ -173,20 +162,14 @@ from_bmagics(std::span<const std::uint64_t> magics)
 {
   assert(magics.size() == 64);
   auto magic_fn = [sq=0, magics=magics] mutable { return magics[sq++]; };
-  auto all_magics = find_all_magics(get_bmask, get_battacks, magic_fn, 1);
-  if (not all_magics)
-    return std::unexpected(all_magics.error());
-  return MagicAttacks(std::move(*all_magics));
+  return find_all_magics(get_bmask, get_battacks, magic_fn, 1);
 }
 
 std::expected<MagicAttacks, Err>
 from_rmagics(std::span<const std::uint64_t> magics)
 {
   auto magic_fn = [sq=0, magics=magics] mutable { return magics[sq++]; };
-  auto all_magics = find_all_magics(get_rmask, get_rattacks, magic_fn, 1);
-  if (not all_magics)
-    return std::unexpected(all_magics.error());
-  return MagicAttacks(std::move(*all_magics));
+  return find_all_magics(get_rmask, get_rattacks, magic_fn, 1);
 }
 
 } // namespace blunder
