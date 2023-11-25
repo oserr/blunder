@@ -15,6 +15,8 @@ GameResult
 SimpleGame::play()
 {
   GameResult game_result;
+  // TODO: get the 300 programmatically.
+  game_result.history.reserve(300);
   game_result.game_start = Board::new_board();
   GameBoardPath game_path;
   game_path.push(game_result.game_start);
@@ -31,10 +33,13 @@ SimpleGame::play()
        ? wplayer->make_move(game_path)
        : bplayer->make_move(game_path);
 
-    game_result.history.push_back(std::move(play_result));
-    const auto& next_board = game_result.history.back().play_move.board;
-    std::cout << "Move (" << move_num++ << ") -> "
-              << *next_board.last_move() << std::endl;
+    const auto& pr = game_result.history.emplace_back(std::move(play_result));
+    const auto& next_board = pr.play_move.board;
+
+    std::cout << "move " << move_num++ << " -> "
+              << *next_board.last_move()
+              << "  value=" << pr.value << std::endl;
+
     game_path.push(next_board);
   }
 
