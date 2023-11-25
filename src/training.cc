@@ -96,11 +96,11 @@ main(int argc, char** argv)
 
     std::cout << "\tgame statistics are ...\n"
               << "\t\tmax_nodes_expanded: " << result.max_nodes_expanded << '\n'
-              << "\t\tavg_nodes_expanded: " << std::format("{:10.10f}\n", result.avg_nodes_expanded)
+              << "\t\tavg_nodes_expanded: " << std::format("{:.3f}\n", result.avg_nodes_expanded)
               << "\t\tmax_depth:          " << result.max_depth << '\n'
-              << "\t\tavg_depth:          " << std::format("{:10.10f}\n", result.avg_depth)
-              << "\t\tmillis_per_eval:    " << std::format("{:10.10f}\n", result.millis_per_eval)
-              << "\t\tmillis_per_search:  " << std::format("{:10.10f}\n", result.millis_per_search)
+              << "\t\tavg_depth:          " << std::format("{:.3f}\n", result.avg_depth)
+              << "\t\tmillis_per_eval:    " << std::format("{:.3f}\n", result.millis_per_eval)
+              << "\t\tmillis_per_search:  " << std::format("{:.3f}\n", result.millis_per_search)
               << std::endl;
   }
 
