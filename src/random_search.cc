@@ -21,10 +21,13 @@ RandomSearch::run(const EvalBoardPath& board_path) const
   if (children.empty())
     throw std::length_error("children should be non-empty.");
 
-  std::vector<BoardProb> moves;
+  std::vector<MoveProb> moves;
   moves.reserve(children.size());
-  for (unsigned i = 0; i < children.size(); ++i)
-    moves.emplace_back().board = std::move(children[i]);
+  for (const auto& board : children) {
+    auto last_move = board.last_move();
+    assert(last_move);
+    moves.push_back(MoveProb{.mv=*last_move});
+  }
 
   std::uniform_int_distribution<unsigned> rand_gen(0, moves.size()-1);
   for (unsigned i = 0; i < 100; ++i) {
@@ -37,8 +40,13 @@ RandomSearch::run(const EvalBoardPath& board_path) const
 
   auto iter = std::max_element(moves.begin(), moves.end());
 
+  if (iter == moves.end())
+    throw std::runtime_error("Unable to find best move.");
+
+  const auto index = iter - moves.begin();
+
   SearchResult result {
-    .best = *iter,
+    .best = std::move(children[index]),
     .moves = std::move(moves),
     .value = rand_value_fn(rand_fn)
   };

@@ -57,10 +57,10 @@ SimpleGame::play()
     total_depth += presult.depth;
     game_result.max_depth = std::max(game_result.max_depth, presult.depth);
 
-    total_nodes_expanded += presult.total_nodes_expanded;
+    total_nodes_expanded += presult.num_expanded;
     game_result.max_nodes_expanded = std::max(
         game_result.max_nodes_expanded,
-        presult.total_nodes_expanded);
+        presult.num_expanded);
 
     total_millis_per_eval += presult.millis_per_eval;
     total_millis_per_search += presult.millis_search_time;

@@ -236,8 +236,11 @@ Mcts::run(const EvalBoardPath& board_path) const
   // Copy the priors before adding noise to them.
   SearchResult result;
   result.moves.reserve(pred.move_probs.size());
-  for (const auto& [board, prior] : pred.move_probs)
-    result.moves.emplace_back(BoardProb{.board=board, .prior=prior});
+  for (const auto& [board, prior] : pred.move_probs) {
+    auto last_move = board.last_move();
+    assert(last_move);
+    result.moves.push_back(MoveProb{.mv=*last_move, .prior=prior});
+  }
 
   add_noise(pred.move_probs);
 
@@ -252,6 +255,7 @@ Mcts::run(const EvalBoardPath& board_path) const
     unsigned current_depth = 0;
     while (not node->is_leaf and not node->is_terminal()) {
       node = node->choose_next();
+      ++result.num_visited;
       ++current_depth;
       assert(node);
     }
@@ -274,7 +278,7 @@ Mcts::run(const EvalBoardPath& board_path) const
 
     // Expand leaf node.
     node->expand(std::move(pred)).update_stats();
-    ++result.total_nodes_expanded;
+    ++result.num_expanded;
   }
 
   search_timer.end();

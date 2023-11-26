@@ -41,6 +41,10 @@ inline bool
 operator<(const BoardProb& left, const BoardProb& right) noexcept
 { return left.visits < right.visits; }
 
+inline bool
+operator<(const MoveProb& left, const MoveProb& right) noexcept
+{ return left.visits < right.visits; }
+
 // TODO: Don't want to have two copies of the board in best and moves, so
 // figure out a way to avoid the copy, e.g. have a pointer but make this into a
 // class.
@@ -53,14 +57,17 @@ struct SearchResult {
   // The best move.
   BoardProb best;
 
-  // Vector of moves with prior and posterior probabilities probabilities.
-  std::vector<BoardProb> moves;
+  // Vector of moves with prior and posterior probabilities.
+  std::vector<MoveProb> moves;
 
   // The expected value of winning from this position for the current player.
   float value = 0;
 
   // Total nodes searched, i.e. nodes that are expanded.
-  std::uint64_t total_nodes_expanded = 0;
+  unsigned num_expanded = 0;
+
+  // Total nodes visited, including repeat visits.
+  unsigned num_visited = 0;
 
   // The maximum depth of a branch explored during search.
   unsigned depth = 0;
@@ -81,7 +88,10 @@ struct PlayResult {
   float value = 0;
 
   // Total nodes searched, i.e. nodes that are expanded.
-  std::uint64_t total_nodes_expanded = 0;
+  unsigned num_expanded = 0;
+
+  // The total number of nodes visited, including repeat nodes.
+  unsigned num_visited = 0;
 
   // The maximum depth of a branch explored during search.
   unsigned depth = 0;

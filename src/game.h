@@ -15,7 +15,7 @@ struct GameResult {
   std::optional<Color> winner;
 
   // Maximum nodes expanded in any one run.
-  std::uint64_t max_nodes_expanded = 0;
+  unsigned max_nodes_expanded = 0;
 
   // The average number of nodes expanded per search.
   float avg_nodes_expanded = 0;
