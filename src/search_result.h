@@ -82,31 +82,4 @@ struct SearchResult {
   float millis_search_time = 0;
 };
 
-struct PlayResult {
-  BoardProb play_move;
-  std::vector<MoveProb> other_moves;
-  float value = 0;
-
-  // Total nodes searched, i.e. nodes that are expanded.
-  unsigned num_expanded = 0;
-
-  // The total number of nodes visited, including repeat nodes.
-  unsigned num_visited = 0;
-
-  // The maximum depth of a branch explored during search.
-  unsigned depth = 0;
-
-  // Average number of milliseconds per evaluation of node.
-  float millis_per_eval = 0;
-
-  // Total number of milliseconds spent on evaluation.
-  float millis_eval = 0;
-
-  // Total number of milliseconds during search time.
-  float millis_search_time = 0;
-
-  static PlayResult
-  take_from(SearchResult result);
-};
-
 } // namespace blunder
