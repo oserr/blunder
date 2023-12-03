@@ -2,12 +2,11 @@
 
 namespace blunder {
 
-PlayResult
+SearchResult
 BlunderPlayer::make_move(const GameBoardPath& boards)
 {
   auto board_path = EvalBoardPath::rev(boards);
-  auto result = mcts->run(board_path);
-  return PlayResult::take_from(result);
+  return mcts->run(board_path);
 }
 
 } // namespace blunder

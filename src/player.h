@@ -14,7 +14,7 @@ public:
   // Default dtor for Player.
   virtual ~Player() = default;
 
-  virtual PlayResult
+  virtual SearchResult
   make_move(const GameBoardPath& boards) = 0;
 
   virtual std::string_view

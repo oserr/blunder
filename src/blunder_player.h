@@ -21,7 +21,7 @@ public:
     assert(this->mcts);
   }
 
-  PlayResult
+  SearchResult
   make_move(const GameBoardPath& boards) override;
 
   std::string_view

@@ -15,7 +15,7 @@ public:
   TerminalPlayer(std::string_view name)
     : player_name(name) {}
 
-  PlayResult
+  SearchResult
   make_move(const GameBoardPath& boards) override;
 
   std::string_view

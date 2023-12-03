@@ -10,7 +10,7 @@
 
 namespace blunder {
 
-PlayResult
+SearchResult
 TerminalPlayer::make_move(const GameBoardPath& boards)
 {
   auto board = boards.back();
@@ -54,8 +54,8 @@ TerminalPlayer::make_move(const GameBoardPath& boards)
               << std::endl;
   }
 
-  PlayResult result;
-  result.play_move.board = std::move(next_boards[index]);
+  SearchResult result;
+  result.best.board = std::move(next_boards[index]);
   return result;
 }
 

@@ -16,7 +16,7 @@ SimpleGame::play()
 {
   GameResult game_result;
   // TODO: get the 300 programmatically.
-  game_result.history.reserve(300);
+  game_result.moves.reserve(300);
   game_result.game_start = Board::new_board();
   GameBoardPath game_path;
   game_path.push(game_result.game_start);
@@ -33,8 +33,8 @@ SimpleGame::play()
        ? wplayer->make_move(game_path)
        : bplayer->make_move(game_path);
 
-    const auto& pr = game_result.history.emplace_back(std::move(play_result));
-    const auto& next_board = pr.play_move.board;
+    const auto& pr = game_result.moves.emplace_back(std::move(play_result));
+    const auto& next_board = pr.best.board;
 
     std::cout << "move " << move_num++ << " -> "
               << *next_board.last_move()
@@ -53,7 +53,7 @@ SimpleGame::play()
   float total_millis_per_eval = 0;
   float total_millis_per_search = 0;
 
-  for (const auto& presult : game_result.history) {
+  for (const auto& presult : game_result.moves) {
     total_depth += presult.depth;
     game_result.max_depth = std::max(game_result.max_depth, presult.depth);
 
@@ -66,7 +66,7 @@ SimpleGame::play()
     total_millis_per_search += presult.millis_search_time;
   }
 
-  unsigned nplays = game_result.history.size();
+  unsigned nplays = game_result.moves.size();
   assert(nplays and "nplays cannot be zero.");
   game_result.avg_nodes_expanded = static_cast<float>(total_nodes_expanded) / nplays;
   game_result.avg_depth = static_cast<float>(total_depth) / nplays;

@@ -18,12 +18,11 @@ public:
   RandomPlayer(unsigned seed)
      : rand_search(seed) {}
 
-  PlayResult
+  SearchResult
   make_move(const GameBoardPath& boards) override
   {
     auto board_path = EvalBoardPath::rev(boards);
-    auto result = rand_search.run(board_path);
-    return PlayResult::take_from(result);
+    return rand_search.run(board_path);
   }
 
   std::string_view

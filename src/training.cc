@@ -87,7 +87,7 @@ main(int argc, char** argv)
     else {
         std::cout << "Game " << j << " ended with "
                   << (*result.winner == Color::White ? "WHITE" : "BLACK")
-                  << " as winner in " << result.history.size()
+                  << " as winner in " << result.moves.size()
                   << '!' << std::endl;
     }
 
