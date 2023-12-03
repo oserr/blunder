@@ -56,10 +56,10 @@ struct SearchResult {
   float value = 0;
 
   // Total nodes searched, i.e. nodes that are expanded.
-  unsigned num_expanded = 0;
+  unsigned nodes_expanded = 0;
 
   // Total nodes visited, including repeat visits.
-  unsigned num_visited = 0;
+  unsigned nodes_visited = 0;
 
   // The maximum depth of a branch explored during search.
   unsigned depth = 0;

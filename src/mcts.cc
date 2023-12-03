@@ -255,7 +255,7 @@ Mcts::run(const EvalBoardPath& board_path) const
     unsigned current_depth = 0;
     while (not node->is_leaf and not node->is_terminal()) {
       node = node->choose_next();
-      ++result.num_visited;
+      ++result.nodes_visited;
       ++current_depth;
       assert(node);
     }
@@ -278,7 +278,7 @@ Mcts::run(const EvalBoardPath& board_path) const
 
     // Expand leaf node.
     node->expand(std::move(pred)).update_stats();
-    ++result.num_expanded;
+    ++result.nodes_expanded;
   }
 
   search_timer.end();

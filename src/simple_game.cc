@@ -47,32 +47,6 @@ SimpleGame::play()
   if (board.is_mate())
     game_result.winner = board.is_white_next() ? Color::Black : Color::White;
 
-  // Compute other statistics.
-  unsigned total_depth = 0;
-  unsigned total_nodes_expanded = 0;
-  float total_millis_per_eval = 0;
-  float total_millis_per_search = 0;
-
-  for (const auto& presult : game_result.moves) {
-    total_depth += presult.depth;
-    game_result.max_depth = std::max(game_result.max_depth, presult.depth);
-
-    total_nodes_expanded += presult.num_expanded;
-    game_result.max_nodes_expanded = std::max(
-        game_result.max_nodes_expanded,
-        presult.num_expanded);
-
-    total_millis_per_eval += presult.millis_per_eval;
-    total_millis_per_search += presult.millis_search_time;
-  }
-
-  unsigned nplays = game_result.moves.size();
-  assert(nplays and "nplays cannot be zero.");
-  game_result.avg_nodes_expanded = static_cast<float>(total_nodes_expanded) / nplays;
-  game_result.avg_depth = static_cast<float>(total_depth) / nplays;
-  game_result.millis_per_eval = total_millis_per_eval / nplays;
-  game_result.millis_per_search = total_millis_per_search / nplays;
-
   return game_result;
 }
 

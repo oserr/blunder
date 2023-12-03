@@ -1,7 +1,8 @@
 #pragma once
 
-#include <vector>
 #include <optional>
+#include <string>
+#include <vector>
 
 #include "board.h"
 #include "color.h"
@@ -9,16 +10,18 @@
 
 namespace blunder {
 
-struct GameResult {
-  Board game_start;
-  std::vector<SearchResult> moves;
-  std::optional<Color> winner;
-
+struct GameStats {
   // Maximum nodes expanded in any one run.
   unsigned max_nodes_expanded = 0;
 
   // The average number of nodes expanded per search.
   float avg_nodes_expanded = 0;
+
+  // The average number of nodes visited per search.
+  unsigned max_nodes_visited = 0;
+
+  // The average number of nodes visited per search.
+  float avg_nodes_visited = 0;
 
   // The maximum depth of a branch explored during search.
   unsigned max_depth = 0;
@@ -31,6 +34,19 @@ struct GameResult {
 
   // The average number of milliseconds per search for the entire game.
   float millis_per_search = 0;
+
+  // Creats a debug string.
+  std::string
+  dbg() const;
+};
+
+struct GameResult {
+  Board game_start;
+  std::vector<SearchResult> moves;
+  std::optional<Color> winner;
+
+  GameStats
+  stats() const;
 };
 
 } // namespace blunder

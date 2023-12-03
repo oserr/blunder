@@ -63,6 +63,7 @@ add_library(blunder STATIC
   src/fen.cc
   src/fen.h
   src/game.h
+  src/game_result.cc
   src/game_result.h
   src/game_state.h
   src/hash.h
