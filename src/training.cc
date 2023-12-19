@@ -63,6 +63,9 @@ main(int argc, char** argv)
     }
   }
 
+  // On inference mode guard.
+  c10::InferenceMode inference_mode;
+
   auto net = std::make_shared<AlphaZeroNet>();
 
   auto evaluator = std::make_shared<AlphaZeroEvaluator>(
