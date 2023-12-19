@@ -124,6 +124,9 @@ struct AlphaZeroNet : public torch::nn::Module {
   PolicyNet policy_net;
   ValueNet value_net;
   std::vector<ResBlockNet> res_nets;
+
+  void
+  on_device(torch::Device device);
 };
 
 // TODO: implement a training loop.

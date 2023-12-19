@@ -166,6 +166,18 @@ AlphaZeroNet::forward(Tensor x)
   return {pol, val};
 }
 
+void
+AlphaZeroNet::on_device(torch::Device device)
+{
+  policy_net.to(device);
+  value_net.to(device);
+
+  for (auto& res_net: res_nets)
+    res_net.to(device);
+
+  to(device);
+}
+
 std::shared_ptr<AlphaZeroNet>
 train_net()
 {
