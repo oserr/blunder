@@ -65,6 +65,28 @@ public:
   { return 0; };
 };
 
+// Loads checkpoint parameters from a file onto a collection of output tensors.
+// @file_name The name of the file where the parameters are saved.
+// @out_params The output parameters where the checkpoint parameters are loaded
+// to. Note that Tensors are like pointers or wrappers in that they don't do
+// deep copies by default, so the output tensors point to underlying buffers.
+bool
+load_params(const fs::path& file_name, std::vector<torch::Tensor> out_params)
+{
+  if (out_params.empty())
+    return false;
+
+  std::vector<torch::Tensor> saved_params;
+  torch::load(saved_params, file_name.string());
+  if (saved_params.size() != out_params.size())
+    return false;
+
+  for (auto [saved_tensor, out_tensor] : views::zip(saved_params, out_params))
+    out_tensor.copy_(saved_tensor);
+
+  return true;
+}
+
 } // namespace
 
 //---------------
@@ -230,7 +252,34 @@ AlphaZeroNet::create_checkpoint(const fs::path& checkpoint_dir)
 bool
 AlphaZeroNet::load_checkpoint(const fs::path& checkpoint_dir)
 {
-  (void)checkpoint_dir;
+  // Check that the dir exists.
+  if (not fs::exists(checkpoint_dir) || not fs::is_directory(checkpoint_dir))
+    return false;
+
+  auto file_name = checkpoint_dir;
+
+  file_name.append("input-params.pt");
+  if (not load_params(file_name, parameters()))
+    return false;
+
+  file_name.replace_filename("policy-params.pt");
+  if (not load_params(file_name, policy_net.parameters()))
+    return false;
+
+  file_name.replace_filename("value-params.pt");
+  if (not load_params(file_name, value_net.parameters()))
+    return false;
+
+  std::string buff;
+  buff.reserve(32);
+  for (const auto [i, net] : views::enumerate(res_nets)) {
+    std::format_to(std::back_inserter(buff), "res-block-params-{}.pt", i);
+    file_name.replace_filename(buff);
+    if (not load_params(file_name.string(), net.parameters()))
+        return false;
+    buff.clear();
+  }
+
   return true;
 }
 
