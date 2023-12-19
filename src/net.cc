@@ -1,7 +1,11 @@
 #include "net.h"
 
+#include <filesystem>
 #include <format>
 #include <iostream>
+#include <iterator>
+#include <ranges>
+#include <system_error>
 
 namespace blunder {
 
@@ -20,6 +24,9 @@ using ::torch::nn::MSELoss;
 using ::torch::nn::CrossEntropyLoss;
 using ::torch::relu;
 using ::torch::tanh;
+
+namespace fs = std::filesystem;
+namespace views = std::ranges::views;
 
 inline Conv2d
 make_conv_nn()
@@ -176,6 +183,55 @@ AlphaZeroNet::on_device(torch::Device device)
     res_net.to(device);
 
   to(device);
+}
+
+bool
+AlphaZeroNet::create_checkpoint(const fs::path& checkpoint_dir)
+{
+  // Check that the dir does not exist or that it is empty.
+  if (fs::exists(checkpoint_dir) &&
+      (not fs::is_directory(checkpoint_dir) || not fs::is_empty(checkpoint_dir)))
+    return false;
+
+  std::error_code err;
+  fs::create_directories(checkpoint_dir, err);
+  if (err) return false;
+
+  // Turn on inference mode to create the checkpoint.
+  c10::InferenceMode inference_mode(true);
+
+  auto fpath = checkpoint_dir;
+
+  // Save the input params.
+  fpath.append("input-params.pt");
+  torch::save(parameters(), fpath.string());
+
+  // Save the policy head params.
+  fpath.replace_filename("policy-params.pt");
+  torch::save(policy_net.parameters(), fpath.string());
+
+  // Save the policy head params.
+  fpath.replace_filename("value-params.pt");
+  torch::save(value_net.parameters(), fpath.string());
+
+  // Save the residual block parameters.
+  std::string buff;
+  buff.reserve(32);
+  for (const auto [i, net] : views::enumerate(res_nets)) {
+    std::format_to(std::back_inserter(buff), "res-block-params-{}.pt", i);
+    fpath.replace_filename(buff);
+    torch::save(net.parameters(), fpath.string());
+    buff.clear();
+  }
+
+  return true;
+}
+
+bool
+AlphaZeroNet::load_checkpoint(const fs::path& checkpoint_dir)
+{
+  (void)checkpoint_dir;
+  return true;
 }
 
 std::shared_ptr<AlphaZeroNet>

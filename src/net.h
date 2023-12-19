@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <string_view>
 #include <utility>
 #include <vector>
@@ -127,6 +128,18 @@ struct AlphaZeroNet : public torch::nn::Module {
 
   void
   on_device(torch::Device device);
+
+  // @param checkpoint_dir is the name of a directory where the checkpoint is
+  // created. If the directory already exists, then it is expected to be empty.
+  // Returns true if the checkpoint is created, or false otherwise.
+  bool
+  create_checkpoint(const std::filesystem::path& checkpoint_dir);
+
+  // @param checkpoint_dir is the name of a directory where the checkpoint is
+  // contained. Returns true if the checkpoint is loaded successfully, or false
+  // otherwise.
+  bool
+  load_checkpoint(const std::filesystem::path& checkpoint_dir);
 };
 
 // TODO: implement a training loop.
