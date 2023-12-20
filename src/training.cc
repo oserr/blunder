@@ -16,6 +16,7 @@
 #include "mcts.h"
 #include "net.h"
 #include "simple_game.h"
+#include "timer.h"
 
 using namespace blunder;
 
@@ -73,17 +74,20 @@ main(int argc, char** argv)
           std::make_shared<AlphaZeroDecoder>(),
           std::make_shared<AlphaZeroEncoder>());
 
-  auto mcts = std::make_shared<Mcts>(std::move(evaluator), 300, 0);
+  auto mcts = std::make_shared<Mcts>(std::move(evaluator), 800, 0);
 
   Board::register_magics();
 
   std::cout << "Playing " << num_games << " of self play ..." << std::endl;
   for (unsigned j = 0; j < num_games; ++j) {
+    Timer timer;
+    timer.start();
     auto game = SimpleGame(
             std::make_unique<BlunderPlayer>(mcts),
             std::make_unique<BlunderPlayer>(mcts));
 
     auto result = game.play();
+    timer.end();
 
     if (not result.winner)
         std::cout << "Game " << j << " ended in a draw." << std::endl;
@@ -95,6 +99,8 @@ main(int argc, char** argv)
     }
 
     std::cout << result.stats().dbg() << std::endl;
+    std::cout << "game finished in " << timer.total_minutes()
+              << " minutes." << std::endl;
   }
 
   return EXIT_SUCCESS;
