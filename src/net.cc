@@ -279,7 +279,7 @@ AlphaZeroNet::load_checkpoint(const fs::path& checkpoint_dir)
     std::format_to(std::back_inserter(buff), "res-block-params-{:0>2}.pt", i);
     file_name.replace_filename(buff);
     if (not load_params(file_name.string(), net.parameters()))
-        return false;
+      return false;
     buff.clear();
   }
 
