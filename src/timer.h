@@ -24,6 +24,11 @@ inline Microseconds
 to_micros(T dur) noexcept
 { return std::chrono::duration_cast<Microseconds>(dur); }
 
+template<typename T>
+inline Minutes
+to_minutes(T dur) noexcept
+{ return std::chrono::duration_cast<Minutes>(dur); }
+
 class Timer {
 public:
   // Starts timing a new time interval.
@@ -57,6 +62,10 @@ public:
   std::int64_t
   total_micros() const
   { return to_micros(total_time).count(); }
+
+  std::int64_t
+  total_minutes() const
+  { return to_minutes(total_time).count(); }
 
 private:
 
