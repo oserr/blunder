@@ -55,6 +55,8 @@ add_library(blunder STATIC
   src/board.h
   src/board_path.h
   src/board_side.h
+  src/chess_data_set.cc
+  src/chess_data_set.h
   src/coding_util.cc
   src/coding_util.h
   src/color.h
