@@ -240,7 +240,7 @@ AlphaZeroNet::create_checkpoint(const fs::path& checkpoint_dir)
   std::string buff;
   buff.reserve(32);
   for (const auto [i, net] : views::enumerate(res_nets)) {
-    std::format_to(std::back_inserter(buff), "res-block-params-{}.pt", i);
+    std::format_to(std::back_inserter(buff), "res-block-params-{:0>2}.pt", i);
     fpath.replace_filename(buff);
     torch::save(net.parameters(), fpath.string());
     buff.clear();
@@ -255,6 +255,9 @@ AlphaZeroNet::load_checkpoint(const fs::path& checkpoint_dir)
   // Check that the dir exists.
   if (not fs::exists(checkpoint_dir) || not fs::is_directory(checkpoint_dir))
     return false;
+
+  // Turn on inference mode to load the checkpoint.
+  c10::InferenceMode inference_mode(true);
 
   auto file_name = checkpoint_dir;
 
@@ -273,7 +276,7 @@ AlphaZeroNet::load_checkpoint(const fs::path& checkpoint_dir)
   std::string buff;
   buff.reserve(32);
   for (const auto [i, net] : views::enumerate(res_nets)) {
-    std::format_to(std::back_inserter(buff), "res-block-params-{}.pt", i);
+    std::format_to(std::back_inserter(buff), "res-block-params-{:0>2}.pt", i);
     file_name.replace_filename(buff);
     if (not load_params(file_name.string(), net.parameters()))
         return false;
