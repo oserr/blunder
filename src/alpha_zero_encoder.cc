@@ -36,6 +36,15 @@ encode_pieces(int plane, const PieceSet& pieces, torch::Tensor& tensor) {
 
 } // namespace
 
+
+torch::Tensor
+AlphaZeroEncoder::encode_board(const Board& board) const
+{
+  EvalBoardPath board_path;
+  board_path.push(board);
+  return encode_state(board_path);
+}
+
 torch::Tensor
 AlphaZeroEncoder::encode_state(const EvalBoardPath& board_path) const
 {
@@ -120,6 +129,26 @@ AlphaZeroEncoder::encode_moves(std::span<const BoardProb> moves) const
     auto last_move = mv.board.last_move();
     assert(last_move.has_value());
     auto mv_code = encode_move(*last_move);
+    float prob = static_cast<float>(mv.visits) / total;
+    tensor.index_put_({mv_code.row, mv_code.col, mv_code.code}, prob);
+  }
+
+  return tensor;
+}
+
+torch::Tensor
+AlphaZeroEncoder::encode_moves(std::span<const MoveProb> moves) const
+{
+  assert(not moves.empty());
+
+  unsigned total = 0;
+  for (const auto& mv : moves)
+    total += mv.visits;
+
+  auto tensor = torch::zeros({8, 8, 73});
+
+  for (const auto& mv : moves) {
+    auto mv_code = encode_move(mv.mv);
     float prob = static_cast<float>(mv.visits) / total;
     tensor.index_put_({mv_code.row, mv_code.col, mv_code.code}, prob);
   }
