@@ -25,7 +25,9 @@ using TensorPair = std::pair<torch::Tensor, torch::Tensor>;
 // consist of a pair of tensors in the form of (policy target, value target) to
 // represent the expected policy and value targets.
 class ChessDataSet :
-  public torch::data::datasets::Dataset<ChessDataSet, torch::data::Example<torch::Tensor, TensorPair>>
+  public torch::data::datasets::Dataset<
+    ChessDataSet,
+    torch::data::Example<torch::Tensor, TensorPair>>
 {
 public:
   ChessDataSet(
