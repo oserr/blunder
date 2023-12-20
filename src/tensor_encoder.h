@@ -16,13 +16,21 @@ class TensorEncoder {
 public:
   virtual ~TensorEncoder() = default;
 
+  // Converts |board| into a Tensor.
+  virtual torch::Tensor
+  encode_board(const Board& board) const = 0;
+
   // Converts |board_path| into a Tensor.
   virtual torch::Tensor
   encode_state(const EvalBoardPath& board_path) const = 0;
 
-  // Converts |board_path| into a Tensor.
+  // Converts |moves| into a Tensor.
   virtual torch::Tensor
   encode_moves(std::span<const BoardProb> moves) const = 0;
+
+  // Converts |moves| into a Tensor.
+  virtual torch::Tensor
+  encode_moves(std::span<const MoveProb> moves) const = 0;
 };
 
 } // namespace blunder
