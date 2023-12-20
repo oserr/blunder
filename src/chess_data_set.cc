@@ -52,7 +52,8 @@ ChessDataSet::get(std::size_t index)
 
   auto policy_tensor = encoder->encode_moves(game_result->moves[index].moves);
 
-  torch::Tensor value_tensor = torch::full({1}, game_result->moves[index].value);
+  torch::Tensor value_tensor =
+      torch::full({1}, game_result->moves[index].value);
 
   return ExampleType(std::move(input_tensor),
                      std::make_pair(policy_tensor, value_tensor));
