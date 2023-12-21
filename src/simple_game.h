@@ -27,6 +27,10 @@ public:
   GameResult
   play() override;
 
+  void
+  flip_colors()
+  { wplayer.swap(bplayer); }
+
 private:
   // Player for white pieces.
   std::unique_ptr<Player> wplayer;
