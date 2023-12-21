@@ -18,8 +18,6 @@ using ::torch::nn::BatchNorm2dOptions;
 using ::torch::nn::Conv2d;
 using ::torch::nn::Conv2dOptions;
 using ::torch::nn::Linear;
-using ::torch::nn::MSELoss;
-using ::torch::nn::CrossEntropyLoss;
 using ::torch::relu;
 using ::torch::tanh;
 
