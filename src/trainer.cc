@@ -9,6 +9,7 @@
 #include "chess_data_set.h"
 #include "game_result.h"
 #include "net.h"
+#include "simple_game_builder.h"
 
 #include <torch/torch.h>
 
@@ -16,9 +17,26 @@ namespace blunder {
 
 // Plays the training games.
 std::vector<GameResult>
-Trainer::play_training_games() const
+Trainer::play_training_games(std::shared_ptr<AlphaZeroNet> net) const
 {
-  throw std::runtime_error("Not implemented yet");
+  c10::InferenceMode inference_mode(true);
+
+  auto game = SimpleGameBuilder()
+                .set_net(std::move(net))
+                .set_max_moves(max_moves_per_game)
+                .set_decoder(decoder)
+                .set_encoder(encoder)
+                .build();
+
+  std::vector<GameResult> game_results;
+  game_results.reserve(training_games);
+
+  for (unsigned i = 0; i < training_games; ++i) {
+    auto game_result = game.play();
+    game_results.push_back(std::move(game_result));
+  }
+
+  return game_results;
 }
 
 // Plays the tournament games.
@@ -100,7 +118,12 @@ Trainer::train_model() const
   return net;
 }
 
-// Runs the full training pipeline.
+// Runs the full training pipeline:
+// 1. Generates training data by playing games of self-play.
+// 2. Use the data from the games to train a new model.
+// 3. Play a tournament between the new agent and the old agent.
+// 4. If the the new agent has a sufficient winning percentage, then repeat 1-3
+// with the new agent, otherwise repeat with the same agent.
 void
 Trainer::do_training() const
 {
