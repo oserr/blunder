@@ -55,7 +55,7 @@ Trainer::train_model(
 {
   // TODO: don't create a new net, but used the one to generate the training
   // data.
-  auto trained_net = std::make_shared<AlphaZeroNet>(net);
+  auto trained_net = std::make_shared<AlphaZeroNet>(net.clone());
 
   ChessDataSet data_set(game_results, encoder);
 
