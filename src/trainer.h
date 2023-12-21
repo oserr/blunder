@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <memory>
+#include <span>
 #include <string_view>
 #include <utility>
 #include <vector>
@@ -40,9 +41,14 @@ private:
   std::vector<GameResult>
   play_tournament_games() const;
 
-  // Trains the model.
+  // Creates a new version of the model by training the current model.
+  // @param game_results A collection of games for use as training data.
+  // @param net The current version of the model.
+  // @return A new version of the model that is trained on game_results.
   std::shared_ptr<AlphaZeroNet>
-  train_model() const;
+  train_model(
+      std::span<const GameResult> game_results,
+      const AlphaZeroNet& net) const;
 
   // The total number of training games to use for each training session.
   unsigned training_games = 0;
@@ -67,7 +73,7 @@ private:
 
   // The location of the current model checkpoint. This is necessary after
   // training an agent
-  mutable std::string current_model_checkpoint;
+  mutable std::string model_params_dir;
 
   std::shared_ptr<TensorDecoder> decoder = nullptr;
   std::shared_ptr<TensorEncoder> encoder = nullptr;

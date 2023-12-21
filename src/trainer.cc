@@ -1,6 +1,7 @@
 #include "trainer.h"
 
 #include <memory>
+#include <span>
 #include <stdexcept>
 #include <utility>
 #include <vector>
@@ -48,16 +49,14 @@ Trainer::play_tournament_games() const
 
 // Trains the model.
 std::shared_ptr<AlphaZeroNet>
-Trainer::train_model() const
+Trainer::train_model(
+    std::span<const GameResult> game_results,
+    const AlphaZeroNet& net) const
 {
   // TODO: don't create a new net, but used the one to generate the training
   // data.
-  auto net = std::make_shared<AlphaZeroNet>();
+  auto trained_net = std::make_shared<AlphaZeroNet>(net);
 
-  // Create the encoder.
-  auto encoder = std::make_shared<AlphaZeroEncoder>();
-
-  std::vector<GameResult> game_results;
   ChessDataSet data_set(game_results, encoder);
 
   // Create a multi-threaded data loader for the MNIST dataset.
@@ -68,7 +67,7 @@ Trainer::train_model() const
       /*batch_size=*/64);
 
   // Instantiate an SGD optimization algorithm to update our Net's parameters.
-  torch::optim::SGD optimizer(net->parameters(), /*lr=*/0.01);
+  torch::optim::SGD optimizer(trained_net->parameters(), /*lr=*/0.01);
 
   for (size_t epoch = 1; epoch <= 10; ++epoch) {
     size_t batch_index = 0;
@@ -82,7 +81,7 @@ Trainer::train_model() const
         optimizer.zero_grad();
 
         // Execute the model on the input data.
-        auto [policy_pred, value_pred] = net->forward(example.data);
+        auto [policy_pred, value_pred] = trained_net->forward(example.data);
 
         // Get the target values from self play.
         auto& [policy_target, value_target] = example.target;
@@ -110,12 +109,12 @@ Trainer::train_model() const
 
           // TODO: create checkpoint correctly. The name needs to be different
           // for each checkpoint.
-          torch::save(net, "net.pt");
+          trained_net->create_checkpoint("net.pt");
         }
       }
     }
   }
-  return net;
+  return trained_net;
 }
 
 // Runs the full training pipeline:
