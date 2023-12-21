@@ -114,17 +114,22 @@ struct ValueNet : public torch::nn::Module {
 // TODO: figure out how to enable the network to operate in inference mode to
 // make computations more efficient:
 // https://pytorch.org/cppdocs/notes/inference_mode.html.
-struct AlphaZeroNet : public torch::nn::Module {
+class AlphaZeroNet : public torch::nn::Module {
+public:
   AlphaZeroNet();
+
+  // Copy ctor.
+  AlphaZeroNet(const AlphaZeroNet& net) = delete;
+
+  // Move ctor.
+  AlphaZeroNet(AlphaZeroNet&& net) = default;
+
+  // Creates a new instance of AlphaZeroNet by cloning itself.
+  AlphaZeroNet
+  clone() const;
 
   std::pair<torch::Tensor, torch::Tensor>
   forward(torch::Tensor x);
-
-  torch::nn::Conv2d conv = nullptr;
-  torch::nn::BatchNorm2d bnorm = nullptr;
-  PolicyNet policy_net;
-  ValueNet value_net;
-  std::vector<ResBlockNet> res_nets;
 
   void
   on_device(torch::Device device);
@@ -140,6 +145,14 @@ struct AlphaZeroNet : public torch::nn::Module {
   // otherwise.
   bool
   load_checkpoint(const std::filesystem::path& checkpoint_dir);
+
+private:
+  torch::nn::Conv2d conv = nullptr;
+  torch::nn::BatchNorm2d bnorm = nullptr;
+  PolicyNet policy_net;
+  ValueNet value_net;
+  std::vector<ResBlockNet> res_nets;
+
 };
 
 } // namespace blunder

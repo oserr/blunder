@@ -65,6 +65,20 @@ public:
   { return 0; };
 };
 
+bool
+clone_params(
+    std::vector<torch::Tensor> from_params,
+    std::vector<torch::Tensor> to_params)
+{
+  if (from_params.size() != to_params.size())
+    return false;
+
+  for (auto [from_tensor, to_tensor] : views::zip(from_params, to_params))
+    to_tensor.copy_(from_tensor);
+
+  return true;
+}
+
 // Loads checkpoint parameters from a file onto a collection of output tensors.
 // @file_name The name of the file where the parameters are saved.
 // @out_params The output parameters where the checkpoint parameters are loaded
@@ -78,13 +92,7 @@ load_params(const fs::path& file_name, std::vector<torch::Tensor> out_params)
 
   std::vector<torch::Tensor> saved_params;
   torch::load(saved_params, file_name.string());
-  if (saved_params.size() != out_params.size())
-    return false;
-
-  for (auto [saved_tensor, out_tensor] : views::zip(saved_params, out_params))
-    out_tensor.copy_(saved_tensor);
-
-  return true;
+  return clone_params(std::move(saved_params), std::move(out_params));
 }
 
 } // namespace
@@ -284,6 +292,13 @@ AlphaZeroNet::load_checkpoint(const fs::path& checkpoint_dir)
   }
 
   return true;
+}
+
+AlphaZeroNet
+AlphaZeroNet::clone() const
+{
+  AlphaZeroNet other_net;
+  return other_net;
 }
 
 } // namespace blunder
