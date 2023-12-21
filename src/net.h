@@ -142,8 +142,4 @@ struct AlphaZeroNet : public torch::nn::Module {
   load_checkpoint(const std::filesystem::path& checkpoint_dir);
 };
 
-// TODO: implement a training loop.
-std::shared_ptr<AlphaZeroNet>
-train_net();
-
 } // namespace blunder
