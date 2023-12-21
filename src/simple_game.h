@@ -39,6 +39,8 @@ private:
   std::unique_ptr<Player> bplayer;
 
   unsigned max_moves;
+
+  friend class SimpleGameBuilder;
 };
 
 } // namespace blunder

@@ -92,6 +92,8 @@ add_library(blunder STATIC
   src/search_result.h
   src/simple_game.cc
   src/simple_game.h
+  src/simple_game_builder.cc
+  src/simple_game_builder.h
   src/square.cc
   src/square.h
   src/square_iter.h
