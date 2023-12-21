@@ -298,6 +298,22 @@ AlphaZeroNet
 AlphaZeroNet::clone() const
 {
   AlphaZeroNet other_net;
+
+  if (not clone_params(parameters(), other_net.parameters()))
+    throw std::runtime_error("Unable clone input params");
+
+  if (not clone_params(
+        policy_net.parameters(), other_net.policy_net.parameters()))
+    throw std::runtime_error("Unable clone policy network params.");
+
+  if (not clone_params(
+        value_net.parameters(), other_net.value_net.parameters()))
+    throw std::runtime_error("Unable clone value network params.");
+
+  for (auto [from, to] : views::zip(res_nets, other_net.res_nets)) {
+    if (not clone_params(from.parameters(), to.parameters()))
+      throw std::runtime_error("Unable clone residual network params.");
+  }
   return other_net;
 }
 
