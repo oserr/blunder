@@ -46,14 +46,22 @@ ChessDataSet::get(std::size_t index)
   if (not game_result)
     throw std::runtime_error("Unable to find the game_result for index.");
 
-  auto input_tensor = encoder->encode_board(index == 0
+  const auto& board = index == 0
       ? game_result->game_start
-      : game_result->moves[index-1].best.board);
+      : game_result->moves[index-1].best.board;
 
+  auto input_tensor = encoder->encode_board(board);
   auto policy_tensor = encoder->encode_moves(game_result->moves[index].moves);
 
-  torch::Tensor value_tensor =
-      torch::full({1}, game_result->moves[index].value);
+  // Compute the actual value from the game result.
+  float value = 0;
+  if (game_result->winner == Color::White) {
+    value = board.is_white_next() ? 1 : -1;
+  } else if (game_result->winner == Color::Black) {
+    value = board.is_white_next() ? -1 : 1;
+  }
+
+  torch::Tensor value_tensor = torch::full({1}, value);
 
   return ExampleType(std::move(input_tensor),
                      std::make_pair(policy_tensor, value_tensor));
