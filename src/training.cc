@@ -8,14 +8,9 @@
 #include <string_view>
 #include <unistd.h>
 
-#include "alpha_zero_decoder.h"
-#include "alpha_zero_encoder.h"
-#include "alpha_zero_evaluator.h"
 #include "board.h"
-#include "blunder_player.h"
-#include "mcts.h"
 #include "net.h"
-#include "simple_game.h"
+#include "simple_game_builder.h"
 #include "timer.h"
 
 using namespace blunder;
@@ -25,7 +20,7 @@ print_help(std::string_view prog, std::ostream& os)
 {
   os << "Usage: " << prog << " [options] ...\n"
      << "   -h|--help   Print this help message.\n"
-     << "   -g|--games  The totla number of games to train for.\n"
+     << "   -g|--games  The total number of games to train for.\n"
      << std::endl;
 }
 
@@ -67,25 +62,15 @@ main(int argc, char** argv)
   // On inference mode guard.
   c10::InferenceMode inference_mode;
 
-  auto net = std::make_shared<AlphaZeroNet>();
-
-  auto evaluator = std::make_shared<AlphaZeroEvaluator>(
-          std::move(net),
-          std::make_shared<AlphaZeroDecoder>(),
-          std::make_shared<AlphaZeroEncoder>());
-
-  auto mcts = std::make_shared<Mcts>(std::move(evaluator), 800, 0);
-
   Board::register_magics();
+
+  auto net = std::make_shared<AlphaZeroNet>();
+  auto game = SimpleGameBuilder().set_net(std::move(net)).build();
 
   std::cout << "Playing " << num_games << " of self play ..." << std::endl;
   for (unsigned j = 0; j < num_games; ++j) {
     Timer timer;
     timer.start();
-    auto game = SimpleGame(
-            std::make_unique<BlunderPlayer>(mcts),
-            std::make_unique<BlunderPlayer>(mcts));
-
     auto result = game.play();
     timer.end();
 
