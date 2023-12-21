@@ -75,12 +75,12 @@ main(int argc, char** argv)
     timer.end();
 
     if (not result.winner)
-        std::cout << "Game " << j << " ended in a draw." << std::endl;
+      std::cout << "Game " << j << " ended in a draw." << std::endl;
     else {
-        std::cout << "Game " << j << " ended with "
-                  << (*result.winner == Color::White ? "WHITE" : "BLACK")
-                  << " as winner in " << result.moves.size()
-                  << '!' << std::endl;
+      std::cout << "Game " << j << " ended with "
+                << (*result.winner == Color::White ? "WHITE" : "BLACK")
+                << " as winner in " << result.moves.size()
+                << '!' << std::endl;
     }
 
     std::cout << result.stats().dbg() << std::endl;
