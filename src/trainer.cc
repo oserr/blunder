@@ -32,14 +32,8 @@ Trainer::play_tournament_games() const
 std::shared_ptr<AlphaZeroNet>
 Trainer::train_model() const
 {
-  throw std::runtime_error("Not implemented yet");
-}
-
-// Runs the full training pipeline.
-void
-Trainer::do_training() const
-{
-  // Create a new Net.
+  // TODO: don't create a new net, but used the one to generate the training
+  // data.
   auto net = std::make_shared<AlphaZeroNet>();
 
   // Create the encoder.
@@ -103,6 +97,14 @@ Trainer::do_training() const
       }
     }
   }
+  return net;
+}
+
+// Runs the full training pipeline.
+void
+Trainer::do_training() const
+{
+  throw std::runtime_error("Not implemented yet");
 }
 
 } // namespace blunder
