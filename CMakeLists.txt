@@ -101,7 +101,9 @@ add_library(blunder STATIC
   src/timer.h
   src/time_types.h
   src/terminal_player.h
-  src/terminal_player.cc)
+  src/terminal_player.cc
+  src/trainer.h
+  src/trainer.cc)
 set_target_properties(blunder PROPERTIES CXX_STANDARD 23)
 target_compile_options(blunder PUBLIC ${TORCH_CXX_FLAGS})
 target_include_directories(blunder PUBLIC ${TORCH_INCLUDE_DIRS})
