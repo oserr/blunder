@@ -12,8 +12,6 @@ namespace blunder {
 namespace {
 
 using ::torch::Tensor;
-using ::torch::data::datasets::Dataset;
-using ::torch::data::Example;
 using ::torch::flatten;
 using ::torch::nn::BatchNorm2d;
 using ::torch::nn::BatchNorm2dOptions;
@@ -39,36 +37,8 @@ inline BatchNorm2d
 make_bnorm()
 { return BatchNorm2d(BatchNorm2dOptions(256)); }
 
-using TensorPair = std::pair<Tensor, Tensor>;
-
-// TODO: When we begin to generate training data through self play, we'll save
-// the game history, and this custom loader will need to read the data and
-// convert it to tensors.
-//
-// Placer holder code for a custom dataset to use with a dataloader.
-// Each example will consists of the input to the network, i.e. an 8x8x119 stack
-// of planes representing the current chess position, and the target will
-// consist of a pair of tensors, one to represent the value and the other to
-// represent the move policy.
-class ChessDataset :
-  public Dataset<ChessDataset, Example<Tensor, TensorPair>>
-{
-public:
-  //static constexpr bool is_stateful = false;
-
-  ExampleType
-  get(size_t) override
-  { return ExampleType(); }
-
-  torch::optional<size_t>
-  size() const override
-  { return 0; };
-};
-
 bool
-clone_params(
-    std::vector<torch::Tensor> from_params,
-    std::vector<torch::Tensor> to_params)
+clone_params(std::vector<Tensor> from_params, std::vector<Tensor> to_params)
 {
   if (from_params.size() != to_params.size())
     return false;
@@ -85,12 +55,12 @@ clone_params(
 // to. Note that Tensors are like pointers or wrappers in that they don't do
 // deep copies by default, so the output tensors point to underlying buffers.
 bool
-load_params(const fs::path& file_name, std::vector<torch::Tensor> out_params)
+load_params(const fs::path& file_name, std::vector<Tensor> out_params)
 {
   if (out_params.empty())
     return false;
 
-  std::vector<torch::Tensor> saved_params;
+  std::vector<Tensor> saved_params;
   torch::load(saved_params, file_name.string());
   return clone_params(std::move(saved_params), std::move(out_params));
 }
