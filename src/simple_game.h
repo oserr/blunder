@@ -14,9 +14,15 @@ class SimpleGame : public Game {
 public:
   SimpleGame(
       std::unique_ptr<Player> white_player,
-      std::unique_ptr<Player> black_player)
+      std::unique_ptr<Player> black_player,
+      unsigned max_moves = 300)
     : wplayer(std::move(white_player)),
-      bplayer(std::move(black_player)) {}
+      bplayer(std::move(black_player)),
+      max_moves(max_moves)
+  {
+    if (not max_moves)
+      throw std::invalid_argument("max_moves cannot be zero");
+  }
 
   GameResult
   play() override;
@@ -27,6 +33,8 @@ private:
 
   // Player for black pieces.
   std::unique_ptr<Player> bplayer;
+
+  unsigned max_moves;
 };
 
 } // namespace blunder

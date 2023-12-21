@@ -15,8 +15,7 @@ GameResult
 SimpleGame::play()
 {
   GameResult game_result;
-  // TODO: get the 300 programmatically.
-  game_result.moves.reserve(300);
+  game_result.moves.reserve(max_moves);
   game_result.game_start = Board::new_board();
   GameBoardPath game_path;
   game_path.push(game_result.game_start);
