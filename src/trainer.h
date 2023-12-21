@@ -51,19 +51,22 @@ private:
       const AlphaZeroNet& net) const;
 
   // The total number of training games to use for each training session.
-  unsigned training_games = 0;
+  unsigned training_epochs = 10;
+
+  // The total number of training games to use for each training session.
+  unsigned training_games = 1000;
 
   // The total number of tournament games to play between two models.
-  unsigned tournament_games = 0;
+  unsigned tournament_games = 400;
 
   // The minimum win rate required for a new model to replace the current model.
-  float min_win_rate = 0.0;
+  float min_win_rate = 0.55;
 
   // The number of steps to take before creating a checkpoint for the model.
   unsigned checkpoint_steps = 100;
 
   // The number of steps to take before creating a checkpoint for the model.
-  unsigned batch_size = 64;
+  unsigned batch_size = 32;
 
   // Maximum number of moves per game before game is drawn.
   unsigned max_moves_per_game = 300;
