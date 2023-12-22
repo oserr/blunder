@@ -83,7 +83,7 @@ private:
 
   // The location of the current model checkpoint. This is necessary after
   // training an agent
-  mutable std::string model_params_dir;
+  std::string model_params_dir;
 
   // The current champion network.
   std::shared_ptr<AlphaZeroNet> champion = nullptr;
