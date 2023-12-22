@@ -89,6 +89,7 @@ private:
   std::shared_ptr<TensorDecoder> decoder = nullptr;
   std::shared_ptr<TensorEncoder> encoder = nullptr;
 
+  friend class TrainerBuilder;
   // TODO: Add other configuration parameters, e.g. learning rate, etc.
 };
 
