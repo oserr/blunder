@@ -3,7 +3,7 @@
 #include <cassert>
 #include <memory>
 #include <span>
-#include <string_view>
+#include <string>
 #include <utility>
 #include <vector>
 

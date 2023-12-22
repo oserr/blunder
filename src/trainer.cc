@@ -1,7 +1,10 @@
 #include "trainer.h"
 
+#include <filesystem>
+#include <format>
 #include <memory>
 #include <span>
+#include <string>
 #include <stdexcept>
 #include <utility>
 #include <vector>
@@ -15,6 +18,8 @@
 #include <torch/torch.h>
 
 namespace blunder {
+
+namespace fs = std::filesystem;
 
 // Plays the training games.
 std::vector<GameResult>
@@ -53,8 +58,6 @@ Trainer::train_model(
     std::span<const GameResult> game_results,
     const AlphaZeroNet& net) const
 {
-  // TODO: don't create a new net, but used the one to generate the training
-  // data.
   auto trained_net = std::make_shared<AlphaZeroNet>(net.clone());
 
   ChessDataSet data_set(game_results, encoder);
@@ -68,6 +71,11 @@ Trainer::train_model(
 
   // Instantiate an SGD optimization algorithm to update our Net's parameters.
   torch::optim::SGD optimizer(trained_net->parameters(), /*lr=*/0.01);
+
+  unsigned num_checkpoint = 0;
+  fs::path dir_path(checkpoint_dir);
+  std::string dir_name;
+  dir_name.reserve(32);
 
   for (size_t epoch = 1; epoch <= training_epochs; ++epoch) {
     size_t batch_index = 0;
@@ -107,9 +115,12 @@ Trainer::train_model(
                     << " | Loss: " << loss.item<float>()
                     << std::endl;
 
-          // TODO: create checkpoint correctly. The name needs to be different
-          // for each checkpoint.
-          trained_net->create_checkpoint("net.pt");
+          std::format_to(
+              std::back_inserter(dir_name), "model-{:0>4}.pt", num_checkpoint);
+          trained_net->create_checkpoint(dir_path / dir_name);
+
+          // Clear the dir_name so we can reuse the buffer.
+          dir_name.clear();
         }
       }
     }
