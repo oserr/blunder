@@ -7,6 +7,7 @@
 #include <utility>
 #include <vector>
 
+#include "net.h"
 #include "game_result.h"
 #include "net.h"
 #include "search.h"
@@ -77,6 +78,9 @@ private:
   // The location of the current model checkpoint. This is necessary after
   // training an agent
   mutable std::string model_params_dir;
+
+  // The current champion network.
+  std::shared_ptr<AlphaZeroNet> champion = nullptr;
 
   std::shared_ptr<TensorDecoder> decoder = nullptr;
   std::shared_ptr<TensorEncoder> encoder = nullptr;

@@ -117,8 +117,11 @@ Trainer::train_model(
                   << std::endl;
 
         std::format_to(
-            std::back_inserter(dir_name), "model-{:0>4}.pt", num_checkpoint);
+            std::back_inserter(dir_name), "model-{:0>4}", num_checkpoint);
         trained_net->create_checkpoint(dir_path / dir_name);
+
+        auto file_name = std::format("optim-{:0>4}.pt", num_checkpoint);
+        torch::save(optimizer, dir_path / dir_name / file_name);
 
         // Clear the dir_name so we can reuse the buffer.
         dir_name.clear();
