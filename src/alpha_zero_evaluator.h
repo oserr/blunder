@@ -25,7 +25,7 @@ public:
     assert(this->net);
     assert(this->tensor_decoder);
     assert(this->tensor_encoder);
-    this->net->eval();
+    this->net->set_eval_mode();
   }
 
   Prediction
