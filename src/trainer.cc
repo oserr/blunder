@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <format>
+#include <iterator>
 #include <memory>
 #include <span>
 #include <string>
@@ -20,6 +21,8 @@
 namespace blunder {
 
 namespace fs = std::filesystem;
+
+using torch::data::transforms::Collate;
 
 // Plays the training games.
 std::vector<GameResult>
@@ -58,18 +61,20 @@ Trainer::train_model(
     std::span<const GameResult> game_results,
     const AlphaZeroNet& net) const
 {
+  // Disable inference mode.
+  c10::InferenceMode inference_mode(false);
+
   auto trained_net = std::make_shared<AlphaZeroNet>(net.clone());
+  trained_net->train();
 
   ChessDataSet data_set(game_results, encoder);
 
-  // Create a multi-threaded data loader for the MNIST dataset.
   auto data_loader = torch::data::make_data_loader(
-      //torch::data::datasets::MNIST("./data").map(
-      //    torch::data::transforms::Stack<>()),
-      std::move(data_set),
-      /*batch_size=*/64);
+      std::move(data_set).map(Collate<ChessDataExample>(stack_examples)),
+      batch_size);
 
   // Instantiate an SGD optimization algorithm to update our Net's parameters.
+  // TODO: experiment with updating the learning rate.
   torch::optim::SGD optimizer(trained_net->parameters(), /*lr=*/0.01);
 
   unsigned num_checkpoint = 0;
@@ -81,50 +86,46 @@ Trainer::train_model(
     size_t batch_index = 0;
     // Iterate the data loader to yield batches from the dataset.
     for (auto& batch : *data_loader) {
-      // TODO: define a function to stack Elements when we create the data
-      // loader, so we can operate on the whole batch rather than individual
-      // examples. For now do this to get it to compile.
-      for (auto& example : batch) {
-        // Reset gradients.
-        optimizer.zero_grad();
+      // Reset gradients.
+      optimizer.zero_grad();
 
-        // Execute the model on the input data.
-        auto [policy_pred, value_pred] = trained_net->forward(example.data);
+      // Execute the model on the input data.
+      auto [policy_pred, value_pred] = trained_net->forward(batch.data);
 
-        // Get the target values from self play.
-        auto& [policy_target, value_target] = example.target;
+      // Get the target values from self play.
+      auto& [policy_target, value_target] = batch.target;
 
-        // TODO: compute loss for value
-        torch::nn::MSELoss mse_loss;
-        auto value_loss = mse_loss(value_pred, value_target);
+      // TODO: compute loss for value
+      torch::nn::MSELoss mse_loss;
+      auto value_loss = mse_loss(value_pred, value_target);
 
-        torch::nn::CrossEntropyLoss ce_loss;
-        auto policy_loss = ce_loss(policy_pred, policy_target);
+      torch::nn::CrossEntropyLoss ce_loss;
+      auto policy_loss = ce_loss(policy_pred, policy_target);
 
-        // TODO: add L2 regularization.
-        auto loss = value_loss + policy_loss;
-        loss.backward();
+      // TODO: add L2 regularization.
+      auto loss = value_loss + policy_loss;
+      loss.backward();
 
-        // Update the parameters based on the calculated gradients.
-        optimizer.step();
+      // Update the parameters based on the calculated gradients.
+      optimizer.step();
 
-        // Output the loss and checkpoint every batches.
-        if (++batch_index % checkpoint_steps == 0) {
-          std::cout << "Epoch: " << epoch
-                    << " | Batch: " << batch_index
-                    << " | Loss: " << loss.item<float>()
-                    << std::endl;
+      // Output the loss and checkpoint every batches.
+      if (++batch_index % checkpoint_steps == 0) {
+        std::cout << "Epoch: " << epoch
+                  << " | Batch: " << batch_index
+                  << " | Loss: " << loss.item<float>()
+                  << std::endl;
 
-          std::format_to(
-              std::back_inserter(dir_name), "model-{:0>4}.pt", num_checkpoint);
-          trained_net->create_checkpoint(dir_path / dir_name);
+        std::format_to(
+            std::back_inserter(dir_name), "model-{:0>4}.pt", num_checkpoint);
+        trained_net->create_checkpoint(dir_path / dir_name);
 
-          // Clear the dir_name so we can reuse the buffer.
-          dir_name.clear();
-        }
+        // Clear the dir_name so we can reuse the buffer.
+        dir_name.clear();
       }
     }
   }
+
   return trained_net;
 }
 
