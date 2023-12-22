@@ -49,10 +49,37 @@ Trainer::play_training_games(std::shared_ptr<AlphaZeroNet> net) const
 }
 
 // Plays the tournament games.
-std::vector<GameResult>
-Trainer::play_tournament_games() const
+MatchStats
+Trainer::play_tournament_games(std::shared_ptr<AlphaZeroNet> contender) const
 {
-  throw std::runtime_error("Not implemented yet");
+  c10::InferenceMode inference_mode(true);
+
+  auto game = SimpleGameBuilder()
+                .set_white_net(champion)
+                .set_black_net(std::move(contender))
+                .set_max_moves(max_moves_per_game)
+                .set_decoder(decoder)
+                .set_encoder(encoder)
+                .build();
+
+  MatchStats stats;
+  auto* white = &stats.champion_wins;
+  auto* black = &stats.contender_wins;
+
+  for (unsigned i = 0; i < tournament_games; ++i) {
+    auto game_result = game.play();
+    if (game_result.winner == Color::White)
+      *white += 1;
+    else if (game_result.winner == Color::Black)
+      *black += 1;
+    else
+      stats.draws += 1;
+
+    game.flip_colors();
+    std::swap(white, black);
+  }
+
+  return stats;
 }
 
 // Trains the model.

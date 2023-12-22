@@ -17,6 +17,12 @@
 
 namespace blunder {
 
+struct MatchStats {
+  unsigned champion_wins = 0;
+  unsigned contender_wins = 0;
+  unsigned draws = 0;
+};
+
 class Trainer {
 public:
   // Initializes the Trainer.
@@ -39,8 +45,8 @@ private:
   play_training_games(std::shared_ptr<AlphaZeroNet> net) const;
 
   // Plays the tournament games.
-  std::vector<GameResult>
-  play_tournament_games() const;
+  MatchStats
+  play_tournament_games(std::shared_ptr<AlphaZeroNet> contender) const;
 
   // Creates a new version of the model by training the current model.
   // @param game_results A collection of games for use as training data.
