@@ -5,6 +5,7 @@
 #include <span>
 #include <stdexcept>
 #include <utility>
+#include <vector>
 
 #include "game_result.h"
 #include "tensor_encoder.h"
@@ -14,6 +15,7 @@
 namespace blunder {
 
 using TensorPair = std::pair<torch::Tensor, torch::Tensor>;
+using ChessDataExample = torch::data::Example<torch::Tensor, TensorPair>;
 
 // TODO: When we begin to generate training data through self play, we'll save
 // the game history, and this custom loader will need to read the data and
@@ -25,9 +27,7 @@ using TensorPair = std::pair<torch::Tensor, torch::Tensor>;
 // consist of a pair of tensors in the form of (policy target, value target) to
 // represent the expected policy and value targets.
 class ChessDataSet :
-  public torch::data::datasets::Dataset<
-    ChessDataSet,
-    torch::data::Example<torch::Tensor, TensorPair>>
+  public torch::data::datasets::Dataset<ChessDataSet, ChessDataExample>
 {
 public:
   ChessDataSet(
@@ -50,5 +50,10 @@ private:
   std::shared_ptr<TensorEncoder> encoder;
   std::size_t num_examples = 0;
 };
+
+// Converts a collection of ChessDataExamples into a single Example by stacking
+// all the tensors as a single tensor.
+ChessDataExample
+stack_examples(std::vector<ChessDataExample> examples);
 
 } // namespace blunder

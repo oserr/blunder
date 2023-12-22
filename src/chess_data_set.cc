@@ -13,6 +13,8 @@
 
 namespace blunder {
 
+using torch::Tensor;
+
 ChessDataSet::ChessDataSet(
     std::span<const GameResult> game_results,
     std::shared_ptr<TensorEncoder> encoder)
@@ -61,10 +63,32 @@ ChessDataSet::get(std::size_t index)
     value = board.is_white_next() ? -1 : 1;
   }
 
-  torch::Tensor value_tensor = torch::full({1}, value);
+  Tensor value_tensor = torch::full({1}, value);
 
   return ExampleType(std::move(input_tensor),
                      std::make_pair(policy_tensor, value_tensor));
+}
+
+ChessDataExample
+stack_examples(std::vector<ChessDataExample> examples)
+{
+  std::vector<Tensor> data;
+  std::vector<Tensor> policies;
+  std::vector<Tensor> values;
+  data.reserve(examples.size());
+  policies.reserve(examples.size());
+  values.reserve(examples.size());
+
+  for (auto example : examples) {
+    data.push_back(std::move(example.data));
+    auto& [policy, value] = example.target;
+    policies.push_back(std::move(policy));
+    values.push_back(std::move(value));
+  }
+
+  return ChessDataExample(
+      torch::stack(data),
+      std::make_pair(torch::stack(policies), torch::stack(values)));
 }
 
 } // namespace blunder
