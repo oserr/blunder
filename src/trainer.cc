@@ -65,7 +65,7 @@ Trainer::train_model(
   c10::InferenceMode inference_mode(false);
 
   auto trained_net = std::make_shared<AlphaZeroNet>(net.clone());
-  trained_net->train();
+  trained_net->set_training_mode();
 
   ChessDataSet data_set(game_results, encoder);
 
