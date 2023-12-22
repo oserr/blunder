@@ -146,6 +146,14 @@ public:
   bool
   load_checkpoint(const std::filesystem::path& checkpoint_dir);
 
+  // Enables eval mode.
+  void
+  set_eval_mode();
+
+  // Enables training mode.
+  void
+  set_training_mode();
+
 private:
   torch::nn::Conv2d conv = nullptr;
   torch::nn::BatchNorm2d bnorm = nullptr;

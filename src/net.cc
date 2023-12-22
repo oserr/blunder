@@ -285,4 +285,24 @@ AlphaZeroNet::clone() const
   return other_net;
 }
 
+void
+AlphaZeroNet::set_eval_mode()
+{
+  eval();
+  policy_net.eval();
+  value_net.eval();
+  for (auto& res_net : res_nets)
+    res_net.eval();
+}
+
+void
+AlphaZeroNet::set_training_mode()
+{
+  train();
+  policy_net.train();
+  value_net.train();
+  for (auto& res_net : res_nets)
+    res_net.train();
+}
+
 } // namespace blunder
