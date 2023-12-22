@@ -160,7 +160,6 @@ private:
   PolicyNet policy_net;
   ValueNet value_net;
   std::vector<ResBlockNet> res_nets;
-
 };
 
 } // namespace blunder
