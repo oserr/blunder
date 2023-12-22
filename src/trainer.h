@@ -25,21 +25,15 @@ struct MatchStats {
 
 class Trainer {
 public:
-  // Initializes the Trainer.
-  // TODO: create a TrainingBuilder to build the Trainer agent.
-  Trainer(
-      unsigned training_games,
-      unsigned tournament_games,
-      float min_win_rate)
-    : training_games(training_games),
-      tournament_games(tournament_games),
-      min_win_rate(min_win_rate) {}
-
   // Runs the full training pipeline.
   void
-  do_training() const;
+  train() const;
 
 private:
+  // Make this private to force clients to use the builder.
+  // TODO: create a TrainingBuilder to build the Trainer agent.
+  Trainer();
+
   // Plays the training games.
   std::vector<GameResult>
   play_training_games(std::shared_ptr<AlphaZeroNet> net) const;

@@ -166,7 +166,7 @@ Trainer::train_model(
 // 4. If the the new agent has a sufficient winning percentage, then repeat 1-3
 // with the new agent, otherwise repeat with the same agent.
 void
-Trainer::do_training() const
+Trainer::train() const
 {
   throw std::runtime_error("Not implemented yet");
 }
