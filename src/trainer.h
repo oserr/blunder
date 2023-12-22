@@ -57,7 +57,11 @@ private:
       std::span<const GameResult> game_results,
       const AlphaZeroNet& net) const;
 
-  // The total number of training games to use for each training session.
+  // The total number of training sessions. Each session consists of a round of
+  // training games, model training, and tournament games.
+  unsigned training_sessions = 10;
+
+  // The total number of training epochs to use during model training.
   unsigned training_epochs = 10;
 
   // The total number of training games to use for each training session.
