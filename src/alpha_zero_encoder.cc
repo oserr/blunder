@@ -59,7 +59,8 @@ AlphaZeroEncoder::encode_state(const EvalBoardPath& board_path) const
   // with grad disabled.
   //
   // See https://pytorch.org/cppdocs/notes/tensor_creation.html.
-  auto tensor = torch::zeros({119, 8, 8});
+  auto tensor = torch::zeros({119, 8, 8},
+                             torch::requires_grad(with_grad_enabled));
   int plane = 0;
 
   if (root.is_white_next()) {
@@ -123,7 +124,8 @@ AlphaZeroEncoder::encode_moves(std::span<const BoardProb> moves) const
   for (const auto& mv : moves)
     total += mv.visits;
 
-  auto tensor = torch::zeros({8, 8, 73});
+  auto tensor = torch::zeros({8, 8, 73},
+                             torch::requires_grad(with_grad_enabled));
 
   for (const auto& mv : moves) {
     auto last_move = mv.board.last_move();
@@ -145,7 +147,8 @@ AlphaZeroEncoder::encode_moves(std::span<const MoveProb> moves) const
   for (const auto& mv : moves)
     total += mv.visits;
 
-  auto tensor = torch::zeros({8, 8, 73});
+  auto tensor = torch::zeros({8, 8, 73},
+                             torch::requires_grad(with_grad_enabled));
 
   for (const auto& mv : moves) {
     auto mv_code = encode_move(mv.mv);
