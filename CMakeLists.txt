@@ -106,6 +106,7 @@ add_library(blunder STATIC
   src/terminal_player.cc
   src/trainer.h
   src/trainer.cc
+  src/trainer_builder.cc
   src/trainer_builder.h)
 set_target_properties(blunder PROPERTIES CXX_STANDARD 23)
 target_compile_options(blunder PUBLIC ${TORCH_CXX_FLAGS})
