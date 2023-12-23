@@ -34,7 +34,9 @@ public:
       std::span<const GameResult> game_results,
       std::shared_ptr<TensorEncoder> encoder);
 
-  //static constexpr bool is_stateful = false;
+  // Disable grad mode on the encoder.
+  ~ChessDataSet()
+  { this->encoder->with_grad(false); }
 
   ExampleType
   get(std::size_t index) override;

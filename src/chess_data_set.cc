@@ -24,6 +24,9 @@ ChessDataSet::ChessDataSet(
   if (not this->encoder)
     throw std::invalid_argument("encoder cannot be null.");
 
+  // Enable encoding tensors with grad enabled.
+  this->encoder->with_grad(true);
+
   for (const auto& gr : game_results)
     num_examples += gr.moves.size();
 }
