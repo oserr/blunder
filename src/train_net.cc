@@ -54,7 +54,12 @@ main()
 
   std::cout << "Net finished running and...\n"
             << "v.dim() = " << v.dim()
+            << "\nv=" << v
             << "\np.dim() = " << p.dim() << std::endl;
+
+  torch::Tensor tensor = torch::full({1}, 3.456789);
+  std::cout << "\n\ntensor=" << tensor << std::endl;
+  std::cout << "\n\ntensor.dim=" << tensor.dim() << std::endl;
 
   return EXIT_SUCCESS;
 }
