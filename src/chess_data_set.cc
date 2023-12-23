@@ -57,11 +57,10 @@ ChessDataSet::get(std::size_t index)
 
   // Compute the actual value from the game result.
   float value = 0;
-  if (game_result->winner == Color::White) {
+  if (game_result->winner == Color::White)
     value = board.is_white_next() ? 1 : -1;
-  } else if (game_result->winner == Color::Black) {
+  else if (game_result->winner == Color::Black)
     value = board.is_white_next() ? -1 : 1;
-  }
 
   Tensor value_tensor = torch::full({1}, value);
 
