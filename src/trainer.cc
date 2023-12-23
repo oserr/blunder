@@ -89,10 +89,11 @@ Trainer::train_model(
     std::span<const GameResult> game_results,
     const AlphaZeroNet& net) const
 {
+  auto trained_net = std::make_shared<AlphaZeroNet>(net.clone());
+
   // Disable inference mode.
   c10::InferenceMode inference_mode(false);
 
-  auto trained_net = std::make_shared<AlphaZeroNet>(net.clone());
   trained_net->set_training_mode();
 
   ChessDataSet data_set(game_results, encoder);
