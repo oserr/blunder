@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <format>
+#include <iostream>
 #include <iterator>
 #include <memory>
 #include <span>
@@ -50,7 +51,7 @@ Trainer::play_training_games(std::shared_ptr<AlphaZeroNet> net) const
 
 // Plays the tournament games.
 MatchStats
-Trainer::play_tournament_games(std::shared_ptr<AlphaZeroNet> contender) const
+Trainer::play_tournament(std::shared_ptr<AlphaZeroNet> contender) const
 {
   c10::InferenceMode inference_mode(true);
 
@@ -168,7 +169,33 @@ Trainer::train_model(
 void
 Trainer::train() const
 {
-  throw std::runtime_error("Not implemented yet");
+  assert(champion);
+
+  for (unsigned i = 0; i < training_sessions; ++i) {
+    auto game_results = play_training_games(champion);
+    auto contender = train_model(game_results, *champion);
+    auto match_stats = play_tournament(contender);
+
+    std::cout << "Match stats:\n"
+              << "  champion wins:  " << match_stats.champion_wins
+              << "  contender wins: " << match_stats.contender_wins
+              << "  draws:          " << match_stats.draws
+              << std::endl;
+
+    const float win_rate =
+      match_stats.contender_wins / static_cast<float>(tournament_games);
+
+    if (win_rate < min_win_rate) {
+      std::cout << "Champion keeps title" << std::endl;
+      continue;
+    }
+
+    std::cout << "New champion with a win rate of " << win_rate << std::endl;
+    champion.swap(contender);
+    fs::path dir_path(checkpoint_dir);
+    auto dir_name = std::format("champion-{:0>6}", i);
+    champion->create_checkpoint(dir_path / dir_name);
+  }
 }
 
 } // namespace blunder

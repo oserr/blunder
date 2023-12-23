@@ -40,7 +40,7 @@ private:
 
   // Plays the tournament games.
   MatchStats
-  play_tournament_games(std::shared_ptr<AlphaZeroNet> contender) const;
+  play_tournament(std::shared_ptr<AlphaZeroNet> contender) const;
 
   // Creates a new version of the model by training the current model.
   // @param game_results A collection of games for use as training data.
@@ -79,15 +79,11 @@ private:
   // The directory where checkpoints are created.
   std::string checkpoint_dir;
 
-  // The location of the current model checkpoint. This is necessary after
-  // training an agent
-  std::string model_params_dir;
-
-  // The current champion network.
-  std::shared_ptr<AlphaZeroNet> champion = nullptr;
-
   std::shared_ptr<TensorDecoder> decoder = nullptr;
   std::shared_ptr<TensorEncoder> encoder = nullptr;
+
+  // The current champion network.
+  mutable std::shared_ptr<AlphaZeroNet> champion = nullptr;
 
   friend class TrainerBuilder;
   // TODO: Add other configuration parameters, e.g. learning rate, etc.
