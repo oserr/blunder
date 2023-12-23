@@ -14,6 +14,13 @@ public:
   }
 
   TrainerBuilder&
+  set_training_games(unsigned training_games)
+  {
+    trainer.training_games = training_games;
+    return *this;
+  }
+
+  TrainerBuilder&
   set_training_epochs(unsigned training_epochs)
   {
     trainer.training_epochs = training_epochs;
