@@ -21,7 +21,7 @@ ChessDataSet::ChessDataSet(
   : game_results(game_results),
     encoder(std::move(encoder))
 {
-  if (not encoder)
+  if (not this->encoder)
     throw std::invalid_argument("encoder cannot be null.");
 
   for (const auto& gr : game_results)
