@@ -2,6 +2,10 @@
 
 #include <stdexcept>
 
+#include "alpha_zero_decoder.h"
+#include "alpha_zero_encoder.h"
+#include "net.h"
+
 namespace blunder {
 
 Trainer
@@ -33,9 +37,6 @@ TrainerBuilder::build()
 
     if (trainer.checkpoint_dir.empty())
       trainer.checkpoint_dir = "checkpoints";
-
-    if (trainer.model_params_dir.empty())
-      trainer.model_params_dir = "model_params";
 
     if (not trainer.champion)
       trainer.champion = std::make_shared<AlphaZeroNet>();

@@ -63,13 +63,6 @@ public:
   }
 
   TrainerBuilder&
-  set_model_params_dir(std::string model_params_dir)
-  {
-    trainer.model_params_dir = model_params_dir;
-    return *this;
-  }
-
-  TrainerBuilder&
   set_champion_net(std::shared_ptr<AlphaZeroNet> champion)
   {
     trainer.champion = std::move(champion);
@@ -84,7 +77,7 @@ public:
   }
 
   TrainerBuilder&
-  set_encoder(std::shared_ptr<TensorDecoder> encoder)
+  set_encoder(std::shared_ptr<TensorEncoder> encoder)
   {
     trainer.encoder = std::move(encoder);
     return *this;
