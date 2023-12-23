@@ -32,7 +32,7 @@ public:
 private:
   // Make this private to force clients to use the builder.
   // TODO: create a TrainingBuilder to build the Trainer agent.
-  Trainer();
+  Trainer() = default;
 
   // Plays the training games.
   std::vector<GameResult>
