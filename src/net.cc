@@ -265,6 +265,9 @@ AlphaZeroNet::load_checkpoint(const fs::path& checkpoint_dir)
 AlphaZeroNet
 AlphaZeroNet::clone() const
 {
+  // Enable inference mode to do the copying.
+  c10::InferenceMode inference_mode(true);
+
   AlphaZeroNet other_net;
 
   if (not clone_params(parameters(), other_net.parameters()))
