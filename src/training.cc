@@ -1,17 +1,11 @@
 #include <cstdlib>
-#include <format>
 #include <getopt.h>
 #include <iostream>
-#include <memory>
-#include <random>
-#include <string>
 #include <string_view>
 #include <unistd.h>
 
 #include "board.h"
-#include "net.h"
-#include "simple_game_builder.h"
-#include "timer.h"
+#include "trainer_builder.h"
 
 using namespace blunder;
 
@@ -19,8 +13,8 @@ void
 print_help(std::string_view prog, std::ostream& os)
 {
   os << "Usage: " << prog << " [options] ...\n"
-     << "   -h|--help   Print this help message.\n"
-     << "   -g|--games  The total number of games to train for.\n"
+     << "   -h|--help            Print this help message.\n"
+     << "   -t|--training_games  The total number of games to train for.\n"
      << std::endl;
 }
 
@@ -29,24 +23,24 @@ main(int argc, char** argv)
 {
   struct option longopts[] = {
     {"help", no_argument, nullptr, 'h'},
-    {"games", required_argument, nullptr, 'g'},
+    {"training_games", required_argument, nullptr, 't'},
     {0, 0, 0, 0},
   };
 
-  unsigned num_games = 0;
+  unsigned training_games = 32;
 
   while (true) {
-    auto ret = getopt_long(argc, argv, "hg:", longopts, nullptr);
+    auto ret = getopt_long(argc, argv, "ht:", longopts, nullptr);
     if (ret == -1) break;
     switch (ret) {
       case 'h':
         print_help(argv[0], std::cout);
         return EXIT_SUCCESS;
-      case 'g':
+      case 't':
         try {
-          num_games = std::stol(optarg);
+          training_games = std::stol(optarg);
         } catch (...) {
-          std::cerr << "--games needs to be a valid number greather than 0"
+          std::cerr << "--training_games needs to be a valid number greather than 0"
               << " but got " << optarg << std::endl;
           print_help(argv[0], std::cout);
           return EXIT_FAILURE;
@@ -59,33 +53,21 @@ main(int argc, char** argv)
     }
   }
 
-  // On inference mode guard.
-  c10::InferenceMode inference_mode;
-
   Board::register_magics();
 
-  auto net = std::make_shared<AlphaZeroNet>();
-  auto game = SimpleGameBuilder().set_net(std::move(net)).build();
-
-  std::cout << "Playing " << num_games << " of self play ..." << std::endl;
-  for (unsigned j = 0; j < num_games; ++j) {
-    Timer timer;
-    timer.start();
-    auto result = game.play();
-    timer.end();
-
-    if (not result.winner)
-      std::cout << "Game " << j << " ended in a draw." << std::endl;
-    else {
-      std::cout << "Game " << j << " ended with "
-                << (*result.winner == Color::White ? "WHITE" : "BLACK")
-                << " as winner in " << result.moves.size()
-                << '!' << std::endl;
-    }
-
-    std::cout << result.stats().dbg() << std::endl;
-    std::cout << "game finished in " << timer.total_minutes()
-              << " minutes." << std::endl;
+  try {
+    TrainerBuilder()
+      .set_training_sessions(2)
+      .set_training_games(training_games)
+      .set_training_epochs(3)
+      .set_tournament_games(3)
+      .set_checkpoint_steps(1)
+      .set_batch_size(5)
+      .build()
+      .train();
+  } catch (std::exception& err) {
+    std::cerr << err.what() << std::endl;
+    return EXIT_FAILURE;
   }
 
   return EXIT_SUCCESS;
