@@ -90,10 +90,8 @@ public:
     return *this;
   }
 
-  // TODO: here we need to verify that everything is set in resonable manner.
   Trainer
-  build()
-  { return trainer; }
+  build();
 
 private:
   Trainer trainer;
