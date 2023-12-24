@@ -310,7 +310,7 @@ public:
   // Updates this board with move |mv| if the move is pseudo-legal. Returns
   // true if the update succeeds, false otherwise.
   bool
-  update_with_move(Move mv) noexcept;
+  update_with_move(Move mv);
 
   // Updates this board with a sequence of moves. Returns an exception the full
   // sequence of moves cannot be applied.
@@ -359,11 +359,11 @@ private:
 
   // Updates this board with move |mv| without updating the game state.
   Board&
-  quick_update(Move mv) noexcept;
+  quick_update(Move mv);
 
   // Updates this board with move |mv|.
   Board&
-  update(Move mv) noexcept;
+  update(Move mv);
 
   // Computes simples moves for Bishops, Kights, Rooks, and Queens. Simple moves
   // consists of non-attack moves and attacks. |piece| is the piece moving, and

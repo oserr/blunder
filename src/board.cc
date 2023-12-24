@@ -537,6 +537,8 @@ Board::compute_game_state() noexcept
   }
 
   for (auto mv : moves) {
+    // TODO: avoid having to copy the board for every move by implementing an
+    // undo move.
     Board board(*this);
     board.quick_update(mv);
     // Found a way to get out of check.
@@ -558,7 +560,7 @@ Board::compute_game_state() noexcept
 }
 
 Board&
-Board::quick_update(Move mv) noexcept
+Board::quick_update(Move mv)
 {
   auto from_piece = mv.piece();
   assert(from_piece.type() != Type::None);
@@ -566,7 +568,20 @@ Board::quick_update(Move mv) noexcept
   auto from_square = mv.from();
   auto to_square = mv.to();
 
-  bb_mine.update_bit(from_piece, from_square, to_square);
+  try {
+    if (mv.is_enpassant() or mv.is_castling()) {
+      std::cout << "Updating with move: " << mv
+                << "\nCurrent board state is\n"
+                << str() << std::endl;
+    }
+    bb_mine.update_bit(from_piece, from_square, to_square);
+  } catch (std::runtime_error& err) {
+    std::cout << "Unable to update_bit properly with move "
+              << mv << std::endl
+              << "Current board state is\n"
+              << str() << std::endl;
+    throw err;
+  }
 
   // En passant capture square is different from square where piece is moving.
   if (mv.is_enpassant())
@@ -583,7 +598,18 @@ Board::quick_update(Move mv) noexcept
     auto rk_from_to = mv.get_rook_from_to();
     assert(rk_from_to);
     auto [rk_from, rk_to] = *rk_from_to;
-    bb_mine.update_bit(Piece::rook(), rk_from, rk_to);
+    try {
+      std::cout << "Updating with move: " << mv
+                << "\nCurrent board state is:\n"
+                << str() << std::endl;
+      bb_mine.update_bit(Piece::rook(), rk_from, rk_to);
+    } catch (std::runtime_error& err) {
+      std::cout << "Unable to update_bit properly with move "
+                << mv << std::endl
+                << "Current board state is\n"
+                << str() << std::endl;
+      throw err;
+    }
   }
 
   // Half move is reset on capture or pawn move, and incremented otherwise.
@@ -637,7 +663,7 @@ Board::quick_update(Move mv) noexcept
 }
 
 Board&
-Board::update(Move mv) noexcept
+Board::update(Move mv)
 {
   quick_update(mv);
   compute_game_state(mv.capture().is_king());
@@ -646,7 +672,7 @@ Board::update(Move mv) noexcept
 }
 
 bool
-Board::update_with_move(Move mv) noexcept
+Board::update_with_move(Move mv)
 {
   auto moves = all_moves();
   if (std::ranges::find(moves, mv) == moves.end())
@@ -676,7 +702,6 @@ Board::get_simple_moves(
 {
   auto bb = mine().get(piece);
   auto no_pieces = none();
-
 
   while (bb) {
     auto [from_square, bb_piece] = bb.index_bb_and_clear();
