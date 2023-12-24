@@ -83,7 +83,7 @@ public:
   { return clear_bit(piece.type(), index); }
 
   PieceSet&
-  update_bit(Type type, unsigned from, unsigned to) noexcept
+  update_bit(Type type, unsigned from, unsigned to)
   {
     get_mut(type).update_bit(from, to);
     all_bits.update_bit(from, to);
@@ -91,7 +91,7 @@ public:
   }
 
   PieceSet&
-  update_bit(Piece piece, unsigned from, unsigned to) noexcept
+  update_bit(Piece piece, unsigned from, unsigned to)
   { return update_bit(piece.type(), from, to); }
 
   // Flips all the pieces horizontally across the board to switch between
