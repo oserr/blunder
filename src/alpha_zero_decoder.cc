@@ -38,8 +38,7 @@ AlphaZeroDecoder::decode(
   assert(mdims[0] == 1 and mdims[1] == 73 and
          mdims[2] == mdims[3] and mdims[2] == 8);
 
-  [[maybe_unused]] auto edims = eval_tensor.sizes();
-  assert(edims.size() == 1);
+  assert(eval_tensor.sizes().size() == 2);
 
   auto children = board.next();
   if (children.empty()) {
@@ -67,7 +66,7 @@ AlphaZeroDecoder::decode(
   for (auto& [ignored, logit] : move_probs)
     logit /= total;
 
-  float value = eval_tensor.index({0}).item<float>();
+  float value = eval_tensor.index({0, 0}).item<float>();
 
   return DecodedMoves{
     .move_probs=std::move(move_probs),
