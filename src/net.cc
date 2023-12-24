@@ -42,7 +42,7 @@ clone_params(std::vector<Tensor> from_params, std::vector<Tensor> to_params)
     return false;
 
   for (auto [from_tensor, to_tensor] : views::zip(from_params, to_params))
-    to_tensor.copy_(from_tensor);
+    to_tensor = from_tensor.clone();
 
   return true;
 }
@@ -87,7 +87,7 @@ ResBlockNet::forward(Tensor x)
 {
   auto out = relu(bnorm1(conv1(x)));
   out = bnorm2(conv2(out));
-  out += x;
+  out = out + x;
   return relu(out);
 }
 
@@ -130,8 +130,15 @@ ValueNet::ValueNet()
 Tensor
 ValueNet::forward(Tensor x)
 {
-  auto out = relu(bnorm(conv(x)));
-  return tanh(fc2(relu(fc1(flatten(out)))));
+  auto out = conv(x);
+  out = bnorm(out);
+  out = relu(out);
+  out = flatten(out, /*start_dim=*/1);
+  out = fc1(out);
+  out = relu(out);
+  out = fc2(out);
+  out = tanh(out);
+  return out;
 }
 
 //--------------
@@ -265,9 +272,6 @@ AlphaZeroNet::load_checkpoint(const fs::path& checkpoint_dir)
 AlphaZeroNet
 AlphaZeroNet::clone() const
 {
-  // Enable inference mode to do the copying.
-  c10::InferenceMode inference_mode(true);
-
   AlphaZeroNet other_net;
 
   if (not clone_params(parameters(), other_net.parameters()))
