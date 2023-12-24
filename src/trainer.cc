@@ -90,12 +90,7 @@ Trainer::train_model(
     const AlphaZeroNet& net) const
 {
   auto trained_net = std::make_shared<AlphaZeroNet>(net.clone());
-
-  // Disable inference mode.
-  c10::InferenceMode inference_mode(false);
-
   trained_net->set_training_mode();
-
   ChessDataSet data_set(game_results, encoder);
 
   auto data_loader = torch::data::make_data_loader(
@@ -177,10 +172,10 @@ Trainer::train() const
     auto contender = train_model(game_results, *champion);
     auto match_stats = play_tournament(contender);
 
-    std::cout << "Match stats:\n"
-              << "  champion wins:  " << match_stats.champion_wins
-              << "  contender wins: " << match_stats.contender_wins
-              << "  draws:          " << match_stats.draws
+    std::cout << "Match stats:"
+              << "  \nchampion wins:  " << match_stats.champion_wins
+              << "  \ncontender wins: " << match_stats.contender_wins
+              << "  \ndraws:          " << match_stats.draws
               << std::endl;
 
     const float win_rate =
