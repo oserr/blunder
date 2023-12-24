@@ -124,7 +124,7 @@ AlphaZeroEncoder::encode_moves(std::span<const BoardProb> moves) const
   for (const auto& mv : moves)
     total += mv.visits;
 
-  auto tensor = torch::zeros({8, 8, 73},
+  auto tensor = torch::zeros({73, 8, 8},
                              torch::requires_grad(with_grad_enabled));
 
   for (const auto& mv : moves) {
@@ -132,7 +132,7 @@ AlphaZeroEncoder::encode_moves(std::span<const BoardProb> moves) const
     assert(last_move.has_value());
     auto mv_code = encode_move(*last_move);
     float prob = static_cast<float>(mv.visits) / total;
-    tensor.index_put_({mv_code.row, mv_code.col, mv_code.code}, prob);
+    tensor.index_put_({mv_code.code, mv_code.row, mv_code.col}, prob);
   }
 
   return tensor;
@@ -147,13 +147,13 @@ AlphaZeroEncoder::encode_moves(std::span<const MoveProb> moves) const
   for (const auto& mv : moves)
     total += mv.visits;
 
-  auto tensor = torch::zeros({8, 8, 73},
+  auto tensor = torch::zeros({73, 8, 8},
                              torch::requires_grad(with_grad_enabled));
 
   for (const auto& mv : moves) {
     auto mv_code = encode_move(mv.mv);
     float prob = static_cast<float>(mv.visits) / total;
-    tensor.index_put_({mv_code.row, mv_code.col, mv_code.code}, prob);
+    tensor.index_put_({mv_code.code, mv_code.row, mv_code.col}, prob);
   }
 
   return tensor;
