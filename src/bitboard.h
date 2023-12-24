@@ -7,6 +7,7 @@
 #include <concepts>
 #include <cstdint>
 #include <ostream>
+#include <stdexcept>
 #include <string>
 #include <utility>
 
@@ -70,10 +71,16 @@ public:
   }
 
   BitBoard&
-  update_bit(unsigned from, unsigned to) noexcept
+  update_bit(unsigned from, unsigned to)
   {
-    assert(has_bit(from));
-    assert(!has_bit(to));
+    // TODO: use assert(has_bit(from)) once I fix the bug.
+    if (!has_bit(from))
+      throw std::runtime_error("update_bit: from bit is not set.");
+
+    // TODO: use assert(!has_bit(to)) once I fix the bug.
+    if (has_bit(to))
+      throw std::runtime_error("update_bit: to bit already set.");
+
     return clear_bit(from).set_bit(to);
   }
 
