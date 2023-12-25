@@ -68,6 +68,8 @@ add_library(blunder STATIC
   src/game_result.cc
   src/game_result.h
   src/game_state.h
+  src/game_winner.cc
+  src/game_winner.h
   src/hash.h
   src/magic_attacks.cc
   src/magic_attacks.h
