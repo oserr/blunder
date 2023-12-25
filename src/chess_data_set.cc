@@ -55,8 +55,9 @@ ChessDataSet::get(std::size_t index)
       ? game_result->game_start
       : game_result->moves[index-1].best.board;
 
-  auto input_tensor = encoder->encode_board(board);
-  auto policy_tensor = encoder->encode_moves(game_result->moves[index].moves);
+  auto input_tensor = encoder->encode_board(board).to(torch::kCUDA);
+  auto policy_tensor = encoder->encode_moves(game_result->moves[index].moves)
+                                .to(torch::kCUDA);
 
   // Compute the actual value from the game result.
   float value = 0;
@@ -65,7 +66,7 @@ ChessDataSet::get(std::size_t index)
   else if (game_result->winner == Color::Black)
     value = board.is_white_next() ? -1 : 1;
 
-  Tensor value_tensor = torch::full({1}, value);
+  Tensor value_tensor = torch::full({1}, value, torch::kCUDA);
 
   return ExampleType(std::move(input_tensor),
                      std::make_pair(policy_tensor, value_tensor));
