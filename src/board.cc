@@ -632,7 +632,9 @@ Board::quick_update(Move mv)
       en_passant = true;
       en_passant_file = *passant;
     }
-  } else if (from_piece.type() == Type::Rook) {
+  }
+  // Remove castling right for a specific rook.
+  else if (from_piece.type() == Type::Rook) {
     if (is_white_next()) {
       if (from_square == 0)
         wq_castle = false;
@@ -643,7 +645,9 @@ Board::quick_update(Move mv)
       bq_castle = false;
     else if (from_square == 63)
       bk_castle = false;
-  } else if (from_piece.type() == Type::King) {
+  }
+  // Remove castling right for the king.
+  else if (from_piece.type() == Type::King) {
     if (is_white_next()) {
       wk_castle = false;
       wq_castle = false;
@@ -651,6 +655,20 @@ Board::quick_update(Move mv)
       bk_castle = false;
       bq_castle = false;
     }
+  }
+  // Remove castling right for specific rook if the rook is captured.
+  else if (mv.capture().type() == Type::Rook) {
+    if (is_white_next()) {
+      if (to_square == 56)
+        bq_castle = false;
+      else if (to_square == 63)
+        bk_castle = false;
+    }
+    // Black is moving next.
+    else if (to_square == 0)
+      wq_castle = false;
+    else if (to_square == 7)
+      wk_castle = false;
   }
 
   bb_mine.swap(bb_other);
