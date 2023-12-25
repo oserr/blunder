@@ -35,9 +35,11 @@ SimpleGame::play()
     const auto& pr = game_result.moves.emplace_back(std::move(play_result));
     const auto& next_board = pr.best.board;
 
-    std::cout << "move " << move_num++ << " -> "
-              << *next_board.last_move()
-              << "  value=" << pr.value << std::endl;
+    if (verbose) {
+      std::cout << "move " << move_num++ << " -> "
+                << *next_board.last_move()
+                << "  value=" << pr.value << std::endl;
+    }
 
     game_path.push(next_board);
   }

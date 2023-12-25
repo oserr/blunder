@@ -39,6 +39,7 @@ private:
   std::unique_ptr<Player> bplayer;
 
   unsigned max_moves;
+  bool verbose = false;
 
   friend class SimpleGameBuilder;
 };
