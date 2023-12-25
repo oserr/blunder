@@ -81,6 +81,13 @@ SimpleGameBuilder::set_encoder(std::shared_ptr<TensorEncoder> encoder)
   return *this;
 }
 
+SimpleGameBuilder&
+SimpleGameBuilder::set_verbose(bool verbose)
+{
+  this->verbose = verbose;
+  return *this;
+}
+
 SimpleGame
 SimpleGameBuilder::build()
 {
@@ -100,8 +107,10 @@ SimpleGameBuilder::build()
 
   auto wp = create_player(white_net, white_seed);
   auto bp = create_player(black_net, black_seed);
+  SimpleGame simple_game(std::move(wp), std::move(bp), max_moves);
+  simple_game.verbose = verbose;
 
-  return SimpleGame(std::move(wp), std::move(bp), max_moves);
+  return simple_game;
 }
 
 std::unique_ptr<Player>

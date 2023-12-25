@@ -40,6 +40,9 @@ public:
   SimpleGameBuilder&
   set_encoder(std::shared_ptr<TensorEncoder> encoder);
 
+  SimpleGameBuilder&
+  set_verbose(bool verbose);
+
   SimpleGame
   build();
 
@@ -56,6 +59,7 @@ private:
   std::uint64_t black_seed = 0;
   unsigned max_moves = 300;
   unsigned simulations = 800;
+  bool verbose = false;
 };
 
 } // namespace blunder
