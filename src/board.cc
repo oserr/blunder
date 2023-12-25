@@ -569,11 +569,6 @@ Board::quick_update(Move mv)
   auto to_square = mv.to();
 
   try {
-    if (mv.is_enpassant() or mv.is_castling()) {
-      std::cout << "Updating with move: " << mv
-                << "\nCurrent board state is\n"
-                << str() << std::endl;
-    }
     bb_mine.update_bit(from_piece, from_square, to_square);
   } catch (std::runtime_error& err) {
     std::cout << "Unable to update_bit properly with move "
@@ -599,9 +594,6 @@ Board::quick_update(Move mv)
     assert(rk_from_to);
     auto [rk_from, rk_to] = *rk_from_to;
     try {
-      std::cout << "Updating with move: " << mv
-                << "\nCurrent board state is:\n"
-                << str() << std::endl;
       bb_mine.update_bit(Piece::rook(), rk_from, rk_to);
     } catch (std::runtime_error& err) {
       std::cout << "Unable to update_bit properly with move "
