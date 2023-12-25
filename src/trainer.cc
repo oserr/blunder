@@ -43,6 +43,7 @@ Trainer::play_training_games(std::shared_ptr<AlphaZeroNet> net) const
 
   for (unsigned i = 0; i < training_games; ++i) {
     auto game_result = game.play();
+    std::cout << game_result.stats().dbg() << std::endl;
     game_results.push_back(std::move(game_result));
   }
 
