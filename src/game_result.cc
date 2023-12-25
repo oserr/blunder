@@ -6,6 +6,19 @@
 #include <utility>
 
 namespace blunder {
+namespace {
+
+GameWinner
+get_game_winner(std::optional<Color> color) noexcept
+{
+  if (color == Color::White)
+    return GameWinner::White;
+  if (color == Color::Black)
+    return GameWinner::Black;
+  return GameWinner::Draw;
+}
+
+}
 
 std::string
 GameStats::dbg() const {
@@ -14,6 +27,7 @@ GameStats::dbg() const {
   std::format_to(std::back_inserter(buffer),
     R"(
     GameStats[
+        winner={},
         max_nodes_expanded={},
         avg_nodes_expanded={:.3f}
         max_nodes_visited={}
@@ -23,6 +37,7 @@ GameStats::dbg() const {
         millis_per_eval={:.3f}
         millis_per_search={:.3f}
     ])",
+  str(game_winner),
   max_nodes_expanded,
   avg_nodes_expanded,
   max_nodes_visited,
@@ -69,6 +84,7 @@ GameResult::stats() const {
   if (not n)
     throw std::runtime_error("Cannot compute game stats without moves.");
 
+  game_stats.game_winner = get_game_winner(winner);
   game_stats.avg_nodes_expanded = static_cast<float>(total_nodes_expanded) / n;
   game_stats.avg_nodes_visited = static_cast<float>(total_nodes_visited) / n;
   game_stats.avg_depth = static_cast<float>(total_depth) / n;
