@@ -112,7 +112,9 @@ find_all_magics(
 }
 
 // Parallel version of find_all_magics.
-// TODO: inject thread pool to avoid constructing it every time.
+//
+// TODO: inject thread pool to avoid constructing it every time and integrate
+// this so that this is actually used when computing the magic bitboards.
 std::expected<MagicAttacks, Err>
 find_all_magics_par(
     std::function<BitBoard(std::uint32_t)> mask_fn,
