@@ -44,7 +44,7 @@ FetchContent_MakeAvailable(googletest)
 FetchContent_Declare(
   par
   GIT_REPOSITORY https://github.com/oserr/par.git
-  GIT_TAG 0369ff5b3721f61126ca2a175ab1700960aa8463)
+  GIT_TAG 979889d5154248a32141cb1ee4d3b34263b57c8e)
 FetchContent_MakeAvailable(par)
 
 add_library(blunder STATIC
@@ -119,9 +119,11 @@ add_library(blunder STATIC
   src/trainer_builder.h)
 set_target_properties(blunder PROPERTIES CXX_STANDARD 23)
 target_compile_options(blunder PUBLIC ${TORCH_CXX_FLAGS})
-target_include_directories(blunder PUBLIC ${TORCH_INCLUDE_DIRS})
+target_include_directories(blunder PUBLIC
+  ${TORCH_INCLUDE_DIRS}
+  ${par_INCLUDE_DIRS})
 target_compile_features(blunder PRIVATE)
-target_link_libraries(blunder ${TORCH_LIBRARIES})
+target_link_libraries(blunder ${TORCH_LIBRARIES} par)
 
 # Simple function to create a test target.
 function(create_target target)

@@ -15,6 +15,8 @@
 #include "bitboard.h"
 #include "err.h"
 
+#include "par.h"
+
 namespace blunder {
 namespace {
 
@@ -104,6 +106,49 @@ find_all_magics(
       return std::unexpected(magic_info.error());
 
     magics.push_back(std::move(magic_info->first));
+  }
+
+  return MagicAttacks(std::move(magics));
+}
+
+// Parallel version of find_all_magics.
+// TODO: inject thread pool to avoid constructing it every time.
+std::expected<MagicAttacks, Err>
+find_all_magics_par(
+    std::function<BitBoard(std::uint32_t)> mask_fn,
+    std::function<BitBoard(std::uint32_t, BitBoard)> attacks_fn,
+    const std::function<std::uint64_t()>& magic_fn,
+    std::uint32_t loops = 1000000000)
+{
+  auto wq = par::WorkQ::with_nthreads(30);
+
+  auto fn = [
+    mask_fn=std::move(mask_fn),
+    attacks_fn=std::move(attacks_fn),
+    &magic_fn=magic_fn,
+    loops=loops
+  ](auto s) -> std::expected<std::pair<Magic, std::uint32_t>, Err>
+  {
+    return find_magic(s, mask_fn, attacks_fn, magic_fn, loops);
+  };
+
+  auto futs = wq.for_range(64, fn);
+
+  // Wait for all the futures to be ready.
+  for (auto& fut : futs)
+    fut.wait();
+
+  // Now collect the resuts.
+  std::vector<Magic> magics;
+  magics.reserve(64);
+
+  for (auto& fut : futs) {
+    auto magic_info = fut.get();
+
+    if (not magic_info)
+      return std::unexpected(magic_info.error());
+
+    magics.emplace_back(std::move(magic_info->first));
   }
 
   return MagicAttacks(std::move(magics));
