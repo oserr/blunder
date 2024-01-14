@@ -40,6 +40,13 @@ FetchContent_Declare(
   GIT_TAG v1.13.0)
 FetchContent_MakeAvailable(googletest)
 
+# Par
+FetchContent_Declare(
+  par
+  GIT_REPOSITORY https://github.com/oserr/par.git
+  GIT_TAG 0369ff5b3721f61126ca2a175ab1700960aa8463)
+FetchContent_MakeAvailable(par)
+
 add_library(blunder STATIC
   src/alpha_zero_decoder.cc
   src/alpha_zero_decoder.h
