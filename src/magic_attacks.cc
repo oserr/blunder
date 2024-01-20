@@ -29,7 +29,9 @@ get_magic_hash(
   return (blocking.raw() * magic) >> (64 - magic_bits);
 }
 
-std::expected<std::pair<Magic, std::uint32_t>, Err>
+using ExpectedMagicResult = std::expected<std::pair<Magic, std::uint32_t>, Err>;
+
+ExpectedMagicResult
 find_magic(
     std::uint32_t sq,
     std::function<BitBoard(std::uint32_t)> mask_fn,
@@ -112,29 +114,12 @@ find_all_magics(
 }
 
 // Parallel version of find_all_magics.
-//
-// TODO: inject thread pool to avoid constructing it every time and integrate
-// this so that this is actually used when computing the magic bitboards.
 std::expected<MagicAttacks, Err>
 find_all_magics_par(
-    std::function<BitBoard(std::uint32_t)> mask_fn,
-    std::function<BitBoard(std::uint32_t, BitBoard)> attacks_fn,
-    const std::function<std::uint64_t()>& magic_fn,
-    std::uint32_t loops = 1000000000)
+    par::WorkQ& workq,
+    std::function<ExpectedMagicResult(std::uint64_t)> find_magic_fn)
 {
-  auto wq = par::WorkQ::with_nthreads(30);
-
-  auto fn = [
-    mask_fn=std::move(mask_fn),
-    attacks_fn=std::move(attacks_fn),
-    &magic_fn=magic_fn,
-    loops=loops
-  ](auto s) -> std::expected<std::pair<Magic, std::uint32_t>, Err>
-  {
-    return find_magic(s, mask_fn, attacks_fn, magic_fn, loops);
-  };
-
-  auto futs = wq.for_range(64, fn);
+  auto futs = workq.for_range(64, std::move(find_magic_fn));
 
   // Wait for all the futures to be ready.
   for (auto& fut : futs)
@@ -217,6 +202,90 @@ from_rmagics(std::span<const std::uint64_t> magics)
 {
   auto magic_fn = [sq=0, magics=magics] mutable { return magics[sq++]; };
   return find_all_magics(get_rmask, get_rattacks, magic_fn, 1);
+}
+
+std::expected<MagicAttacks, Err>
+SimpleMagicComputer::compute_bmagics() const
+{ return compute_bmagics(); }
+
+std::expected<MagicAttacks, Err>
+SimpleMagicComputer::compute_rmagics() const
+{ return compute_rmagics(); }
+
+std::expected<MagicAttacks, Err>
+SimpleMagicComputer::from_bmagics(std::span<const std::uint64_t> magics) const
+{ return from_bmagics(magics); }
+
+std::expected<MagicAttacks, Err>
+SimpleMagicComputer::from_rmagics(std::span<const std::uint64_t> magics) const
+{ return from_rmagics(magics); }
+
+std::expected<MagicAttacks, Err>
+ParMagicComputer::compute_bmagics() const
+{
+  auto fn = [
+    mask_fn=get_bmask,
+    attacks_fn=get_battacks,
+    magic_fn=create_rand_fn()
+  ](auto square) -> ExpectedMagicResult
+  {
+    return find_magic(square, mask_fn, attacks_fn, magic_fn);
+  };
+
+  return find_all_magics_par(*workq, std::move(fn));
+}
+
+std::expected<MagicAttacks, Err>
+ParMagicComputer::compute_rmagics() const
+{
+  auto fn = [
+    mask_fn=get_rmask,
+    attacks_fn=get_rattacks,
+    magic_fn=create_rand_fn()
+  ](auto square) -> ExpectedMagicResult
+  {
+    return find_magic(square, mask_fn, attacks_fn, magic_fn);
+  };
+
+  return find_all_magics_par(*workq, std::move(fn));
+}
+
+std::expected<MagicAttacks, Err>
+ParMagicComputer::from_bmagics(std::span<const std::uint64_t> magics) const
+{
+  assert(magics.size() == 64);
+
+  auto fn = [
+    mask_fn=get_bmask,
+    attacks_fn=get_battacks,
+    magics=magics
+  ](auto square) -> ExpectedMagicResult
+  {
+    const auto m = magics[square];
+    auto magic_fn = [m=m]() -> std::uint64_t { return m; };
+    return find_magic(square, mask_fn, attacks_fn, magic_fn, 1);
+  };
+
+  return find_all_magics_par(*workq, std::move(fn));
+}
+
+std::expected<MagicAttacks, Err>
+ParMagicComputer::from_rmagics(std::span<const std::uint64_t> magics) const
+{
+  assert(magics.size() == 64);
+
+  auto fn = [
+    mask_fn=get_rmask,
+    attacks_fn=get_rattacks,
+    magics=magics
+  ](auto square) -> ExpectedMagicResult
+  {
+    const auto m = magics[square];
+    auto magic_fn = [m=m]() -> std::uint64_t { return m; };
+    return find_magic(square, mask_fn, attacks_fn, magic_fn, 1);
+  };
+
+  return find_all_magics_par(*workq, std::move(fn));
 }
 
 } // namespace blunder

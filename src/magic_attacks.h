@@ -2,13 +2,17 @@
 
 #include <cstdint>
 #include <expected>
+#include <memory>
 #include <span>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
 #include "bitboard.h"
 #include "err.h"
 #include "magics.h"
+
+#include "par.h"
 
 namespace blunder {
 
@@ -44,6 +48,75 @@ public:
 private:
   // The magic numbers for every square on the board.
   std::vector<Magic> magics_;
+};
+
+class MagicComputer {
+public:
+  virtual ~MagicComputer() = default;
+
+  // Computes bishop magics from scratch.
+  virtual std::expected<MagicAttacks, Err>
+  compute_bmagics() const = 0;
+
+  // Computes rook magics from scratch.
+  virtual std::expected<MagicAttacks, Err>
+  compute_rmagics() const = 0;
+
+  // Initializes bishop magics from precomputed |magics|.
+  virtual std::expected<MagicAttacks, Err>
+  from_bmagics(std::span<const std::uint64_t> magics) const = 0;
+
+  // Initializes rook magics from precomputed |magics|.
+  virtual std::expected<MagicAttacks, Err>
+  from_rmagics(std::span<const std::uint64_t> magics) const = 0;
+};
+
+class SimpleMagicComputer : public MagicComputer {
+public:
+  // Computes bishop magics from scratch.
+  std::expected<MagicAttacks, Err>
+  compute_bmagics() const override;
+
+  // Computes rook magics from scratch.
+  std::expected<MagicAttacks, Err>
+  compute_rmagics() const override;
+
+  // Initializes bishop magics from precomputed |magics|.
+  std::expected<MagicAttacks, Err>
+  from_bmagics(std::span<const std::uint64_t> magics) const override;
+
+  // Initializes rook magics from precomputed |magics|.
+  std::expected<MagicAttacks, Err>
+  from_rmagics(std::span<const std::uint64_t> magics) const override;
+};
+
+class ParMagicComputer : public MagicComputer {
+public:
+  ParMagicComputer(std::shared_ptr<par::WorkQ> workq)
+    : workq(std::move(workq))
+  {
+    if (not this->workq)
+      throw std::invalid_argument("workq is null.");
+  }
+
+  // Computes bishop magics from scratch.
+  std::expected<MagicAttacks, Err>
+  compute_bmagics() const override;
+
+  // Computes rook magics from scratch.
+  std::expected<MagicAttacks, Err>
+  compute_rmagics() const override;
+
+  // Initializes bishop magics from precomputed |magics|.
+  std::expected<MagicAttacks, Err>
+  from_bmagics(std::span<const std::uint64_t> magics) const override;
+
+  // Initializes rook magics from precomputed |magics|.
+  std::expected<MagicAttacks, Err>
+  from_rmagics(std::span<const std::uint64_t> magics) const override;
+
+private:
+  std::shared_ptr<par::WorkQ> workq;
 };
 
 // Computes bishop magics from scratch.
