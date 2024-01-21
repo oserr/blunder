@@ -225,11 +225,14 @@ ParMagicComputer::compute_bmagics() const
 {
   auto fn = [
     mask_fn=get_bmask,
-    attacks_fn=get_battacks,
-    magic_fn=create_rand_fn()
+    attacks_fn=get_battacks
   ](auto square) -> ExpectedMagicResult
   {
-    return find_magic(square, mask_fn, attacks_fn, magic_fn);
+    // TODO: avoid creating the random generating function every time. Ideally,
+    // we should create one each for every worker in the thread pool. For now,
+    // create one each time to avoid using the same generator across all
+    // threads.
+    return find_magic(square, mask_fn, attacks_fn, create_rand_fn());
   };
 
   return find_all_magics_par(*workq, std::move(fn));
@@ -240,11 +243,14 @@ ParMagicComputer::compute_rmagics() const
 {
   auto fn = [
     mask_fn=get_rmask,
-    attacks_fn=get_rattacks,
-    magic_fn=create_rand_fn()
+    attacks_fn=get_rattacks
   ](auto square) -> ExpectedMagicResult
   {
-    return find_magic(square, mask_fn, attacks_fn, magic_fn);
+    // TODO: avoid creating the random generating function every time. Ideally,
+    // we should create one each for every worker in the thread pool. For now,
+    // create one each time to avoid using the same generator across all
+    // threads.
+    return find_magic(square, mask_fn, attacks_fn, create_rand_fn());
   };
 
   return find_all_magics_par(*workq, std::move(fn));
