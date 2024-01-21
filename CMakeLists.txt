@@ -44,7 +44,7 @@ FetchContent_MakeAvailable(googletest)
 FetchContent_Declare(
   par
   GIT_REPOSITORY https://github.com/oserr/par.git
-  GIT_TAG 979889d5154248a32141cb1ee4d3b34263b57c8e)
+  GIT_TAG f48b5ece91dbb5f756dad59634f5ce5bd12a6b7b)
 FetchContent_MakeAvailable(par)
 
 add_library(blunder STATIC
@@ -155,3 +155,14 @@ create_test(bitboard)
 create_test(fen)
 create_test(board)
 create_test(board_path)
+
+# Simple function to create a bench target.
+function(create_bench target)
+  add_executable(${target}_bench benches/${target}.cc)
+  set_target_properties(${target}_bench PROPERTIES CXX_STANDARD 23)
+  target_include_directories(${target}_bench PUBLIC src)
+  target_compile_features(${target}_bench PRIVATE)
+  target_link_libraries(${target}_bench blunder)
+endfunction()
+
+create_bench(magics)
