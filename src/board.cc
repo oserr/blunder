@@ -868,13 +868,11 @@ Board::enough_material() const noexcept
   if (my_count == 1 and other_count == 1)
     return false;
 
-  if (my_count == 2 and other_count == 1)
-    return mine().bishop().count() == 1
-        or mine().knight().count() == 1;
-
-  if (other_count == 2 and my_count == 1)
-    return other().bishop().count() == 1
-        or other().knight().count() == 1;
+  if (my_count <= 2 and other_count <= 1)
+    return not (mine().bishop().count() == 1
+        or mine().knight().count() == 1) and
+        not (other().bishop().count() == 1
+        or other().knight().count() == 1);
 
   return true;
 }
