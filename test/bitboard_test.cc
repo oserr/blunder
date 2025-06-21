@@ -64,7 +64,8 @@ TEST(GetBishopAttacks, FromB2WithOneBlocker) {
   auto blockers = to_bitboard(SqList{Sq::f6});
   EXPECT_THAT(
       get_battacks(square, blockers),
-      EqualToSq(SqList{Sq::c3, Sq::d4, Sq::e5, Sq::f6}));
+      EqualToSq(
+        SqList{Sq::a1, Sq::c1, Sq::a3, Sq::c3, Sq::d4, Sq::e5, Sq::f6}));
 }
 
 TEST(GetBishopAttacks, FromH6WithNoBlockers) {
@@ -72,5 +73,6 @@ TEST(GetBishopAttacks, FromH6WithNoBlockers) {
   auto blockers = to_bitboard(SqList{});
   EXPECT_THAT(
       get_battacks(square, blockers),
-      EqualToSq(SqList{Sq::d2, Sq::e3, Sq::f4, Sq::g5, Sq::g7}));
+      EqualToSq(
+        SqList{Sq::c1, Sq::d2, Sq::e3, Sq::f4, Sq::g5, Sq::g7, Sq::f8}));
 }
