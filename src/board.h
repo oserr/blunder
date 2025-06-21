@@ -45,19 +45,17 @@ public:
   mine() const noexcept
   { return bb_mine; }
 
-private:
-  // Returns a mutable reference to piece set for player moving next.
-  PieceSet&
-  mine_mut() noexcept
-  { return bb_mine; }
-
-public:
   // Returns a reference to piece set for player not moving next.
   const PieceSet&
   other() const noexcept
   { return bb_other; }
 
 private:
+  // Returns a mutable reference to piece set for player moving next.
+  PieceSet&
+  mine_mut() noexcept
+  { return bb_mine; }
+
   // Returns a reference to piece set for player not moving next.
   PieceSet&
   other_mut() noexcept
@@ -105,10 +103,12 @@ public:
   black() const noexcept
   { return is_white_next() ? bb_other : bb_mine; }
 
+  // Returns the half-move count.
   unsigned
   hm_count() const noexcept
   { return half_move; }
 
+  // Returns the full-move count.
   unsigned
   fm_count() const noexcept
   { return full_move; }
