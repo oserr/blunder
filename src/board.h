@@ -160,19 +160,19 @@ public:
   //---------------------------
 
   bool
-  has_wk_castling() const noexcept
+  has_white_king_castle() const noexcept
   { return wk_castle; }
 
   unsigned
-  has_wq_castling() const noexcept
+  has_white_queen_castle() const noexcept
   { return wq_castle; }
 
   unsigned
-  has_bk_castling() const noexcept
+  has_black_king_castle() const noexcept
   { return bk_castle; }
 
   unsigned
-  has_bq_castling() const noexcept
+  has_black_queen_castle() const noexcept
   { return bq_castle; }
 
   //-------------------------------

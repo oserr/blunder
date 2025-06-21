@@ -96,10 +96,10 @@ AlphaZeroEncoder::encode_state(const EvalBoardPath& board_path) const
   const unsigned bin_features[7] = {
     root.is_white_next(),
     root.fm_count(),
-    root.has_wk_castling(),
-    root.has_wq_castling(),
-    root.has_bk_castling(),
-    root.has_bq_castling(),
+    root.has_white_king_castle(),
+    root.has_white_queen_castle(),
+    root.has_black_king_castle(),
+    root.has_black_queen_castle(),
     root.hm_count()
   };
 
