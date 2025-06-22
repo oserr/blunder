@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <expected>
 #include <memory>
 #include <span>
 #include <stdexcept>
@@ -55,38 +54,38 @@ public:
   virtual ~MagicComputer() = default;
 
   // Computes bishop magics from scratch.
-  virtual std::expected<MagicAttacks, Err>
+  virtual MagicAttacks
   compute_bmagics() const = 0;
 
   // Computes rook magics from scratch.
-  virtual std::expected<MagicAttacks, Err>
+  virtual MagicAttacks
   compute_rmagics() const = 0;
 
   // Initializes bishop magics from precomputed |magics|.
-  virtual std::expected<MagicAttacks, Err>
+  virtual MagicAttacks
   from_bmagics(std::span<const std::uint64_t> magics) const = 0;
 
   // Initializes rook magics from precomputed |magics|.
-  virtual std::expected<MagicAttacks, Err>
+  virtual MagicAttacks
   from_rmagics(std::span<const std::uint64_t> magics) const = 0;
 };
 
 class SimpleMagicComputer : public MagicComputer {
 public:
   // Computes bishop magics from scratch.
-  std::expected<MagicAttacks, Err>
+  MagicAttacks
   compute_bmagics() const override;
 
   // Computes rook magics from scratch.
-  std::expected<MagicAttacks, Err>
+  MagicAttacks
   compute_rmagics() const override;
 
   // Initializes bishop magics from precomputed |magics|.
-  std::expected<MagicAttacks, Err>
+  MagicAttacks
   from_bmagics(std::span<const std::uint64_t> magics) const override;
 
   // Initializes rook magics from precomputed |magics|.
-  std::expected<MagicAttacks, Err>
+  MagicAttacks
   from_rmagics(std::span<const std::uint64_t> magics) const override;
 };
 
@@ -100,19 +99,19 @@ public:
   }
 
   // Computes bishop magics from scratch.
-  std::expected<MagicAttacks, Err>
+  MagicAttacks
   compute_bmagics() const override;
 
   // Computes rook magics from scratch.
-  std::expected<MagicAttacks, Err>
+  MagicAttacks
   compute_rmagics() const override;
 
   // Initializes bishop magics from precomputed |magics|.
-  std::expected<MagicAttacks, Err>
+  MagicAttacks
   from_bmagics(std::span<const std::uint64_t> magics) const override;
 
   // Initializes rook magics from precomputed |magics|.
-  std::expected<MagicAttacks, Err>
+  MagicAttacks
   from_rmagics(std::span<const std::uint64_t> magics) const override;
 
 private:
@@ -120,19 +119,19 @@ private:
 };
 
 // Computes bishop magics from scratch.
-std::expected<MagicAttacks, Err>
+MagicAttacks
 compute_bmagics();
 
 // Computes rook magics from scratch.
-std::expected<MagicAttacks, Err>
+MagicAttacks
 compute_rmagics();
 
 // Initializes bishop magics from precomputed |magics|.
-std::expected<MagicAttacks, Err>
+MagicAttacks
 from_bmagics(std::span<const std::uint64_t> magics);
 
 // Initializes rook magics from precomputed |magics|.
-std::expected<MagicAttacks, Err>
+MagicAttacks
 from_rmagics(std::span<const std::uint64_t> magics);
 
 } // namespace blunder

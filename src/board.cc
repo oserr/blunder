@@ -378,13 +378,9 @@ Board::register_magics()
   std::call_once(init_flag, []{
     auto bmagics = from_bmagics(kBishopMagics);
     auto rmagics = from_rmagics(kRookMagics);
-    if (not bmagics)
-      throw std::runtime_error("Unable to initialize the bishop magics.");
-    if (not rmagics)
-      throw std::runtime_error("Unable to initialize the rook magics.");
     register_magics(
-        std::make_unique<MagicAttacks>(std::move(*bmagics)),
-        std::make_unique<MagicAttacks>(std::move(*rmagics)));
+        std::make_unique<MagicAttacks>(std::move(bmagics)),
+        std::make_unique<MagicAttacks>(std::move(rmagics)));
   });
 }
 

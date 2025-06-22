@@ -46,41 +46,17 @@ print_magics(
 std::pair<MagicAttacks, MagicAttacks>
 gen_magics()
 {
-  // Handle bishops.
   auto magic_bishops = compute_bmagics();
-  if (not magic_bishops) {
-    std::cerr << "Unable to compute magic attacks for bishops." << std::endl;
-    std::exit(EXIT_FAILURE);
-  }
-
-  // Handle rooks.
   auto magic_rooks = compute_rmagics();
-  if (not magic_rooks) {
-    std::cerr << "Unable to compute magic attacks for rooks." << std::endl;
-    std::exit(EXIT_FAILURE);
-  }
-
-  return std::make_pair(std::move(*magic_bishops), std::move(*magic_rooks));
+  return std::make_pair(std::move(magic_bishops), std::move(magic_rooks));
 }
 
 std::pair<MagicAttacks, MagicAttacks>
 init_magics()
 {
-  // Handle bishops.
   auto magic_bishops = from_bmagics(kBishopMagics);
-  if (not magic_bishops) {
-    std::cerr << "Unable to use precomputed magics for bishops." << std::endl;
-    std::exit(EXIT_FAILURE);
-  }
-
-  // Handle rooks.
   auto magic_rooks = from_rmagics(kRookMagics);
-  if (not magic_rooks) {
-    std::cerr << "Unable to use precomputed magics for rooks." << std::endl;
-    std::exit(EXIT_FAILURE);
-  }
-
-  return std::make_pair(std::move(*magic_bishops), std::move(*magic_rooks));
+  return std::make_pair(std::move(magic_bishops), std::move(magic_rooks));
 }
 
 void
@@ -160,15 +136,20 @@ main(int argc, char** argv)
     return EXIT_FAILURE;
   }
 
-  auto [magic_bishops, magic_rooks] = generated
-    ? gen_magics()
-    : init_magics();
+  try {
+    auto [magic_bishops, magic_rooks] = generated
+      ? gen_magics()
+      : init_magics();
 
-  auto bmagics = magic_bishops.get_magics();
-  auto rmagics = magic_rooks.get_magics();
+    auto bmagics = magic_bishops.get_magics();
+    auto rmagics = magic_rooks.get_magics();
 
-  print_magics(bmagics, rmagics);
-  write_magics(fname, bmagics, rmagics);
+    print_magics(bmagics, rmagics);
+    write_magics(fname, bmagics, rmagics);
+  } catch (std::exception& err) {
+    std::cerr << "Unable to compute the magics: " << err.what() << std::endl;
+    return EXIT_FAILURE;
+  }
 
   return EXIT_SUCCESS;
 }

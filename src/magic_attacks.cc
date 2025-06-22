@@ -4,7 +4,6 @@
 #include <array>
 #include <bit>
 #include <cassert>
-#include <expected>
 #include <format>
 #include <functional>
 #include <iostream>
@@ -29,9 +28,9 @@ get_magic_hash(
   return (blocking.raw() * magic) >> (64 - magic_bits);
 }
 
-using ExpectedMagicResult = std::expected<std::pair<Magic, std::uint32_t>, Err>;
+using MagicResult = std::pair<Magic, std::uint32_t>;
 
-ExpectedMagicResult
+MagicResult
 find_magic(
     std::uint32_t sq,
     std::function<BitBoard(std::uint32_t)> mask_fn,
@@ -43,7 +42,7 @@ find_magic(
   std::uint32_t num_bits = mask.count();
 
   if (num_bits < 5 or num_bits > 12)
-    return std::unexpected(Err::MagicBitsOutOfRange);
+    throw std::domain_error("Mask should have between 5 and 12 bits.");
 
   const auto ncombos = 1u << num_bits;
   constexpr unsigned kMaxCombos = 1u << 12;
@@ -88,10 +87,10 @@ find_magic(
   }
 
   // Unable to find a magic number.
-  return std::unexpected(Err::MagicNotFound);
+  throw std::runtime_error("Unable to find magic number.");
 }
 
-std::expected<MagicAttacks, Err>
+MagicAttacks
 find_all_magics(
     std::function<BitBoard(std::uint32_t)> mask_fn,
     std::function<BitBoard(std::uint32_t, BitBoard)> attacks_fn,
@@ -102,22 +101,19 @@ find_all_magics(
   magics.reserve(64);
 
   for (auto s = 0u; s < 64u; ++s) {
-    auto magic_info = find_magic(s, mask_fn, attacks_fn, magic_fn, loops);
-
-    if (not magic_info)
-      return std::unexpected(magic_info.error());
-
-    magics.push_back(std::move(magic_info->first));
+    auto [magic, ignored] =
+      find_magic(s, mask_fn, attacks_fn, magic_fn, loops);
+    magics.push_back(std::move(magic));
   }
 
   return MagicAttacks(std::move(magics));
 }
 
 // Parallel version of find_all_magics.
-std::expected<MagicAttacks, Err>
+MagicAttacks
 find_all_magics_par(
     par::WorkQ& workq,
-    std::function<ExpectedMagicResult(std::uint64_t)> find_magic_fn)
+    std::function<MagicResult(std::uint64_t)> find_magic_fn)
 {
   auto futs = workq.for_range(64, std::move(find_magic_fn));
 
@@ -130,12 +126,8 @@ find_all_magics_par(
   magics.reserve(64);
 
   for (auto& fut : futs) {
-    auto magic_info = fut.get();
-
-    if (not magic_info)
-      return std::unexpected(magic_info.error());
-
-    magics.emplace_back(std::move(magic_info->first));
+    auto [magic, ignored] = fut.get();
+    magics.emplace_back(std::move(magic));
   }
 
   return MagicAttacks(std::move(magics));
@@ -175,21 +167,21 @@ MagicAttacks::get_attacks(std::uint8_t square, BitBoard blockers) const noexcept
   return attacks[magic_hash];
 }
 
-std::expected<MagicAttacks, Err>
+MagicAttacks
 compute_bmagics()
 {
   auto magic_fn = create_rand_fn();
   return find_all_magics(get_bmask, get_battacks, magic_fn);
 }
 
-std::expected<MagicAttacks, Err>
+MagicAttacks
 compute_rmagics()
 {
   auto magic_fn = create_rand_fn();
   return find_all_magics(get_rmask, get_rattacks, magic_fn);
 }
 
-std::expected<MagicAttacks, Err>
+MagicAttacks
 from_bmagics(std::span<const std::uint64_t> magics)
 {
   assert(magics.size() == 64);
@@ -197,36 +189,36 @@ from_bmagics(std::span<const std::uint64_t> magics)
   return find_all_magics(get_bmask, get_battacks, magic_fn, 1);
 }
 
-std::expected<MagicAttacks, Err>
+MagicAttacks
 from_rmagics(std::span<const std::uint64_t> magics)
 {
   auto magic_fn = [sq=0, magics=magics] mutable { return magics[sq++]; };
   return find_all_magics(get_rmask, get_rattacks, magic_fn, 1);
 }
 
-std::expected<MagicAttacks, Err>
+MagicAttacks
 SimpleMagicComputer::compute_bmagics() const
 { return compute_bmagics(); }
 
-std::expected<MagicAttacks, Err>
+MagicAttacks
 SimpleMagicComputer::compute_rmagics() const
 { return compute_rmagics(); }
 
-std::expected<MagicAttacks, Err>
+MagicAttacks
 SimpleMagicComputer::from_bmagics(std::span<const std::uint64_t> magics) const
 { return from_bmagics(magics); }
 
-std::expected<MagicAttacks, Err>
+MagicAttacks
 SimpleMagicComputer::from_rmagics(std::span<const std::uint64_t> magics) const
 { return from_rmagics(magics); }
 
-std::expected<MagicAttacks, Err>
+MagicAttacks
 ParMagicComputer::compute_bmagics() const
 {
   auto fn = [
     mask_fn=get_bmask,
     attacks_fn=get_battacks
-  ](auto square) -> ExpectedMagicResult
+  ](auto square) -> MagicResult
   {
     // TODO: avoid creating the random generating function every time. Ideally,
     // we should create one each for every worker in the thread pool. For now,
@@ -238,13 +230,13 @@ ParMagicComputer::compute_bmagics() const
   return find_all_magics_par(*workq, std::move(fn));
 }
 
-std::expected<MagicAttacks, Err>
+MagicAttacks
 ParMagicComputer::compute_rmagics() const
 {
   auto fn = [
     mask_fn=get_rmask,
     attacks_fn=get_rattacks
-  ](auto square) -> ExpectedMagicResult
+  ](auto square) -> MagicResult
   {
     // TODO: avoid creating the random generating function every time. Ideally,
     // we should create one each for every worker in the thread pool. For now,
@@ -256,7 +248,7 @@ ParMagicComputer::compute_rmagics() const
   return find_all_magics_par(*workq, std::move(fn));
 }
 
-std::expected<MagicAttacks, Err>
+MagicAttacks
 ParMagicComputer::from_bmagics(std::span<const std::uint64_t> magics) const
 {
   assert(magics.size() == 64);
@@ -265,7 +257,7 @@ ParMagicComputer::from_bmagics(std::span<const std::uint64_t> magics) const
     mask_fn=get_bmask,
     attacks_fn=get_battacks,
     magics=magics
-  ](auto square) -> ExpectedMagicResult
+  ](auto square) -> MagicResult
   {
     const auto m = magics[square];
     auto magic_fn = [m=m]() -> std::uint64_t { return m; };
@@ -275,7 +267,7 @@ ParMagicComputer::from_bmagics(std::span<const std::uint64_t> magics) const
   return find_all_magics_par(*workq, std::move(fn));
 }
 
-std::expected<MagicAttacks, Err>
+MagicAttacks
 ParMagicComputer::from_rmagics(std::span<const std::uint64_t> magics) const
 {
   assert(magics.size() == 64);
@@ -284,7 +276,7 @@ ParMagicComputer::from_rmagics(std::span<const std::uint64_t> magics) const
     mask_fn=get_rmask,
     attacks_fn=get_rattacks,
     magics=magics
-  ](auto square) -> ExpectedMagicResult
+  ](auto square) -> MagicResult
   {
     const auto m = magics[square];
     auto magic_fn = [m=m]() -> std::uint64_t { return m; };

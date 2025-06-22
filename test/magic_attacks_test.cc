@@ -23,8 +23,7 @@ protected:
   {
     if (not bmagics) {
       auto result = from_bmagics(kBishopMagics);
-      ASSERT_TRUE(result) << "Unable to initialize bishop magics.";
-      bmagics = std::make_unique<MagicAttacks>(std::move(*result));
+      bmagics = std::make_unique<MagicAttacks>(std::move(result));
     }
   }
 };
@@ -69,8 +68,7 @@ protected:
   {
     if (not rmagics) {
       auto result = from_rmagics(kRookMagics);
-      ASSERT_TRUE(result) << "Unable to initialize bishop magics.";
-      rmagics = std::make_unique<MagicAttacks>(std::move(*result));
+      rmagics = std::make_unique<MagicAttacks>(std::move(result));
     }
   }
 };
