@@ -78,8 +78,8 @@ get_simple_attacks(
   while (to_squares) {
     auto [to_square, attacked] = to_squares.index_bb_and_clear();
     auto to_piece = other.find_type(attacked);
-    assert(to_piece.type() != Type::None);
-    moves.emplace_back(piece, from_square, to_piece, to_square);
+    assert(to_piece.has_value());
+    moves.emplace_back(piece, from_square, *to_piece, to_square);
   }
 }
 
@@ -187,8 +187,9 @@ attack_with_pawns(
 
   while (pawn_moves) {
     auto [to_square, to_bb] = pawn_moves.index_bb_and_clear();
-    auto to_piece = board.other().find_type(to_bb);
-    assert(not to_piece.is_none());
+    auto to_piece_opt = board.other().find_type(to_bb);
+    assert(to_piece_opt.has_value());
+    auto to_piece = *to_piece_opt;
     auto from_square = from_fn(to_square);
 
     if (not is_promo_fn(to_square))
@@ -518,7 +519,7 @@ Board::compute_game_state() noexcept
   }
 
   // Draw by insufficient material.
-  if (not enough_material()) {
+  if (not is_enough_material()) {
     game_state = GameState::Draw;
     return;
   }
@@ -559,8 +560,6 @@ Board&
 Board::quick_update(Move mv)
 {
   auto from_piece = mv.piece();
-  assert(from_piece.type() != Type::None);
-
   auto from_square = mv.from();
   auto to_square = mv.to();
 
@@ -576,13 +575,13 @@ Board::quick_update(Move mv)
 
   // En passant capture square is different from square where piece is moving.
   if (mv.is_enpassant())
-    bb_other.clear_bit(mv.capture(), mv.passant());
+    bb_other.clear_bit(*mv.capture(), mv.passant());
   else if (mv.is_capture())
-    bb_other.clear_bit(mv.capture(), to_square);
+    bb_other.clear_bit(*mv.capture(), to_square);
 
   if (mv.is_promo()) {
     bb_mine.clear_bit(Piece::pawn(), to_square);
-    bb_mine.set_bit(mv.promoted(), to_square);
+    bb_mine.set_bit(*mv.promoted(), to_square);
   }
 
   if (mv.is_castling()) {
@@ -645,7 +644,7 @@ Board::quick_update(Move mv)
     }
   }
   // Remove castling right for specific rook if the rook is captured.
-  else if (mv.capture().type() == Type::Rook) {
+  else if (mv.is_capture(Type::Rook)) {
     if (is_white_next()) {
       if (to_square == 56)
         bq_castle = false;
@@ -659,7 +658,7 @@ Board::quick_update(Move mv)
       wk_castle = false;
   }
 
-  bb_mine.swap(bb_other);
+  std::swap(bb_mine, bb_other);
   next_to_move = is_white_next() ? Color::Black : Color::White;
 
   set_attacked_by_mine();
@@ -672,7 +671,7 @@ Board&
 Board::update(Move mv)
 {
   quick_update(mv);
-  compute_game_state(mv.capture().is_king());
+  compute_game_state(mv.is_capture(Type::King));
   prev_moves.push_back(mv);
   return *this;
 }
@@ -849,7 +848,7 @@ Board::set_attacked_by_mine() noexcept
 }
 
 bool
-Board::enough_material() const noexcept
+Board::is_enough_material() const noexcept
 {
   assert(mine().king().count() == 1);
   assert(other().king().count() == 1);
@@ -864,11 +863,11 @@ Board::enough_material() const noexcept
   if (my_count == 1 and other_count == 1)
     return false;
 
-  if (my_count <= 2 and other_count <= 1)
-    return not (mine().bishop().count() == 1
-        or mine().knight().count() == 1) and
-        not (other().bishop().count() == 1
-        or other().knight().count() == 1);
+  if (my_count == 2 and other_count == 1)
+    return mine().bishop().count() == 0 and mine().knight().count() == 1;
+
+  if (my_count == 1 and other_count == 2)
+    return other().bishop().count() == 0 and other().knight().count() == 0;
 
   return true;
 }

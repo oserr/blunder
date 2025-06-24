@@ -5,18 +5,6 @@
 
 namespace blunder {
 
-bool
-Move::eq(Move mv) const noexcept
-{
-  return piece() == mv.piece()
-     and capture() == mv.capture()
-     and from() == mv.from()
-     and to() == mv.to()
-     and type() == mv.type()
-     and passant() == mv.passant()
-     and promoted() == mv.promoted();
-}
-
 std::string
 Move::str() const
 {
@@ -51,12 +39,12 @@ Move::str() const
 
   if (is_capture()) {
     buff += ", !";
-    buff += capture().letter();
+    buff += to_piece->letter();
   }
 
   if (is_promo()) {
     buff += ", ^";
-    buff += promoted().letter();
+    buff += promo_piece->letter();
   }
 
   buff += '}';

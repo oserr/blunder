@@ -19,7 +19,6 @@ enum struct Type : std::uint8_t {
   Bishop,
   Knight,
   Pawn,
-  None
 };
 
 inline unsigned
@@ -30,9 +29,6 @@ class Piece {
 public:
   Piece(Type type) noexcept
     : ptype(type) {}
-
-  Piece() noexcept
-    : ptype(Type::None) {}
 
   //-------------
   // Copy control.
@@ -63,7 +59,7 @@ public:
   // Returns the ascii letter initial of the piece. Upercase for white and lower
   // case for black.
   std::uint8_t
-  letter(Color color = Color::White) noexcept;
+  letter(Color color = Color::White) const noexcept;
 
   // Returns true if other is the same piece type.
   bool
@@ -102,10 +98,6 @@ public:
   is_pawn() const noexcept
   { return is_type(Type::Pawn); }
 
-  bool
-  is_none() const noexcept
-  { return is_type(Type::None); }
-
   // Computes the hash of this piece.
   size_t
   hsh() const noexcept
@@ -138,10 +130,6 @@ public:
   static Piece
   pawn() noexcept
   { return Piece(Type::Pawn); }
-
-  static Piece
-  none() noexcept
-  { return Piece(Type::None); }
 
 private:
   Type ptype;

@@ -26,7 +26,7 @@ enum class MoveType : std::uint8_t {
 class Move {
 public:
   // Initializes all fields.
-  Move() = default;
+  Move() = delete;
 
   // ------------------------------------------------------------------------
   // Most common scenario for a move, i.e. we move a piece from one square to
@@ -164,10 +164,6 @@ public:
   std::string
   str() const;
 
-  // Returns true if both moves are equal.
-  bool
-  eq(Move mv) const noexcept;
-
   //-----------
   // Accessors.
   //-----------
@@ -176,7 +172,7 @@ public:
   piece() const noexcept
   { return from_piece; }
 
-  Piece
+  std::optional<Piece>
   capture() const noexcept
   { return to_piece; }
 
@@ -192,7 +188,7 @@ public:
   type() const noexcept
   { return move_type; }
 
-  Piece
+  std::optional<Piece>
   promoted() const noexcept
   { return promo_piece; }
 
@@ -204,6 +200,10 @@ public:
   bool
   is_promo() const noexcept
   { return type() == MoveType::Promo; }
+
+  bool
+  is_promoted_to(Type piece_type) const noexcept
+  { return promo_piece.has_value() and promo_piece->type() == piece_type; }
 
   bool
   is_enpassant() const noexcept
@@ -223,7 +223,11 @@ public:
 
   bool
   is_capture() const noexcept
-  { return capture().type() != Type::None; }
+  { return to_piece.has_value(); }
+
+  bool
+  is_capture(Type piece_type) const noexcept
+  { return to_piece.has_value() and to_piece->type() == piece_type; }
 
   // If this is a castling move, returns a pair of (from, to) with source and
   // destination squares for the rook.
@@ -244,6 +248,9 @@ public:
       promo_piece);
   }
 
+  // Default equality comparison.
+  friend bool operator==(const Move&, const Move&) = default;
+
 private:
   // The color of the piece moving is not encoded as a member because moves are
   // done in the context of a Board and a game, and the color can be determined
@@ -251,8 +258,8 @@ private:
 
   // Represents the piece being moved. If the move does not represent an attack,
   // then |capture| is set to none.
-  Piece from_piece = Piece::none();
-  Piece to_piece = Piece::none();
+  Piece from_piece;
+  std::optional<Piece> to_piece;
 
   // The source and destination squares.
   std::uint8_t from_square = 0;
@@ -267,15 +274,11 @@ private:
   std::uint8_t passant_square = 0;
 
   // For pawn promotions, the promoted piece type.
-  Piece promo_piece = Piece::none();
+  std::optional<Piece> promo_piece;
 
   // TODO: add one more member with a numeric ID to represent the move code
   // for use with the neural network.
 };
-
-inline bool
-operator==(Move left, Move right) noexcept
-{ return left.eq(right); }
 
 inline std::ostream&
 operator<<(std::ostream& os, Move mv)
