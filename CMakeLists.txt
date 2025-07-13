@@ -44,7 +44,7 @@ FetchContent_MakeAvailable(googletest)
 FetchContent_Declare(
   par
   GIT_REPOSITORY https://github.com/oserr/par.git
-  GIT_TAG 68028cf34dc5271c055f5342c08d28c5d3aedcf7)
+  GIT_TAG c6e36b4bd3a71e989311117896fd111b95383f30)
 FetchContent_MakeAvailable(par)
 
 add_library(blunder STATIC
