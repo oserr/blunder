@@ -8,6 +8,7 @@
 #include <expected>
 #include <functional>
 #include <iostream>
+#include <optional>
 #include <tuple>
 #include <utility>
 
@@ -129,7 +130,7 @@ parse_pieces(std::string_view field) noexcept
         continue;
       }
 
-      Piece piece;
+      std::optional<Piece> piece;
 
       switch (to_lower(letter)) {
         case 'k':
@@ -155,9 +156,9 @@ parse_pieces(std::string_view field) noexcept
       }
 
       if (is_upper(letter))
-        white.set_bit(piece, square);
+        white.set_bit(*piece, square);
       else
-        black.set_bit(piece, square);
+        black.set_bit(*piece, square);
 
       ++square;
     }

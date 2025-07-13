@@ -6,7 +6,7 @@
 namespace blunder {
 
 std::uint8_t
-Piece::letter(Color color) noexcept
+Piece::letter(Color color) const noexcept
 {
   unsigned char letter = '?';
 

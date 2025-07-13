@@ -136,7 +136,7 @@ TEST_F(ReadFenTest, PawnsAndKing)
   ASSERT_TRUE(board);
 
   auto white = board->white();
-  EXPECT_EQ(white.full_set().count(), white.pawn().count() + 1);
+  EXPECT_EQ(white.all().count(), white.pawn().count() + 1);
   EXPECT_THAT(white.king(), EqualToSq(SqList{Sq::h3}));
   EXPECT_THAT(white.pawn(),
       EqualToSq(SqList{Sq::a3, Sq::b4, Sq::d5, Sq::e4, Sq::f3, Sq::h4}));
@@ -144,7 +144,7 @@ TEST_F(ReadFenTest, PawnsAndKing)
   EXPECT_FALSE(board->has_white_queen_castle());
 
   auto black = board->black();
-  EXPECT_EQ(black.full_set().count(), black.pawn().count() + 1);
+  EXPECT_EQ(black.all().count(), black.pawn().count() + 1);
   EXPECT_THAT(black.king(), EqualToSq(SqList{Sq::f7}));
   EXPECT_THAT(black.pawn(),
       EqualToSq(SqList{Sq::a4, Sq::b5, Sq::d6, Sq::e5, Sq::f4, Sq::h5}));

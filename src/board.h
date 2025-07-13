@@ -79,12 +79,12 @@ public:
   // Returns a bitboard with all the pieces for the player moving next.
   BitBoard
   all_mine() const noexcept
-  { return mine().full_set(); }
+  { return mine().all(); }
 
   // Returns a bitboard with all the pieces for the player not moving next.
   BitBoard
   all_other() const noexcept
-  { return other().full_set(); }
+  { return other().all(); }
 
   // Returns a bitboard with all the pieces both players.
   BitBoard
@@ -427,7 +427,7 @@ private:
   // - king + knight vs king
   // - king + bishop vs king
   bool
-  enough_material() const noexcept;
+  is_enough_material() const noexcept;
 
   // Returns true if the player moving next is in check.
   bool

@@ -108,14 +108,12 @@ encode_move(Move mv)
   EncodedMove mv_code(from_row, from_col);
 
   switch (piece.type()) {
-    case Type::None:
-      throw std::invalid_argument("Move should have a piece.");
     case Type::Knight:
       mv_code.code = 56 + encode_knight_move(row_diff, col_diff);
       return mv_code;
     case Type::Pawn:
-      if (mv.is_promo() and not mv.promoted().is_queen()) {
-        mv_code.code = 64 + encode_under_promo(col_diff, mv.promoted());
+      if (mv.is_promo() and not mv.is_promoted_to(Type::Queen)) {
+        mv_code.code = 64 + encode_under_promo(col_diff, *mv.promoted());
         return mv_code;
       }
       [[fallthrough]];

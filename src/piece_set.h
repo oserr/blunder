@@ -3,8 +3,10 @@
 #include <array>
 #include <cassert>
 #include <cstdint>
+#include <optional>
 
 #include "bitboard.h"
+#include "color.h"
 #include "pieces.h"
 
 namespace blunder {
@@ -16,11 +18,7 @@ public:
   //----------
 
   BitBoard
-  get(Piece piece) const noexcept
-  {
-    assert(piece.type() != Type::None and "PieceSet does not contain None.");
-    return pieces[piece.uint()];
-  }
+  get(Piece piece) const;
 
   BitBoard
   get(Type type) const noexcept
@@ -28,30 +26,30 @@ public:
 
   BitBoard
   king() const noexcept
-  { return get(Type::King); }
+  { return kings; }
 
   BitBoard
   queen() const noexcept
-  { return get(Type::Queen); }
+  { return queens; }
 
   BitBoard
   rook() const noexcept
-  { return get(Type::Rook); }
+  { return rooks; }
 
   BitBoard
   bishop() const noexcept
-  { return get(Type::Bishop); }
+  { return bishops; }
 
   BitBoard
   knight() const noexcept
-  { return get(Type::Knight); }
+  { return knights; }
 
   BitBoard
   pawn() const noexcept
-  { return get(Type::Pawn); }
+  { return pawns; }
 
   BitBoard
-  full_set() const noexcept
+  all() const noexcept
   { return all_bits; }
 
   //----------
@@ -59,36 +57,21 @@ public:
   //----------
 
   PieceSet&
-  set_bit(Type type, unsigned index) noexcept
-  {
-    get_mut(type).set_bit(index);
-    all_bits.set_bit(index);
-    return *this;
-  }
+  set_bit(Type type, unsigned index) noexcept;
 
   PieceSet&
   set_bit(Piece piece, unsigned index) noexcept
   { return set_bit(piece.type(), index); }
 
   PieceSet&
-  clear_bit(Type type, unsigned index) noexcept
-  {
-    get_mut(type).clear_bit(index);
-    all_bits.clear_bit(index);
-    return *this;
-  }
+  clear_bit(Type type, unsigned index) noexcept;
 
   PieceSet&
   clear_bit(Piece piece, unsigned index) noexcept
   { return clear_bit(piece.type(), index); }
 
   PieceSet&
-  update_bit(Type type, unsigned from, unsigned to)
-  {
-    get_mut(type).update_bit(from, to);
-    all_bits.update_bit(from, to);
-    return *this;
-  }
+  update_bit(Type type, unsigned from, unsigned to);
 
   PieceSet&
   update_bit(Piece piece, unsigned from, unsigned to)
@@ -99,33 +82,9 @@ public:
   PieceSet
   flip() const noexcept;
 
-  //----------
-  // Iterators
-  //----------
-
-  auto
-  begin() noexcept
-  { return pieces.begin(); }
-
-  auto
-  end() noexcept
-  { return pieces.end(); }
-
-  auto
-  begin() const noexcept
-  { return pieces.cbegin(); }
-
-  auto
-  end() const noexcept
-  { return pieces.cend(); }
-
-  bool
-  eq(const PieceSet& other) const noexcept
-  { return pieces == other.pieces and all_bits == other.all_bits; }
-
   // Given a bitboard with one bit set, finds the piece type for the given
   // bitboard.
-  Piece
+  std::optional<Piece>
   find_type(BitBoard bb) const noexcept;
 
   // Initializes a PieceSet with the full set of white pieces positioned for a
@@ -144,38 +103,26 @@ public:
   bool
   is_valid() const noexcept;
 
-  PieceSet&
-  swap(PieceSet& other) noexcept
-  {
-    std::swap(pieces, other.pieces);
-    all_bits.swap(other.all_bits);
-    return *this;
-  }
+  // Default equality operators.
+  friend bool operator==(const PieceSet&, const PieceSet&) = default;
 
 private:
-
   BitBoard&
-  get_mut(Type type) noexcept
-  {
-    assert(type != Type::None and "Cannot get None.");
-    return pieces[uint(type)];
-  }
+  get_mut(Type type) noexcept;
 
-  // BitBoards representing the pieces for one side.
-  // 0 - king
-  // 1 - queen
-  // 2 - rook
-  // 3 - bishop
-  // 4 - knight
-  // 5 - pawns
-  std::array<BitBoard, 6> pieces;
-
-  // The bitboard containing all of the pieces.
+  BitBoard kings;
+  BitBoard queens;
+  BitBoard rooks;
+  BitBoard bishops;
+  BitBoard knights;
+  BitBoard pawns;
+  // Contains all the pieces.
   BitBoard all_bits;
+  Color color;
+  // True if the king has castling right.
+  bool king_castle;
+  // True if the queen has castling right.
+  bool queen_castle;
 };
-
-inline bool
-operator==(const PieceSet& left, const PieceSet& right) noexcept
-{ return left.eq(right); }
 
 } // namespace blunder
